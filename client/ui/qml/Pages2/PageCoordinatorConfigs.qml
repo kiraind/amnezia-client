@@ -75,7 +75,7 @@ PageType {
                 Layout.leftMargin: 16
 
                 headerText: qsTr("Аккаунт VPN")
-                descriptionText: "@" + CoordinatorController.username
+                descriptionText: CoordinatorController.username
             }
 
             WarningType {

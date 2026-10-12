@@ -67,7 +67,15 @@ QString CoordinatorController::baseUrl() const
 
 QString CoordinatorController::username() const
 {
-    return m_appSettingsRepository->coordinatorUser().value("username").toString();
+    // username may be null for Telegram users without one; tgId is the identity then
+    const QJsonObject user = m_appSettingsRepository->coordinatorUser();
+    const QString name = user.value("username").toString();
+    if (!name.isEmpty()) {
+        return QStringLiteral("@") + name;
+    }
+    const QJsonValue tgId = user.value("tgId");
+    const QString id = tgId.isString() ? tgId.toString() : QString::number(tgId.toInteger());
+    return tgId.isUndefined() || tgId.isNull() ? QString() : QStringLiteral("Telegram ID %1").arg(id);
 }
 
 void CoordinatorController::start()

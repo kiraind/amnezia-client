@@ -34,7 +34,7 @@ public:
 
     bool isLoggedIn() const;
     QString baseUrl() const;
-    QString username() const;
+    QString username() const; // "@name", or "Telegram ID <id>" when the user has no username
 
     // Account
     void login(const QString &baseUrl, const QString &code);
