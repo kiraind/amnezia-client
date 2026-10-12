@@ -147,6 +147,8 @@ PageType {
             BasicButtonType {
                 id: checkUpdatesButton
 
+                visible: IsAppUpdatesEnabled
+
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: 8
                 Layout.bottomMargin: 16

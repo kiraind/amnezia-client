@@ -270,7 +270,6 @@ PageType {
 
     property list<QtObject> variants: [
         coordinatorLogin,
-        backupRestore,
         fileOpen,
         qrScan,
         restorePurchases,

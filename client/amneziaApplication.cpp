@@ -147,6 +147,7 @@ void AmneziaApplication::init()
 #else
     m_engine->rootContext()->setContextProperty("IsMacOsNeBuild", false);
 #endif
+    m_engine->rootContext()->setContextProperty("IsAppUpdatesEnabled", bool(CLIENT_ENABLE_APP_UPDATES));
 
 #ifdef Q_OS_IOS
     m_engine->rootContext()->setContextProperty("IosContextMenu", new IosContextMenu(this));

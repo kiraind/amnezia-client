@@ -59,6 +59,7 @@ if(NOT CLIENT_NOTIFICATION_IDENTIFIER)
     set(CLIENT_NOTIFICATION_IDENTIFIER "${CLIENT_TS_PREFIX}" CACHE STRING "Local notification request identifier")
 endif()
 
+# Off in this fork: upstream updates come from Amnezia's gateway and would offer the official app
 if(NOT DEFINED CLIENT_ENABLE_APP_UPDATES)
-    set(CLIENT_ENABLE_APP_UPDATES 1)
+    set(CLIENT_ENABLE_APP_UPDATES 0)
 endif()
