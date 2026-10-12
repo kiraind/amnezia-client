@@ -55,11 +55,19 @@ endif()
 
 set(QT_BUILD_TOOLS_WHEN_CROSS_COMPILING ON)
 
+# Branding (app/service names etc.) is needed here already for the macOS service group and by
+# cmake/CPack.cmake; client/CMakeLists.txt includes it again (the defaults are idempotent).
+include(${CMAKE_CURRENT_SOURCE_DIR}/client/cmake/clientBrandingDefaults.cmake)
+
+# macOS group the service runs as (launchd plist GroupName) and that PF lets through;
+# per-brand so uninstalling one client doesn't delete the other's group
+string(TOLOWER "${CLIENT_APPLICATION_NAME}" AMN_SERVICE_GROUP)
+
 if(APPLE AND NOT IOS)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(AMN_PF_RULE_IDENTITY "user { root }")
     else()
-        set(AMN_PF_RULE_IDENTITY "group { amnvpn }")
+        set(AMN_PF_RULE_IDENTITY "group { ${AMN_SERVICE_GROUP} }")
     endif()
 
     configure_file(

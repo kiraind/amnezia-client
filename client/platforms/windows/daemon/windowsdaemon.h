@@ -13,8 +13,10 @@
 #include "windowssplittunnel.h"
 #include "windowstunnelservice.h"
 #include "wireguardutilswindows.h"
+#include "version.h"
 
-#define TUNNEL_SERVICE_NAME L"AmneziaWGTunnel$AmneziaVPN"
+// "AmneziaWGTunnel$<interface>", interface = branded app name (see WireguardUtilsWindows::s_interfaceName)
+#define TUNNEL_SERVICE_NAME L"AmneziaWGTunnel$" APPLICATION_NAME
 
 class WindowsDaemon final : public Daemon {
   Q_DISABLE_COPY_MOVE(WindowsDaemon)

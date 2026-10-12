@@ -4,6 +4,13 @@ function appName()
     return installer.value("Name")
 }
 
+// user-visible name (CPACK_IFW_PACKAGE_TITLE), used for shortcuts
+function appDisplayName()
+{
+    var title = installer.value("Title");
+    return title ? title : appName();
+}
+
 function serviceName()
 {
     return (appName() + "-service")
@@ -64,12 +71,12 @@ Component.prototype.createOperations = function()
     if (runningOnWindows()) {
 
         component.addOperation("CreateShortcut", "@TargetDir@/" + appExecutableFileName(),
-                               QDesktopServices.storageLocation(QDesktopServices.DesktopLocation) + "/" + appName() + ".lnk",
+                               QDesktopServices.storageLocation(QDesktopServices.DesktopLocation) + "/" + appDisplayName() + ".lnk",
                                "workingDirectory=@TargetDir@", "iconPath=@TargetDir@\\" + appExecutableFileName(), "iconId=0");
 
 
         component.addElevatedOperation("CreateShortcut", "@TargetDir@/" + appExecutableFileName(),
-                                       installer.value("AllUsersStartMenuProgramsPath") + "/" + appName() + ".lnk",
+                                       installer.value("AllUsersStartMenuProgramsPath") + "/" + appDisplayName() + ".lnk",
                                        "workingDirectory=@TargetDir@", "iconPath=@TargetDir@\\" + appExecutableFileName(), "iconId=0");
 
         if (!vcRuntimeIsInstalled()) {

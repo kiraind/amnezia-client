@@ -23,7 +23,7 @@ SystemTrayNotificationHandler::SystemTrayNotificationHandler(QObject* parent) :
     , m_systemTrayIcon(parent)
 #endif
 {
-    m_trayActionShow =  m_menu.addAction(QIcon(":/images/tray/application.png"), tr("Show") + " " + APPLICATION_NAME, this, [this](){
+    m_trayActionShow =  m_menu.addAction(QIcon(":/images/tray/application.png"), tr("Show") + " " + QString::fromUtf8(DISPLAY_NAME), this, [this](){
         emit raiseRequested();
     });
     m_menu.addSeparator();
@@ -38,7 +38,7 @@ SystemTrayNotificationHandler::SystemTrayNotificationHandler(QObject* parent) :
 
     // Quit action: disconnect VPN first on macOS NE, else quit directly
     m_trayActionQuit = m_menu.addAction(QIcon(":/images/tray/cancel.png"),
-                                       tr("Quit") + " " + APPLICATION_NAME,
+                                       tr("Quit") + " " + QString::fromUtf8(DISPLAY_NAME),
                                        this,
                                        [&](){ qApp->quit(); });
 
@@ -49,6 +49,7 @@ SystemTrayNotificationHandler::SystemTrayNotificationHandler(QObject* parent) :
     m_statusIcon = new MacOSStatusIcon(this);
     m_statusIcon->setMenu(&m_menu);
 #else
+    m_systemTrayIcon.setToolTip(QString::fromUtf8(DISPLAY_NAME));
     m_systemTrayIcon.show();
     connect(&m_systemTrayIcon, &QSystemTrayIcon::activated, this,
             &SystemTrayNotificationHandler::onTrayActivated);
@@ -72,11 +73,11 @@ void SystemTrayNotificationHandler::setConnectionState(Vpn::ConnectionState stat
 
 void SystemTrayNotificationHandler::onTranslationsUpdated()
 {
-    m_trayActionShow->setText(tr("Show") + " " + APPLICATION_NAME);
+    m_trayActionShow->setText(tr("Show") + " " + QString::fromUtf8(DISPLAY_NAME));
     m_trayActionConnect->setText(tr("Connect"));
     m_trayActionDisconnect->setText(tr("Disconnect"));
     m_trayActionVisitWebSite->setText(tr("Visit Website"));
-    m_trayActionQuit->setText(tr("Quit")+ " " + APPLICATION_NAME);
+    m_trayActionQuit->setText(tr("Quit") + " " + QString::fromUtf8(DISPLAY_NAME));
 }
 
 void SystemTrayNotificationHandler::updateWebsiteUrl(const QString &newWebsiteUrl) {

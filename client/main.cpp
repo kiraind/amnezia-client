@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 
     app.setApplicationName(APPLICATION_NAME);
     app.setOrganizationName(ORGANIZATION_NAME);
-    app.setApplicationDisplayName(APPLICATION_NAME);
+    app.setApplicationDisplayName(QString::fromUtf8(DISPLAY_NAME));
 
     app.loadFonts();
 

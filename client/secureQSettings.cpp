@@ -1,4 +1,5 @@
 #include "secureQSettings.h"
+#include "version.h"
 
 #include "core/utils/utilities.h"
 #include "cryptoUtils.h"
@@ -18,7 +19,8 @@ namespace {
     constexpr const char *settingsKeyTag = "settingsKeyTag";
     constexpr const char *settingsIvTag = "settingsIvTag";
 #ifndef CLIENT_KEYCHAIN_NAME_STR
-#define CLIENT_KEYCHAIN_NAME_STR "AmneziaVPN-Keychain"
+// same default as CLIENT_KEYCHAIN_NAME in branding/common.cmake (targets that do not pass the define, e.g. the service)
+#define CLIENT_KEYCHAIN_NAME_STR APPLICATION_NAME "-Keychain"
 #endif
     constexpr const char *keyChainName = CLIENT_KEYCHAIN_NAME_STR;
 }

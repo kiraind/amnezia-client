@@ -12,5 +12,8 @@
 #define APPLICATION_NAME        "@CLIENT_APPLICATION_NAME@"
 #define SERVICE_NAME            "@CLIENT_SERVICE_NAME@"
 #define ORGANIZATION_NAME       "@CLIENT_ORGANIZATION_NAME@"
+// User-visible application name (may be non-ASCII); emitted as UTF-8 byte escapes so it
+// survives compilers that do not read sources as UTF-8 (MSVC without /utf-8)
+#define DISPLAY_NAME            "@CLIENT_DISPLAY_NAME_CSTR@"
 
 #endif  // VERSION_H

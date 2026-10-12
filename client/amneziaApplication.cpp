@@ -264,7 +264,7 @@ void AmneziaApplication::loadFonts()
 
 bool AmneziaApplication::parseCommands()
 {
-    m_parser.setApplicationDescription(APPLICATION_NAME);
+    m_parser.setApplicationDescription(QString::fromUtf8(DISPLAY_NAME));
     m_parser.addHelpOption();
     m_parser.addVersionOption();
 

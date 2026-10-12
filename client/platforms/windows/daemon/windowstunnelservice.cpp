@@ -14,6 +14,7 @@
 #include "platforms/windows/windowscommons.h"
 #include "platforms/windows/windowsutils.h"
 #include "windowsdaemon.h"
+#include "version.h"
 
 #define TUNNEL_NAMED_PIPE \
   "\\\\."                 \
@@ -148,7 +149,7 @@ bool WindowsTunnelService::start(const QString& configData) {
 
   logger.debug() << "Service:" << qApp->applicationFilePath();
 
-  service = CreateService(scm, TUNNEL_SERVICE_NAME, L"Amnezia VPN (tunnel)",
+  service = CreateService(scm, TUNNEL_SERVICE_NAME, L"" APPLICATION_NAME L" (tunnel)",
                           SERVICE_ALL_ACCESS, SERVICE_WIN32_OWN_PROCESS,
                           SERVICE_DEMAND_START, SERVICE_ERROR_NORMAL,
                           (const wchar_t*)serviceCmdline.utf16(), nullptr, 0,
@@ -159,7 +160,7 @@ bool WindowsTunnelService::start(const QString& configData) {
   }
 
   SERVICE_DESCRIPTION sd = {
-      (wchar_t*)L"Manages the Amnezia VPN tunnel connection"};
+      (wchar_t*)L"Manages the " APPLICATION_NAME L" tunnel connection"};
 
   if (!ChangeServiceConfig2(service, SERVICE_CONFIG_DESCRIPTION, &sd)) {
     WindowsUtils::windowsLog(

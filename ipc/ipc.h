@@ -7,8 +7,10 @@
 #include <QSet>
 
 #include "../client/core/utils/utilities.h"
+#include "version.h"
 
-#define IPC_SERVICE_URL "local:AmneziaVpnIpcInterface"
+// Derived from the branded app name so a side-by-side install of another build gets its own socket/pipe
+#define IPC_SERVICE_URL "local:" APPLICATION_NAME "IpcInterface"
 
 namespace amnezia {
 

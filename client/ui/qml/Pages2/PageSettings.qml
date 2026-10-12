@@ -190,7 +190,7 @@ PageType {
     QtObject {
         id: about
 
-        property string title: qsTr("About AmneziaVPN")
+        property string title: qsTr("О приложении %1").arg(Qt.application.displayName)
         readonly property string leftImagePath: "qrc:/images/controls/amnezia.svg"
         property bool isVisible: true
         readonly property var clickedHandler: function() {
