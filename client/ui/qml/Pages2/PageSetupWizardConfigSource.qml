@@ -239,41 +239,12 @@ PageType {
             }
         }
 
-        footer: ColumnLayout {
-            width: listView.width
-
-            BasicButtonType {
-                id: siteLink2
-                Layout.topMargin: 24
-                Layout.bottomMargin: 16
-                Layout.alignment: Qt.AlignHCenter
-                implicitHeight: 32
-
-                visible: Qt.platform.os !== "ios" && !IsMacOsNeBuild
-
-                defaultColor: AmneziaStyle.color.transparent
-                hoveredColor: AmneziaStyle.color.translucentWhite
-                pressedColor: AmneziaStyle.color.sheerWhite
-                disabledColor: AmneziaStyle.color.mutedGray
-                textColor: AmneziaStyle.color.goldenApricot
-
-                text: qsTr("Site Amnezia")
-
-                rightImageSource: "qrc:/images/controls/external-link.svg"
-
-                clickedFunc: function() {
-                    Qt.openUrlExternally(LanguageUiController.getCurrentSiteUrl())
-                }
-            }
-        }
     }
 
     property list<QtObject> variants: [
         coordinatorLogin,
         fileOpen,
-        qrScan,
-        restorePurchases,
-        siteLink
+        qrScan
     ]
     
     QtObject {
@@ -351,34 +322,6 @@ PageType {
             if (Qt.platform.os === "ios") {
                 PageController.goToPage(PageEnum.PageSetupWizardQrReader)
             }
-        }
-    }
-
-    QtObject {
-        id: restorePurchases
-
-        property bool featuredAmneziaConnection: false
-        property string title: qsTr("Restore purchases")
-        property string description: qsTr("")
-        property string imageSource: "qrc:/images/controls/refresh-cw.svg"
-        property bool isVisible: Qt.platform.os === "ios" || IsMacOsNeBuild || IsPlayBuild
-        property var handler: function() {
-            PageController.showBusyIndicator(true)
-            SubscriptionUiController.restoreServiceFromStore()
-            PageController.showBusyIndicator(false)
-        }
-    }
-
-    QtObject {
-        id: siteLink
-
-        property bool featuredAmneziaConnection: false
-        property string title: qsTr("I have nothing")
-        property string description: qsTr("")
-        property string imageSource: "qrc:/images/controls/help-circle.svg"
-        property bool isVisible: PageController.isStartPageVisible() && Qt.platform.os !== "ios" && !IsMacOsNeBuild
-        property var handler: function() {
-            Qt.openUrlExternally(LanguageUiController.getCurrentSiteUrl())
         }
     }
 }
