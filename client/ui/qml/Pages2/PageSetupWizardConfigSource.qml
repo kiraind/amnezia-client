@@ -271,6 +271,7 @@ PageType {
     property list<QtObject> variants: [
         amneziaVpn,
         selfHostVpn,
+        coordinatorLogin,
         backupRestore,
         fileOpen,
         qrScan,
@@ -306,6 +307,23 @@ PageType {
         property bool isVisible: true
         property var handler: function() {
             PageController.goToPage(PageEnum.PageSetupWizardCredentials)
+        }
+    }
+
+    QtObject {
+        id: coordinatorLogin
+
+        property bool featuredAmneziaConnection: false
+        property string title: qsTr("Войти по коду из Telegram")
+        property string description: qsTr("Получите код командой /login в боте")
+        property string imageSource: "qrc:/images/controls/telegram.svg"
+        property bool isVisible: true
+        property var handler: function() {
+            if (CoordinatorController.loggedIn) {
+                PageController.goToPage(PageEnum.PageCoordinatorConfigs)
+            } else {
+                PageController.goToPage(PageEnum.PageCoordinatorLogin)
+            }
         }
     }
 

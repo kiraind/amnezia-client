@@ -48,6 +48,8 @@ set(HEADERS ${HEADERS}
     ${CLIENT_ROOT_DIR}/core/controllers/api/storePurchaseController.h
     ${CLIENT_ROOT_DIR}/core/controllers/api/subscriptionController.h
     ${CLIENT_ROOT_DIR}/core/controllers/api/newsController.h
+    ${CLIENT_ROOT_DIR}/core/controllers/coordinator/coordinatorApi.h
+    ${CLIENT_ROOT_DIR}/core/controllers/coordinator/coordinatorController.h
     ${CLIENT_ROOT_DIR}/core/controllers/updateController.h
     ${CLIENT_ROOT_DIR}/core/repositories/secureServersRepository.h
     ${CLIENT_ROOT_DIR}/core/repositories/secureAppSettingsRepository.h
@@ -134,6 +136,8 @@ set(SOURCES ${SOURCES}
     ${CLIENT_ROOT_DIR}/core/controllers/api/storePurchaseController.cpp
     ${CLIENT_ROOT_DIR}/core/controllers/api/subscriptionController.cpp
     ${CLIENT_ROOT_DIR}/core/controllers/api/newsController.cpp
+    ${CLIENT_ROOT_DIR}/core/controllers/coordinator/coordinatorApi.cpp
+    ${CLIENT_ROOT_DIR}/core/controllers/coordinator/coordinatorController.cpp
     ${CLIENT_ROOT_DIR}/core/controllers/updateController.cpp
     ${CLIENT_ROOT_DIR}/core/repositories/secureServersRepository.cpp
     ${CLIENT_ROOT_DIR}/core/repositories/secureAppSettingsRepository.cpp
@@ -235,12 +239,14 @@ file(GLOB UI_MODELS_CPP CONFIGURE_DEPENDS
 file(GLOB UI_CONTROLLERS_H CONFIGURE_DEPENDS
     ${CLIENT_ROOT_DIR}/ui/controllers/*.h
     ${CLIENT_ROOT_DIR}/ui/controllers/api/*.h
+    ${CLIENT_ROOT_DIR}/ui/controllers/coordinator/*.h
     ${CLIENT_ROOT_DIR}/ui/controllers/qml/*.h
     ${CLIENT_ROOT_DIR}/ui/controllers/selfhosted/*.h
 )
 file(GLOB UI_CONTROLLERS_CPP CONFIGURE_DEPENDS
     ${CLIENT_ROOT_DIR}/ui/controllers/*.cpp
     ${CLIENT_ROOT_DIR}/ui/controllers/api/*.cpp
+    ${CLIENT_ROOT_DIR}/ui/controllers/coordinator/*.cpp
     ${CLIENT_ROOT_DIR}/ui/controllers/qml/*.cpp
     ${CLIENT_ROOT_DIR}/ui/controllers/selfhosted/*.cpp
 )

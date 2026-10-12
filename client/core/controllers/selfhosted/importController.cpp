@@ -772,8 +772,14 @@ void ImportController::processAmneziaConfig(QJsonObject &config) const
             }
 
             QJsonObject jsonConfig = QJsonDocument::fromJson(protocolConfig.toUtf8()).object();
-            jsonConfig[configKey::mtu] =
+            // Use the platform default MTU, but keep a smaller one set by the issuer
+            // (the VPN coordinator needs 1280 because of double encapsulation)
+            const QString defaultMtu =
                     ContainerUtils::isAwgContainer(dockerContainer) ? protocols::awg::defaultMtu : protocols::wireguard::defaultMtu;
+            const QJsonValue mtuValue = jsonConfig.value(configKey::mtu);
+            const int issuerMtu = mtuValue.isString() ? mtuValue.toString().toInt() : mtuValue.toInt();
+            jsonConfig[configKey::mtu] =
+                    (issuerMtu <= 0 || issuerMtu > defaultMtu.toInt()) ? defaultMtu : QString::number(issuerMtu);
 
             containerConfig[configKey::lastConfig] = QString(QJsonDocument(jsonConfig).toJson());
 

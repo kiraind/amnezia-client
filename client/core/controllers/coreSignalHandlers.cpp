@@ -22,6 +22,7 @@
 #include "ui/controllers/selfhosted/installUiController.h"
 #include "ui/controllers/importUiController.h"
 #include "ui/controllers/api/subscriptionUiController.h"
+#include "ui/controllers/coordinator/coordinatorUiController.h"
 #include "ui/controllers/updateUiController.h"
 #include "ui/models/serversModel.h"
 #include "core/controllers/serversController.h"
@@ -102,6 +103,9 @@ void CoreSignalHandlers::initErrorMessagesHandler()
 
     connect(m_coreController->m_settingsUiController, &SettingsUiController::errorOccurred, m_coreController->m_pageController,
             qOverload<ErrorCode>(&PageController::showErrorMessage));
+
+    connect(m_coreController->m_coordinatorUiController, &CoordinatorUiController::errorOccurred, m_coreController->m_pageController,
+            qOverload<const QString &>(&PageController::showErrorMessage));
 }
 
 void CoreSignalHandlers::initSettingsSplitTunnelingHandler()

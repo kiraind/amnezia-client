@@ -1,6 +1,7 @@
 #include "coreController.h"
 
 #include <QDirIterator>
+#include <QNetworkAccessManager>
 #include <QTranslator>
 #include <QTimer>
 
@@ -11,6 +12,7 @@
 #include "logger.h"
 #include "secureQSettings.h"
 #include "core/utils/appUiConfig.h"
+#include "amneziaApplication.h"
 
 #if defined(Q_OS_ANDROID)
     #include "core/utils/installedAppsImageProvider.h"
@@ -175,6 +177,16 @@ void CoreController::initCoreControllers()
     m_importCoreController = new ImportController(m_serversRepository, m_appSettingsRepository, this);
     m_connectionController = new ConnectionController(m_serversRepository, m_appSettingsRepository, m_vpnConnection.get(), this);
     m_settingsController = new SettingsController(m_serversRepository, m_appSettingsRepository, this);
+
+    // Share the app-wide QNetworkAccessManager; tests run CoreController without an AmneziaApplication
+    auto *app = qobject_cast<AmneziaApplication *>(QCoreApplication::instance());
+    QNetworkAccessManager *networkManager = app ? app->networkManager() : nullptr;
+    if (!networkManager) {
+        networkManager = new QNetworkAccessManager(this);
+    }
+    m_coordinatorApi = new CoordinatorApi(networkManager, this);
+    m_coordinatorController = new CoordinatorController(m_serversRepository, m_appSettingsRepository, m_importCoreController,
+                                                        m_connectionController, m_coordinatorApi, this);
 }
 
 void CoreController::initControllers()
@@ -244,6 +256,9 @@ void CoreController::initControllers()
     m_apiNewsUiController = new ApiNewsUiController(m_newsModel, m_newsController, this);
     setQmlContextProperty("ApiNewsController", m_apiNewsUiController);
 
+    m_coordinatorUiController = new CoordinatorUiController(m_coordinatorController, this);
+    setQmlContextProperty("CoordinatorController", m_coordinatorUiController);
+
     m_updateUiController = new UpdateUiController(m_updateController, this);
     setQmlContextProperty("UpdateController", m_updateUiController);
 }
@@ -299,6 +314,7 @@ void CoreController::initSignalHandlers()
         m_apiNewsUiController->fetchNews(false);
     }
 
+    m_coordinatorController->start();
 }
 
 void CoreController::checkForAppUpdates()
