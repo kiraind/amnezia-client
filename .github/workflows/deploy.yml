@@ -311,7 +311,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: release-macos
-        path: deploy/build/LeshaVPN_*_macos_x64.pkg
+        path: deploy/build/LeshaVPN_*_macos.pkg
         if-no-files-found: error
         retention-days: 14
 
