@@ -408,8 +408,13 @@ jobs:
     steps:
     - name: 'Free disk space'
       run: |
+        # gradle packages several APK/AAB variants for four ABIs, which overflows the default runner disk
+        df -h /
         sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /usr/local/share/boost \
-          /usr/local/share/powershell /usr/share/swift /opt/hostedtoolcache/CodeQL
+          /usr/local/share/powershell /usr/share/swift /opt/hostedtoolcache /opt/microsoft /opt/google \
+          /opt/az /usr/share/miniconda /usr/local/julia* /usr/local/share/chromium /usr/lib/firefox \
+          /usr/local/lib/node_modules /usr/share/az_* /usr/local/aws-cli /usr/local/share/vcpkg
+        sudo docker system prune -af > /dev/null || true
         df -h /
 
     - name: 'Get sources'
