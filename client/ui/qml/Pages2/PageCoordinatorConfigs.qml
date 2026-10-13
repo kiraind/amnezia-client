@@ -14,6 +14,17 @@ import "../Components"
 PageType {
     id: root
 
+    // One config per device: once this app has one, nothing new can be created here
+    readonly property bool hasConfigInApp: {
+        var configs = CoordinatorController.remoteConfigs
+        for (var i = 0; i < configs.length; i++) {
+            if (configs[i].inApp) {
+                return true
+            }
+        }
+        return false
+    }
+
     function stateText(config) {
         if (config.state === "revoked") {
             return qsTr("Отозван")
@@ -21,7 +32,7 @@ PageType {
         if (config.state === "suspended") {
             return qsTr("Приостановлен")
         }
-        return config.inApp ? qsTr("В приложении") : qsTr("Не добавлен")
+        return config.inApp ? qsTr("Это устройство") : qsTr("Другое устройство")
     }
 
     function askDelete(config) {
@@ -105,16 +116,13 @@ PageType {
 
                 text: modelData.name
                 descriptionText: root.stateText(modelData)
-                rightImageSource: modelData.inApp ? "qrc:/images/controls/trash.svg" : "qrc:/images/controls/plus.svg"
+                rightImageSource: "qrc:/images/controls/trash.svg"
 
                 enabled: !CoordinatorController.busy
 
+                // Another device's config is never added here: two devices with one key knock each other off
                 clickedFunction: function() {
-                    if (!modelData.inApp && modelData.state !== "revoked") {
-                        CoordinatorController.addConfigToApp(modelData.id)
-                    } else {
-                        root.askDelete(modelData)
-                    }
+                    root.askDelete(modelData)
                 }
             }
 
@@ -126,47 +134,21 @@ PageType {
 
             spacing: 0
 
-            TextFieldWithHeaderType {
-                id: nameField
+            BasicButtonType {
+                id: setupButton
 
                 Layout.fillWidth: true
                 Layout.topMargin: 24
                 Layout.leftMargin: 16
                 Layout.rightMargin: 16
 
-                headerText: qsTr("Новое устройство")
-                textField.placeholderText: qsTr("phone")
-                textField.maximumLength: 32
+                visible: !root.hasConfigInApp
+                enabled: !CoordinatorController.busy
 
-                Connections {
-                    target: nameField.textField
-
-                    function onTextChanged() {
-                        var name = nameField.textField.text
-                        if (name === "" || CoordinatorController.isValidConfigName(name)) {
-                            nameField.errorText = ""
-                        } else {
-                            nameField.errorText = qsTr("Только a-z, 0-9 и -, до 32 символов")
-                        }
-                    }
-                }
-            }
-
-            BasicButtonType {
-                id: createButton
-
-                Layout.fillWidth: true
-                Layout.topMargin: 16
-                Layout.leftMargin: 16
-                Layout.rightMargin: 16
-
-                enabled: !CoordinatorController.busy && CoordinatorController.isValidConfigName(nameField.textField.text)
-
-                text: qsTr("Создать")
+                text: qsTr("Подключить это устройство")
 
                 clickedFunc: function() {
-                    CoordinatorController.createConfig(nameField.textField.text)
-                    nameField.textField.text = ""
+                    CoordinatorController.setupThisDevice()
                 }
             }
 
