@@ -54,6 +54,7 @@ jobs:
     - name: 'Install Qt'
       uses: jurplel/install-qt-action@v3
       with:
+        cache: 'true'
         version: ${{ env.QT_VERSION }}
         host: 'linux'
         target: 'desktop'
@@ -137,6 +138,7 @@ jobs:
     - name: 'Install Qt'
       uses: jurplel/install-qt-action@v3
       with:
+        cache: 'true'
         version: ${{ env.QT_VERSION }}
         host: 'windows'
         target: 'desktop'
@@ -250,6 +252,7 @@ jobs:
     - name: 'Install Qt'
       uses: jurplel/install-qt-action@v4.3.1
       with:
+        cache: 'true'
         version: ${{ env.QT_VERSION }}
         host: 'mac'
         target: 'desktop'
@@ -444,6 +447,7 @@ jobs:
     - name: 'Install desktop Qt'
       uses: jurplel/install-qt-action@v4.3.1
       with:
+        cache: 'true'
         version: ${{ env.QT_VERSION }}
         host: 'linux'
         target: 'desktop'
@@ -456,6 +460,7 @@ jobs:
     - name: 'Install android_armv7 Qt'
       uses: jurplel/install-qt-action@v4.3.1
       with:
+        cache: 'true'
         version: ${{ env.QT_VERSION }}
         host: 'all_os'
         target: 'android'
@@ -468,6 +473,7 @@ jobs:
     - name: 'Install android_arm64_v8a Qt'
       uses: jurplel/install-qt-action@v4.3.1
       with:
+        cache: 'true'
         version: ${{ env.QT_VERSION }}
         host: 'all_os'
         target: 'android'
@@ -520,6 +526,22 @@ jobs:
       with:
         key: ccache-${{ github.job }}-${{ matrix.label }}
         max-size: 2G
+
+    # Conan packages: the Amnezia remote has no prebuilt arm64 OpenSSL, so without this
+    # it is compiled from source on every run.
+    - name: 'Cache conan packages'
+      uses: actions/cache@v4
+      with:
+        path: ~/.conan2/p
+        key: conan-${{ github.job }}-${{ matrix.label }}-${{ hashFiles('conanfile.py') }}
+        restore-keys: conan-${{ github.job }}-${{ matrix.label }}-
+
+    # Gradle distribution and dependencies, downloaded by androiddeployqt's gradle run.
+    - name: 'Setup Gradle cache'
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-read-only: false
+        add-job-summary: never
 
     - name: 'Build project'
       env:
@@ -579,6 +601,7 @@ jobs:
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
         with:
+          cache: 'true'
           version: ${{ env.QT_VERSION }}
           host: linux
           target: desktop
