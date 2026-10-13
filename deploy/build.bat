@@ -102,7 +102,12 @@ set "_coordinator_arg="
 if defined COORDINATOR_API_URL set "_coordinator_arg="-DCOORDINATOR_API_URL=%COORDINATOR_API_URL%""
 @echo on
 cmake -S "%PROJECT_DIR%" -B "%BUILD_DIR%" -DCMAKE_BUILD_TYPE=Release "-DCMAKE_PREFIX_PATH=%QT_ROOT_PATH%\msvc2022_%_qt_postfix_arg%" "-DCMAKE_VS_GLOBALS=UseMultiToolTask=true;EnforceProcessCountAcrossBuilds=true" %_tests_arg% %_coordinator_arg% || goto :fail
-cmake --build "%BUILD_DIR%" --config Release -- /m  || goto :fail
+@echo off
+:: "/m" is an MSBuild switch; skip it when CMAKE_GENERATOR=Ninja (CI, for ccache)
+set "_build_tool_args=-- /m"
+if /i "%CMAKE_GENERATOR%" == "Ninja" set "_build_tool_args="
+@echo on
+cmake --build "%BUILD_DIR%" --config Release %_build_tool_args% || goto :fail
 @echo off
 for %%I in (%ARG_BUILD_INSTALLERS%) do (
     if /i "%%I" == "ifw" call :do_ifw

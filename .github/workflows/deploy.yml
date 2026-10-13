@@ -52,7 +52,7 @@ jobs:
 
     steps:
     - name: 'Install Qt'
-      uses: jurplel/install-qt-action@v3
+      uses: jurplel/install-qt-action@v4.3.1
       with:
         cache: 'true'
         version: ${{ env.QT_VERSION }}
@@ -136,7 +136,7 @@ jobs:
         fetch-depth: 10
 
     - name: 'Install Qt'
-      uses: jurplel/install-qt-action@v3
+      uses: jurplel/install-qt-action@v4.3.1
       with:
         cache: 'true'
         version: ${{ env.QT_VERSION }}
@@ -146,7 +146,7 @@ jobs:
         modules: 'qtremoteobjects qt5compat qtshadertools'
         dir: ${{ runner.temp }}
         setup-python: 'true'
-        tools: 'tools_ifw'
+        tools: 'tools_ifw tools_ninja'
         set-env: 'true'
         aqtversion: '==3.3.0'
         py7zrversion: '==0.22.*'
@@ -180,10 +180,21 @@ jobs:
     - name: 'Install conan'
       run: pip install "conan==2.28.0"
 
+    # Compiler cache. MSVC works with ccache only under Ninja (not the Visual Studio
+    # generator), so the build below switches the generator through CMAKE_GENERATOR.
+    - name: 'Setup ccache'
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ccache-${{ github.job }}
+        max-size: 2G
+
     # Unsigned: code signing would need a certificate (build.bat --sign-cloud/--sign-phys).
     - name: 'Build project'
       shell: cmd
       env:
+        CMAKE_GENERATOR: Ninja
+        CMAKE_C_COMPILER_LAUNCHER: ccache
+        CMAKE_CXX_COMPILER_LAUNCHER: ccache
         QT_INSTALL_DIR: ${{ runner.temp }}
       run: |
         set WIX_ROOT_PATH="${{ env.USERPROFILE }}\.dotnet\tools"
@@ -599,7 +610,7 @@ jobs:
           fetch-depth: 10
 
       - name: Install Qt
-        uses: jurplel/install-qt-action@v3
+        uses: jurplel/install-qt-action@v4.3.1
         with:
           cache: 'true'
           version: ${{ env.QT_VERSION }}
