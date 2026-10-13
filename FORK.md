@@ -298,6 +298,21 @@ Android: a stored `VpnState` with a removed `VpnProto` fails to decode and reset
   so it no longer compiles; strip it if iOS/NE is ever enabled. The macOS service group (`AMN_SERVICE_GROUP`) stays, the pf
   rules use it.
 
+## 10. Disguised tunnel interface name
+The desktop daemon names the WireGuard/AmneziaWG network interface after a branding constant that looks like
+an ordinary NIC (default `enp0s9`) instead of `amn0`, so on-device software listing interfaces by name is less
+likely to flag it as a VPN. Caveats (documented, not bugs): tools that inspect the interface *type* (`ip -d link`)
+still see `wireguard`; macOS forces `utunN` (cannot be renamed); Android's tun name is system-assigned and the OS
+always marks the connection as a VPN, so this applies to **Linux and Windows only**.
+- `client/cmake/branding/common.cmake` — `CLIENT_TUNNEL_INTERFACE_NAME` (CACHE, default `enp0s9`, ASCII ≤15 chars).
+- `version.h.in` — emits the `TUNNEL_INTERFACE_NAME` define.
+- Linux: `client/daemon/wireguardutils.h` (`WG_INTERFACE`), `client/platforms/linux/daemon/{linuxroutemonitor,wireguardutilslinux}.cpp`,
+  and `linuxfirewall.cpp` (the `amn0+` allow-rules now use the exact interface name — no `+` prefix — so a NIC-looking
+  name can't match a real card by prefix). `iputilslinux.cpp` follows `WG_INTERFACE`.
+- Windows: `client/platforms/windows/daemon/wireguardutilswindows.h` `s_interfaceName()` returns `TUNNEL_INTERFACE_NAME`
+  (the visible Wintun adapter name). The tunnel Windows service keeps its own internal name (`TUNNEL_SERVICE_NAME`), unchanged.
+How to resolve: keep ours. If upstream adds a new place that hardcodes `amn0` for the interface, point it at `WG_INTERFACE`/`TUNNEL_INTERFACE_NAME`.
+
 ## Translations
 Fork UI strings are Russian source text inside `qsTr(...)` (e.g. "Аккаунт VPN"). The fork does not edit `client/translations/*.ts`,
 so on conflict take upstream's `.ts` files. Only if a fork commit ever added entries to them, re-add those entries.

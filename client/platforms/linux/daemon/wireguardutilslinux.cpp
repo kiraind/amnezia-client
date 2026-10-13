@@ -79,7 +79,7 @@ bool WireguardUtilsLinux::addInterface(const InterfaceConfig& config) {
     m_tunnel.setProcessEnvironment(pe);
 
     QDir appPath(QCoreApplication::applicationDirPath());
-    QStringList wgArgs = {"-f", "amn0"};
+    QStringList wgArgs = {"-f", WG_INTERFACE};
     m_tunnel.start(appPath.filePath("amneziawg-go"), wgArgs);
     if (!m_tunnel.waitForStarted(WG_TUN_PROC_TIMEOUT)) {
         logger.error() << "Unable to start tunnel process due to timeout";
@@ -478,7 +478,7 @@ QString WireguardUtilsLinux::waitForTunnelName(const QString& filename) {
 
     while ((m_tunnel.state() == QProcess::Running) && timeout.isActive()) {
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-        QString ifname = "amn0";
+        QString ifname = WG_INTERFACE;
 
         // Test-connect to the UAPI socket.
         QLocalSocket sock;

@@ -15,6 +15,9 @@
 #endif
 
 #define APPLICATION_NAME        "@CLIENT_APPLICATION_NAME@"
+// Network interface name for the WireGuard/AmneziaWG tunnel (Linux kernel iface,
+// Windows Wintun adapter). Looks like an ordinary NIC rather than a VPN.
+#define TUNNEL_INTERFACE_NAME   "@CLIENT_TUNNEL_INTERFACE_NAME@"
 #define SERVICE_NAME            "@CLIENT_SERVICE_NAME@"
 #define ORGANIZATION_NAME       "@CLIENT_ORGANIZATION_NAME@"
 // User-visible application name (may be non-ASCII); emitted as UTF-8 byte escapes so it
