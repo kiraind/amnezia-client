@@ -605,6 +605,45 @@ private slots:
                  QStringLiteral("🇳🇱 Нидерланды"));
     }
 
+    void testLearnsCoordinatorAddress()
+    {
+        login();
+        const int port = QUrl(m_server->baseUrl()).port();
+        m_api->setBaseUrl(QStringLiteral("http://localhost:%1").arg(port));
+        QSignalSpy learnedSpy(m_api, &CoordinatorApi::addressLearned);
+        m_controller->fetchRemoteConfigs();
+        QTRY_VERIFY(learnedSpy.count() >= 1);
+        QCOMPARE(learnedSpy.at(0).at(0).toString(), QStringLiteral("127.0.0.1"));
+        QCOMPARE(m_core->m_appSettingsRepository->coordinatorApiAddress(), QStringLiteral("127.0.0.1"));
+        QCOMPARE(m_api->fallbackAddress(), QStringLiteral("127.0.0.1"));
+    }
+
+    void testFallsBackToKnownAddressWhenDnsFails()
+    {
+        login();
+        const int port = QUrl(m_server->baseUrl()).port();
+        // ".invalid" never resolves (RFC 2606), like DNS through a dead tunnel
+        m_api->setBaseUrl(QStringLiteral("http://coordinator.invalid:%1").arg(port));
+        m_api->setFallbackAddress(QStringLiteral("127.0.0.1"));
+
+        QSignalSpy remoteSpy(m_controller, &CoordinatorController::remoteConfigsUpdated);
+        QSignalSpy errorSpy(m_controller, &CoordinatorController::errorOccurred);
+        m_server->requests.clear();
+        m_controller->fetchRemoteConfigs();
+        QTRY_COMPARE_WITH_TIMEOUT(remoteSpy.count(), 1, 15000);
+        QCOMPARE(errorSpy.count(), 0);
+
+        const auto meRequests = m_server->requestsTo("GET", "/v1/me");
+        QCOMPARE(meRequests.size(), 1);
+        QCOMPARE(meRequests.first().headers.value("host"), QStringLiteral("coordinator.invalid:%1").arg(port).toUtf8());
+        QCOMPARE(meRequests.first().headers.value("authorization"), "Bearer " + m_token.toUtf8());
+
+        // Without a known address the failure is reported as before
+        m_api->setFallbackAddress(QString());
+        m_controller->fetchRemoteConfigs();
+        QTRY_COMPARE_WITH_TIMEOUT(errorSpy.count(), 1, 15000);
+    }
+
     void testSuspendedReportedOnce()
     {
         login();

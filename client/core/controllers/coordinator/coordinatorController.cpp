@@ -46,7 +46,16 @@ CoordinatorController::CoordinatorController(SecureServersRepository *serversRep
       m_api(api)
 {
     m_api->setBaseUrl(m_appSettingsRepository->coordinatorBaseUrl());
+    m_api->setFallbackAddress(m_appSettingsRepository->coordinatorApiAddress());
     m_api->setToken(m_appSettingsRepository->coordinatorToken());
+
+    // Remember where the coordinator lives: the tunnel bypasses it, and requests fall back to it when DNS fails
+    connect(m_api, &CoordinatorApi::addressLearned, this, [this](const QString &address) {
+        m_api->setFallbackAddress(address);
+        if (m_appSettingsRepository->coordinatorApiAddress() != address) {
+            m_appSettingsRepository->setCoordinatorApiAddress(address);
+        }
+    });
 
     m_refreshTimer.setInterval(refreshIntervalMsecs);
     connect(&m_refreshTimer, &QTimer::timeout, this, &CoordinatorController::refreshAll);
@@ -105,6 +114,7 @@ void CoordinatorController::login(const QString &baseUrl, const QString &code)
         const QString token = reply.body.value("token").toString();
         if (!reply.ok() || token.isEmpty()) {
             m_api->setBaseUrl(m_appSettingsRepository->coordinatorBaseUrl());
+            m_api->setFallbackAddress(m_appSettingsRepository->coordinatorApiAddress());
             emit loginFinished(false, describeError(reply));
             return;
         }
@@ -645,10 +655,17 @@ void CoordinatorController::allowThroughKillSwitch()
 #ifdef AMNEZIA_DESKTOP
     if (m_appSettingsRepository->isStrictKillSwitchEnabled()) {
         const QString host = m_api->host();
+        QStringList ips;
         const QString ip = host.isEmpty() ? QString() : NetworkUtilities::getIPAddress(host);
         if (!ip.isEmpty()) {
+            ips.append(ip);
+        }
+        if (!m_api->fallbackAddress().isEmpty() && !ips.contains(m_api->fallbackAddress())) {
+            ips.append(m_api->fallbackAddress()); // DNS may be unreachable through a dead tunnel
+        }
+        if (!ips.isEmpty()) {
             IpcClient::withInterface([&](QSharedPointer<IpcInterfaceReplica> iface) {
-                QRemoteObjectPendingReply<bool> reply = iface->addKillSwitchAllowedRange(QStringList { ip });
+                QRemoteObjectPendingReply<bool> reply = iface->addKillSwitchAllowedRange(ips);
                 if (!reply.waitForFinished(1000) || !reply.returnValue())
                     qWarning() << "CoordinatorController::allowThroughKillSwitch(): Failed to execute remote addKillSwitchAllowedRange call";
             });

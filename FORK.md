@@ -27,7 +27,10 @@ Fork-only files (never conflict; upstream doesn't have them, but check that APIs
 - `client/tests/testCoordinatorController.cpp` (mock API test, `CoordinatorControllerTest`)
 
 Fork hunks in upstream files (conflict-prone):
-- `client/core/repositories/secureAppSettingsRepository.{h,cpp}` — `coordinatorBaseUrl/Token/User/Configs` accessors + `clearCoordinatorAccount()`; not part of app backups.
+- `client/core/repositories/secureAppSettingsRepository.{h,cpp}` — `coordinatorBaseUrl/Token/User/Configs/ApiAddress` accessors + `clearCoordinatorAccount()`; not part of app backups.
+- `client/vpnConnection.cpp` (`appendSplitTunnelingConfig`, before `splitTunnelType` is stored) — the last known coordinator
+  IP (`coordinatorApiAddress`) is excluded from the tunnel ("all sites" becomes "all except" that one address), so a dead
+  entry server can't block the update that replaces it. `CoordinatorApi` retries by that IP (SNI/Host keep the name) when DNS fails.
 - `client/secureQSettings.cpp` — `"Coordinator/token"` added to `encryptedKeys`; keychain default derived from `APPLICATION_NAME`.
 - `client/core/controllers/coreController.{h,cpp}` — members `m_coordinatorApi`, `m_coordinatorController`, `m_coordinatorUiController`; construction and QML context registration.
 - `client/core/controllers/coreSignalHandlers.cpp` — `CoordinatorUiController::errorOccurred` -> `PageController::showErrorMessage(QString)`.

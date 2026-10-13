@@ -56,12 +56,24 @@ public:
     // Hostname of the base URL, used to allow the coordinator through the strict kill switch.
     QString host() const;
 
+    // Known IPv4 of the host. When a request can't reach the host by name (DNS goes into a dead tunnel),
+    // it is retried once against this address, keeping the host name for TLS (SNI, certificate) and Host.
+    void setFallbackAddress(const QString &address);
+    QString fallbackAddress() const;
+
+signals:
+    // The host answered and currently resolves to this IPv4 address.
+    void addressLearned(const QString &address);
+
 private:
-    void send(const QByteArray &verb, const QString &path, const QJsonObject *body, bool authorized, const Callback &callback);
+    void send(const QByteArray &verb, const QString &path, const QJsonObject *body, bool authorized, const Callback &callback,
+              bool viaFallback = false);
+    void learnAddress();
 
     QNetworkAccessManager *m_networkManager;
     QString m_baseUrl;
     QString m_token;
+    QString m_fallbackAddress;
 };
 
 #endif // COORDINATORAPI_H

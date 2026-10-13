@@ -113,6 +113,9 @@ public:
     void setCoordinatorToken(const QString &token);
     QJsonObject coordinatorUser() const;
     void setCoordinatorUser(const QJsonObject &user);
+    // Last known IPv4 of the coordinator host: bypasses the tunnel and is the fallback when DNS fails
+    QString coordinatorApiAddress() const;
+    void setCoordinatorApiAddress(const QString &address);
     // storageServerId -> { configId, name, revision, state }
     QJsonObject coordinatorConfigs() const;
     void setCoordinatorConfigs(const QJsonObject &configs);

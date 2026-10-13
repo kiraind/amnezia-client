@@ -545,6 +545,16 @@ void SecureAppSettingsRepository::setCoordinatorConfigs(const QJsonObject &confi
     setValue("Coordinator/configs", QJsonDocument(configs).toJson(QJsonDocument::Compact));
 }
 
+QString SecureAppSettingsRepository::coordinatorApiAddress() const
+{
+    return value("Coordinator/apiAddress").toString();
+}
+
+void SecureAppSettingsRepository::setCoordinatorApiAddress(const QString &address)
+{
+    setValue("Coordinator/apiAddress", address);
+}
+
 void SecureAppSettingsRepository::clearCoordinatorAccount()
 {
     setValue("Coordinator/token", QString());

@@ -1,5 +1,7 @@
 #include "coordinatorApi.h"
 
+#include <QHostAddress>
+#include <QHostInfo>
 #include <QJsonDocument>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -33,6 +35,9 @@ void CoordinatorApi::setBaseUrl(const QString &baseUrl)
     QString url = baseUrl.trimmed();
     while (url.endsWith(QLatin1Char('/'))) {
         url.chop(1);
+    }
+    if (QUrl(url).host() != QUrl(m_baseUrl).host()) {
+        m_fallbackAddress.clear(); // belongs to the old host
     }
     m_baseUrl = url;
 }
@@ -98,10 +103,49 @@ QString CoordinatorApi::host() const
     return QUrl(m_baseUrl).host();
 }
 
-void CoordinatorApi::send(const QByteArray &verb, const QString &path, const QJsonObject *body, bool authorized,
-                          const Callback &callback)
+void CoordinatorApi::setFallbackAddress(const QString &address)
 {
-    QNetworkRequest request(QUrl(m_baseUrl + QStringLiteral("/v1") + path, QUrl::StrictMode));
+    m_fallbackAddress = address;
+}
+
+QString CoordinatorApi::fallbackAddress() const
+{
+    return m_fallbackAddress;
+}
+
+void CoordinatorApi::learnAddress()
+{
+    const QString hostName = host();
+    if (hostName.isEmpty() || !QHostAddress(hostName).isNull()) {
+        return;
+    }
+    QHostInfo::lookupHost(hostName, this, [this, hostName](const QHostInfo &info) {
+        if (hostName != host()) {
+            return; // base URL changed meanwhile
+        }
+        for (const QHostAddress &address : info.addresses()) {
+            if (address.protocol() == QAbstractSocket::IPv4Protocol) {
+                emit addressLearned(address.toString());
+                return;
+            }
+        }
+    });
+}
+
+void CoordinatorApi::send(const QByteArray &verb, const QString &path, const QJsonObject *body, bool authorized,
+                          const Callback &callback, bool viaFallback)
+{
+    QUrl url(m_baseUrl + QStringLiteral("/v1") + path, QUrl::StrictMode);
+    const QString hostName = url.host();
+    QNetworkRequest request;
+    if (viaFallback) {
+        // Connect to the IP, but keep the name for TLS (SNI and certificate check) and for the Host header
+        request.setPeerVerifyName(hostName);
+        const int port = url.port();
+        request.setRawHeader("Host", (port > 0 ? QStringLiteral("%1:%2").arg(hostName).arg(port) : hostName).toUtf8());
+        url.setHost(m_fallbackAddress);
+    }
+    request.setUrl(url);
     request.setTransferTimeout(apiDefs::requestTimeoutMsecs);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     request.setRawHeader("Accept", "application/json");
@@ -131,7 +175,9 @@ void CoordinatorApi::send(const QByteArray &verb, const QString &path, const QJs
         }
     });
 
-    connect(reply, &QNetworkReply::finished, this, [reply, sslErrors, callback]() {
+    const std::shared_ptr<QJsonObject> bodyCopy = body ? std::make_shared<QJsonObject>(*body) : nullptr;
+    connect(reply, &QNetworkReply::finished, this, [this, reply, sslErrors, callback, verb, path, bodyCopy, authorized,
+                                                    viaFallback, hostName]() {
         Reply result;
         result.httpStatus = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
         result.networkError = result.httpStatus == 0 || !sslErrors->isEmpty()
@@ -156,6 +202,17 @@ void CoordinatorApi::send(const QByteArray &verb, const QString &path, const QJs
         }
 
         reply->deleteLater();
+
+        // Unreachable by name (no HTTP answer, not a TLS problem): retry once via the known address
+        const bool canRetry = !viaFallback && result.httpStatus == 0 && sslErrors->isEmpty() && !m_fallbackAddress.isEmpty()
+                && m_fallbackAddress != hostName && hostName == host();
+        if (canRetry) {
+            send(verb, path, bodyCopy.get(), authorized, callback, true);
+            return;
+        }
+        if (!viaFallback && result.httpStatus != 0) {
+            learnAddress();
+        }
         if (callback) {
             callback(result);
         }
