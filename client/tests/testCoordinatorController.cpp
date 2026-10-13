@@ -622,20 +622,26 @@ private slots:
     {
         login();
         const int port = QUrl(m_server->baseUrl()).port();
-        // ".invalid" never resolves (RFC 2606), like DNS through a dead tunnel
-        m_api->setBaseUrl(QStringLiteral("http://coordinator.invalid:%1").arg(port));
+        // The host is unreachable (like DNS/connect through a dead tunnel), so the first
+        // attempt gets no HTTP answer. We point it at loopback 127.0.0.2, where nothing
+        // listens: the connection is refused instantly (httpStatus 0), deterministically,
+        // without relying on a real resolver (a CI resolver may hijack bogus names and
+        // answer 200, which would skip the fallback). The mock only binds 127.0.0.1.
+        const QString unreachableHost = QStringLiteral("127.0.0.2");
+        m_api->setBaseUrl(QStringLiteral("http://%1:%2").arg(unreachableHost).arg(port));
         m_api->setFallbackAddress(QStringLiteral("127.0.0.1"));
 
         QSignalSpy remoteSpy(m_controller, &CoordinatorController::remoteConfigsUpdated);
         QSignalSpy errorSpy(m_controller, &CoordinatorController::errorOccurred);
         m_server->requests.clear();
         m_controller->fetchRemoteConfigs();
+        QTRY_COMPARE_WITH_TIMEOUT(m_server->requestsTo("GET", "/v1/me").size(), 1, 15000);
         QTRY_COMPARE_WITH_TIMEOUT(remoteSpy.count(), 1, 15000);
         QCOMPARE(errorSpy.count(), 0);
 
         const auto meRequests = m_server->requestsTo("GET", "/v1/me");
         QCOMPARE(meRequests.size(), 1);
-        QCOMPARE(meRequests.first().headers.value("host"), QStringLiteral("coordinator.invalid:%1").arg(port).toUtf8());
+        QCOMPARE(meRequests.first().headers.value("host"), QStringLiteral("%1:%2").arg(unreachableHost).arg(port).toUtf8());
         QCOMPARE(meRequests.first().headers.value("authorization"), "Bearer " + m_token.toUtf8());
 
         // Without a known address the failure is reported as before
