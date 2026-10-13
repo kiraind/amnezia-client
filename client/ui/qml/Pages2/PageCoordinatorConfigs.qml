@@ -65,6 +65,9 @@ PageType {
 
             BackButtonType {
                 id: backButton
+
+                // Opened straight from the "+" tab when logged in: nothing to go back to
+                visible: root.StackView.index > 0
             }
 
             BaseHeaderType {
@@ -190,7 +193,11 @@ PageType {
 
                     var yesButtonFunction = function() {
                         CoordinatorController.logout()
-                        PageController.closePage()
+                        if (root.StackView.index > 0) {
+                            PageController.closePage()
+                        } else {
+                            PageController.goToPageHome()
+                        }
                     }
                     var noButtonFunction = function() {
                     }

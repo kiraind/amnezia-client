@@ -37,6 +37,8 @@ Fork hunks in upstream files (conflict-prone):
 - `client/cmake/sources.cmake` — coordinator `.h/.cpp` in HEADERS/SOURCES; `ui/controllers/coordinator/*` in the UI_CONTROLLERS globs.
 - `client/ui/utils/pageEnum.h` — `PageCoordinatorLogin`, `PageCoordinatorConfigs`; `client/ui/qml/qml.qrc` — the two pages.
 - `client/ui/qml/Pages2/PageSettings.qml` — `coordinatorAccount` entry ("Аккаунт VPN").
+- `client/ui/qml/Pages2/PageStart.qml` ("+" tab, `onEscapePressed`) and `PageSetupWizardStart.qml` ("Let's get started") —
+  when logged in, open `PageCoordinatorConfigs` instead of the connection screen.
 - `client/CMakeLists.txt` — `COORDINATOR_API_URL` cache var -> `-DCOORDINATOR_API_URL`; `deploy/build.sh` / `deploy/build.bat` pass it through.
 - `client/tests/CMakeLists.txt` — `test_coordinator_controller` target + `add_test`.
 
