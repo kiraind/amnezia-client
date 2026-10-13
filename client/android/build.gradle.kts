@@ -174,6 +174,17 @@ android {
     }
 }
 
+// Fork CI: `-PonlyOssRelease=true` (or ORG_GRADLE_PROJECT_onlyOssRelease=true) builds only the
+// ossRelease variant. Qt's aab target runs `bundle`, which otherwise packages six bundles
+// (oss/play x debug/release/fdroid) for every ABI and overflows the CI runner disk.
+androidComponents {
+    beforeVariants { variant ->
+        if (providers.gradleProperty("onlyOssRelease").orNull == "true") {
+            variant.enable = variant.flavorName == "oss" && variant.buildType == "release"
+        }
+    }
+}
+
 dependencies {
     implementation(project(":qt"))
     implementation(project(":utils"))

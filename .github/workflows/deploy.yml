@@ -522,6 +522,8 @@ jobs:
       env:
         QT_INSTALL_DIR: ${{ runner.temp }}
         LABEL: ${{ matrix.label }}
+        # package only the ossRelease variant (see client/android/build.gradle.kts)
+        ORG_GRADLE_PROJECT_onlyOssRelease: 'true'
       shell: bash
       run: |
         OUT=deploy/artifacts
