@@ -50,9 +50,11 @@ How to resolve: keep upstream's surrounding logic; the rule "mtu = issuer MTU if
 
 ## 3. Connection-screen options removed
 File: `client/ui/qml/Pages2/PageSetupWizardConfigSource.qml` (commits `50d8b95`, `0f472e8`, `8419f3b`).
-Fork state: `variants` = `coordinatorLogin`, `fileOpen`, `qrScan` only. Removed: "VPN by Amnezia"
+Fork state: `variants` = `coordinatorLogin` only. Removed: "VPN by Amnezia"
 (`amneziaVpn`), self-hosted setup (`selfHostVpn`), `backupRestore`, `restorePurchases`, `siteLink`,
-and the "Site Amnezia" footer link.
+the "Site Amnezia" footer link, and (Noah, 2026-10-13) the "Insert key" field with its Continue button,
+the "Other connection options" label, and the `fileOpen`/`qrScan` entries (their QtObjects stay defined,
+just not listed), because imported configs don't auto-update. The intro text is the fork's Russian line.
 How to resolve: take upstream's file for new/changed code, then delete the removed variants again and
 keep the fork's list. Any NEW upstream option that goes to Amnezia's gateway/shop/site must also be dropped.
 Related: `PageSettingsAbout.qml`, `PageSettingsApplication.qml` (update UI gated by `IsAppUpdatesEnabled`),

@@ -158,53 +158,7 @@ PageType {
                 Layout.leftMargin: 16
                 Layout.bottomMargin: 24
 
-                text: qsTr("Insert the key, add a configuration file or scan the QR-code")
-            }
-
-            TextFieldWithHeaderType {
-                id: textKey
-
-                Layout.fillWidth: true
-                Layout.rightMargin: 16
-                Layout.leftMargin: 16
-
-                headerText: qsTr("Insert key")
-                buttonText: qsTr("Insert")
-
-                clickedFunc: function() {
-                    textField.text = ""
-                    textField.paste()
-                }
-            }
-
-            BasicButtonType {
-                id: continueButton
-
-                Layout.fillWidth: true
-                Layout.topMargin: 16
-                Layout.rightMargin: 16
-                Layout.leftMargin: 16
-
-                visible: textKey.textField.text !== ""
-
-                text: qsTr("Continue")
-
-                clickedFunc: function() {
-                    if (ImportController.extractConfigFromData(textKey.textField.text)) {
-                        PageController.goToPage(PageEnum.PageSetupWizardViewConfig)
-                    }
-                }
-            }
-
-            ParagraphTextType {
-                Layout.fillWidth: true
-                Layout.topMargin: 32
-                Layout.rightMargin: 16
-                Layout.leftMargin: 16
-                Layout.bottomMargin: 24
-
-                color: AmneziaStyle.color.charcoalGray
-                text: qsTr("Other connection options")
+                text: qsTr("Войдите по коду из Telegram-бота: приложение само получит и будет обновлять настройки подключения")
             }
         }
 
@@ -241,10 +195,9 @@ PageType {
 
     }
 
+    // Fork: only the coordinator login; key, file and QR imports are hidden (configs from them don't auto-update)
     property list<QtObject> variants: [
-        coordinatorLogin,
-        fileOpen,
-        qrScan
+        coordinatorLogin
     ]
     
     QtObject {
