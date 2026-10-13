@@ -60,7 +60,6 @@ target_compile_definitions(${PROJECT} PRIVATE
 
 if(WIN32 OR (APPLE AND NOT IOS AND NOT MACOS_NE) OR (LINUX AND NOT ANDROID))
     qt_add_repc_replicas(${PROJECT} ${CMAKE_CURRENT_LIST_DIR}/../ipc/ipc_interface.rep)
-    qt_add_repc_replicas(${PROJECT} ${CMAKE_CURRENT_LIST_DIR}/../ipc/ipc_process_interface.rep)
 endif()
 
 qt6_add_resources(QRC ${QRC}
@@ -170,7 +169,6 @@ if(WIN32)
 
     set(LIBS ${LIBS}
         user32
-        rasapi32
         shlwapi
         iphlpapi
         ws2_32
@@ -281,30 +279,9 @@ install(SCRIPT ${QT_DEPLOY_SCRIPT}
 )
 
 if (APPLE AND NOT IOS AND NOT MACOS_NE)
-    list(APPEND OVPN_SCRIPTS "${CMAKE_SOURCE_DIR}/deploy/data/macos/update-resolv-conf.sh")
     set_target_properties(${PROJECT} PROPERTIES
         XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED "NO"
         XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO"
-    )
-endif()
-if (LINUX AND NOT ANDROID)
-    list(APPEND OVPN_SCRIPTS "${CMAKE_SOURCE_DIR}/deploy/data/linux/update-resolv-conf.sh")
-endif()
-
-if(OVPN_SCRIPTS)
-    add_custom_command(TARGET ${PROJECT} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${OVPN_SCRIPTS}
-        "$<TARGET_FILE_DIR:${PROJECT}>"
-    )
-
-    install(FILES ${OVPN_SCRIPTS}
-        DESTINATION ${CMAKE_INSTALL_BINDIR}
-        COMPONENT AmneziaVPN
-        PERMISSIONS
-            OWNER_READ OWNER_EXECUTE
-            GROUP_READ GROUP_EXECUTE
-            WORLD_READ WORLD_EXECUTE
     )
 endif()
 

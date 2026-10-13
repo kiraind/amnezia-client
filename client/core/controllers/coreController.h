@@ -41,15 +41,9 @@
 #include "ui/models/allowedDnsModel.h"
 #include "ui/models/containersModel.h"
 #include "ui/models/languageModel.h"
-#ifdef Q_OS_WINDOWS
-    #include "ui/models/protocols/ikev2ConfigModel.h"
-#endif
 #include "ui/models/appSplitTunnelingModel.h"
 #include "ui/models/protocols/awgConfigModel.h"
-#include "ui/models/protocols/openvpnConfigModel.h"
 #include "ui/models/protocols/wireguardConfigModel.h"
-#include "ui/models/protocols/xrayConfigModel.h"
-#include "ui/models/protocols/xrayConfigSnapshotsModel.h"
 #include "ui/models/protocolsModel.h"
 #include "ui/models/serversModel.h"
 
@@ -166,14 +160,8 @@ private:
     AllowedDnsModel* m_allowedDnsModel;
     AppSplitTunnelingModel* m_appSplitTunnelingModel;
 
-    OpenVpnConfigModel* m_openVpnConfigModel;
-    XrayConfigModel* m_xrayConfigModel;
-    XrayConfigSnapshotsModel* m_xrayConfigSnapshotsModel;
     WireGuardConfigModel* m_wireGuardConfigModel;
     AwgConfigModel* m_awgConfigModel;
-#ifdef Q_OS_WINDOWS
-    Ikev2ConfigModel* m_ikev2ConfigModel;
-#endif
 
     CoreSignalHandlers* m_signalHandlers;
 };

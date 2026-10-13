@@ -362,16 +362,6 @@ void SecureAppSettingsRepository::setInstallationUuid(const QString &uuid)
     m_settings->setValue("Conf/installationUuid", uuid);
 }
 
-QByteArray SecureAppSettingsRepository::xraySavedConfigs() const
-{
-    return value("Xray/savedConfigs").toByteArray();
-}
-
-void SecureAppSettingsRepository::setXraySavedConfigs(const QByteArray &data)
-{
-    setValue("Xray/savedConfigs", data);
-}
-
 QString SecureAppSettingsRepository::coordinatorBaseUrl() const
 {
     return value("Coordinator/baseUrl").toString();

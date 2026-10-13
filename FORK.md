@@ -88,7 +88,7 @@ Code that now derives from these macros instead of hard-coded `AmneziaVPN`/`org.
   `client/mozilla/localsocketcontroller.cpp` (daemon socket names), `client/main.cpp`, `client/amneziaApplication.cpp`,
   `client/core/utils/migrations.cpp`, `client/ui/utils/{notificationHandler,systemTrayNotificationHandler,qAutoStart}.cpp`,
   `client/platforms/windows/**` (service/tunnel/firewall/split-tunnel names), `client/platforms/macos/**`,
-  `client/platforms/ios/{Log,NELogController}.swift`, `client/core/protocols/ikev2VpnProtocolWindows.h`,
+  `client/platforms/ios/{Log,NELogController}.swift`,
   `service/server/{CMakeLists.txt,systemservice.cpp,amneziavpn-service.rc.in}`, `client/platforms/windows/amneziavpn.rc.in`.
 - Root `CMakeLists.txt`: includes `client/cmake/clientBrandingDefaults.cmake` early; macOS service group `AMN_SERVICE_GROUP` = lowercased app name.
 - `client/CMakeLists.txt` / `client/cmake/macos.cmake`: bundle path `${PROJECT}.app`, `MACOSX_BUNDLE_GUI_IDENTIFIER`.
@@ -194,8 +194,8 @@ client config they already hold, can be renamed and removed; the `SelfHostedAdmi
   PageSettingsServerData,PageSettingsServerProtocols,PageSettingsServerProtocol,PageProtocolRaw,PageSettingsDns,
   PageProtocolAwgClientSettings,PageProtocolWireGuardClientSettings}.qml`, `Components/{SettingsContainersListView,HomeContainersListView}.qml`,
   `client/tests/{CMakeLists.txt,utils/testCoreController.h}`, `.github/workflows/deploy.yml` (ctest `-E` list), `THIRD_PARTY_LICENSES.md`.
-- Left for the protocol cleanup: `Pages2/PageProtocol{OpenVpnSettings,Xray*}.qml` (server-side settings) are no longer reachable
-  (the "server settings" entry and `ProtocolsModel`'s `serverProtocolPage` role are gone) and still call the removed `InstallController`.
+- `Pages2/PageProtocol{OpenVpnSettings,Xray*}.qml` (server-side settings) became unreachable here and were deleted with the
+  protocols (§9.4).
 
 ### 9.3 Amnezia gateway (premium/free VPN, news, purchases), update checker and settings backup
 The app no longer talks to Amnezia's gateway at all: no "VPN by Amnezia" (premium/free/trial) configs, country lists,
@@ -247,10 +247,56 @@ stays stable. The Android `oss` product flavor (dimension `billing`) is kept wit
   `client/tests/{CMakeLists.txt,run_android_tests.sh,testSettingsSignals.cpp,testConfigFormatVersion.cpp,utils/testUtils.cpp,
   utils/testCoreController.h}`, `.claude/skills/sync-upstream/SKILL.md`.
 - Kept on purpose: `core/utils/errorCodes.h` (the Billing codes stay, numbering matches Android `ErrorCode.kt`),
-  `core/utils/constants/apiConstants.h` (used by the coordinator API), `ConnectionSettings::isApiConfig` (read by
-  `OpenVpnConfigurator`, always `false` now), `SecureAppSettingsRepository::getInstallationUuid`, the iOS StoreKit/purchase code
+  `core/utils/constants/apiConstants.h` (used by the coordinator API), `SecureAppSettingsRepository::getInstallationUuid`, the iOS StoreKit/purchase code
   in `platforms/ios` (iOS is not built by the fork; remove it if iOS is ever enabled), `qrCodeUtils` + `qrcodegen`
   (`ImportController` uses `qrMagicCode` to parse QR chunks).
+
+### 9.4 XRay, OpenVPN (with Cloak/ShadowSocks) and IKEv2 protocols
+Only AmneziaWG and plain WireGuard remain (the coordinator issues AWG 3.1; WireGuard shares the implementation). This drops
+the heavy runtime deps: conan `amnezia-xray-bindings`, `tun2socks`, `openvpn` (with its `lz4`/`lzo`/`libnl`/`libcap-ng`
+deps), `v2ray-rules-dat` (geosite/geoip), `tap-windows6`, and on Android `amnezia-libxray`, `openvpn-pt-android`. The
+service no longer ships `openvpn`, `tun2socks`, `geo*.dat` or the TAP driver, and the privileged-process IPC
+(`IpcProcessInterface`, `createPrivilegedProcess`), which only launched openvpn/tun2socks/certutil, is gone.
+The `DockerContainer`/`Proto` enum values stay (persisted). A stored server with an OpenVpn, Cloak, ShadowSocks, Ipsec, Xray
+or SSXray container still loads: `ContainerUtils::isUnsupportedContainer` is true for all of them (connect fails with
+`LegacyContainerNotSupportedError`, the protocol page says "no longer supported"), `defaultProtocol` maps them to
+`Proto::Unknown` and their protocol data is not kept when the server is saved again. `.ovpn`, xray JSON and
+`vless://`/`vmess://`/`trojan://`/`ss://`/`ssd://` imports are rejected as invalid; AWG/WireGuard `.conf` and `vpn://` keys import as before.
+Android: a stored `VpnState` with a removed `VpnProto` fails to decode and resets to the default state (corruption handler).
+- Deleted: `client/core/protocols/{xrayProtocol,openVpnProtocol,ikev2VpnProtocolWindows}.*`, `client/core/configurators/
+  {xrayConfigurator,openVpnConfigurator,ikev2Configurator}.*`, `client/core/models/protocols/{xray,openVpn,ikev2}ProtocolConfig.*`,
+  `client/core/utils/managementServer.*`, `client/core/utils/serialization/`, `client/3rd/QJsonStruct/`,
+  `client/ui/models/protocols/{xrayConfigModel,xrayConfigSnapshotsModel,openvpnConfigModel,ikev2ConfigModel}.*`,
+  QML `Pages2/{PageProtocolOpenVpnSettings,PageProtocolXray*}.qml`, `Components/TransportProtoSelector.qml`,
+  `Controls2/{MinMaxRowType,TextAreaType}.qml`, `client/tests/testXraySerialization.cpp`,
+  `service/server/{xray.*,xray_defs.h,tapcontroller_win.*}`, `ipc/{ipc_process_interface.rep,ipcserverprocess.*}`,
+  `deploy/data/{linux,macos}/update-resolv-conf.sh`, Android modules `client/android/{openvpn,xray}/` and
+  `src/org/amnezia/vpn/{OpenVpnService,XrayService}.kt`, recipes `recipes/{amnezia-libxray,amnezia-xray-bindings,openvpn,
+  openvpn-pt-android,tap-windows6,tun2socks,v2ray-rules-dat,libcap-ng}/`, `docs/openVpn*.plantuml`.
+- Hunks: `conanfile.py`, `service/server/CMakeLists.txt` (xray link, openvpn/tun2socks/geo-dat copy+install, openvpn rpath
+  fixups, TAP driver, `rasapi32`), `ipc/{ipc.h,ipc_interface.rep,ipcserver.{h,cpp}}` (removed slots `createPrivilegedProcess`,
+  `checkAndInstallDriver`, `getTapList`, `createTun`, `deleteTun`, `Start/StopRoutingIpv6`, `enablePeerTraffic`, `enableKillSwitch`,
+  `update/restoreResolvers`, `xrayStart/Stop`; `PermittedProcess`/`sanitizeArguments`), `service/server/{localserver.cpp,
+  killswitch.{h,cpp},router.{h,cpp},router_{linux,mac,win}.{h,cpp}}`, `client/platforms/linux/daemon/linuxfirewall.cpp`
+  (`130.allowMarkedXray` anchor no longer installed, still uninstalled), `client/CMakeLists.txt` (process replica,
+  update-resolv-conf install, `rasapi32`), `client/cmake/{sources,android}.cmake`, `client/core/utils/{ipcClient,utilities}.{h,cpp}`,
+  `core/models/{protocolConfig,containerConfig}.{h,cpp}`, `core/utils/containers/containerUtils.cpp`, `core/protocols/{protocolUtils,
+  vpnProtocol}.cpp`, `core/configurators/configuratorBase.cpp`, `core/utils/constants/{configKeys,protocolConstants}.h`,
+  `core/utils/commonStructs.h` (`ConnectionSettings::isApiConfig`), `core/controllers/{connectionController,coreController,
+  serversController}.*`, `core/controllers/selfhosted/importController.{h,cpp}` (no OpenVPN malicious-script warning),
+  `core/models/serverDescription.cpp`, `core/repositories/secureAppSettingsRepository.{h,cpp}` (`Xray/savedConfigs`),
+  `client/vpnConnection.cpp` (include), `ui/controllers/{importUiController,serversUiController}.*`,
+  `ui/models/{containersModel,protocolsModel}.{h,cpp}` (`isIpsec`, `isOpenVpn`, `isXray` roles), `ui/utils/pageEnum.h`,
+  `ui/qml/qml.qrc`, `Components/SettingsContainersListView.qml`, `Pages2/{PageSetupWizardViewConfig,PageSetupWizardConfigSource}.qml`,
+  `client/macos/app/Info.plist.in` (`.ovpn` document type), `client/android/{AndroidManifest.xml,build.gradle.kts,
+  settings.gradle.kts}`, `VpnProto.kt`, `client/tests/{CMakeLists.txt,testConnection.cpp}`, `THIRD_PARTY_LICENSES.md`,
+  `.claude/skills/sync-upstream/SKILL.md`.
+- Kept on purpose: `errorCodes.h`/`errorStrings.cpp` (numbering, matches Android), the env-gated tests that import
+  `THIRD_PARTY_XRAY_VPN_KEY`/`OPEN_VPN`/`CLOAK`/`SS` keys as plain servers (they only exercise the server list), the
+  iOS/macOS Network Extension code (`platforms/ios/*`, `client/{ios,macos}/networkextension`, `ios_controller.mm`) and its
+  conan requirements `hev-socks5-tunnel`/`openvpnadapter` with their recipes: NE is not built by the fork and still uses them,
+  so it no longer compiles; strip it if iOS/NE is ever enabled. The macOS service group (`AMN_SERVICE_GROUP`) stays, the pf
+  rules use it.
 
 ## Translations
 Fork UI strings are Russian source text inside `qsTr(...)` (e.g. "Аккаунт VPN"). The fork does not edit `client/translations/*.ts`,

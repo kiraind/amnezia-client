@@ -8,7 +8,6 @@
         <file>Components/SelectLanguageDrawer.qml</file>
         <file>Components/ServersListView.qml</file>
         <file>Components/SettingsContainersListView.qml</file>
-        <file>Components/TransportProtoSelector.qml</file>
         <file>Components/AddSitePanel.qml</file>
         <file>Config/GlobalConfig.qml</file>
         <file>Config/qmldir</file>
@@ -39,7 +38,6 @@
         <file>Controls2/SwitcherType.qml</file>
         <file>Controls2/TabButtonType.qml</file>
         <file>Controls2/TabImageButtonType.qml</file>
-        <file>Controls2/TextAreaType.qml</file>
         <file>Controls2/TextAreaWithFooterType.qml</file>
         <file>Controls2/TextFieldWithHeaderType.qml</file>
         <file>Controls2/TextTypes/ButtonTextType.qml</file>
@@ -59,18 +57,7 @@
         <file>Modules/Style/AmneziaStyle.qml</file>
         <file>Modules/Style/qmldir</file>
         <file>Pages2/PageHome.qml</file>
-        <file>Pages2/PageProtocolOpenVpnSettings.qml</file>
         <file>Pages2/PageProtocolRaw.qml</file>
-        <file>Pages2/PageProtocolXraySettings.qml</file>
-
-        <file>Pages2/PageProtocolXraySnapshots.qml</file>
-        <file>Pages2/PageProtocolXrayFlowSettings.qml</file>
-        <file>Pages2/PageProtocolXraySecuritySettings.qml</file>
-        <file>Pages2/PageProtocolXrayTransportSettings.qml</file>
-        <file>Pages2/PageProtocolXrayXmuxSettings.qml</file>
-        <file>Pages2/PageProtocolXrayXPaddingSettings.qml</file>
-        <file>Pages2/PageProtocolXrayXPaddingBytesSettings.qml</file>
-        <file>Controls2/MinMaxRowType.qml</file>
 
         <file>Pages2/PageSettings.qml</file>
         <file>Pages2/PageSettingsAbout.qml</file>

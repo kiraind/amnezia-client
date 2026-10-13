@@ -222,7 +222,6 @@ QJsonObject ConnectionController::createConnectionConfiguration(const QPair<QStr
 
     ConnectionSettings connectionSettings = {
         { dns.first, dns.second },
-        false, // isApiConfig: Amnezia gateway configs are not supported in the fork
         {
             m_appSettingsRepository->isSitesSplitTunnelingEnabled(),
             m_appSettingsRepository->routeMode()
@@ -230,6 +229,10 @@ QJsonObject ConnectionController::createConnectionConfiguration(const QPair<QStr
     };
 
     auto configurator = ConfiguratorBase::create(proto);
+    if (!configurator) {
+        // removed protocols (OpenVPN, XRay, IKEv2) have no configurator
+        return vpnConfiguration;
+    }
     ProtocolConfig processedConfig = configurator->processConfigWithLocalSettings(connectionSettings,
                                                                                   containerConfig.protocolConfig);
 

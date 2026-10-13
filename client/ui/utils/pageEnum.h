@@ -34,21 +34,10 @@ namespace PageLoader
         PageSetupWizardViewConfig,
         PageSetupWizardQrReader,
 
-        PageProtocolOpenVpnSettings,
-        PageProtocolXraySettings,
-        PageProtocolIKev2Settings,
         PageProtocolRaw,
 
         PageProtocolWireGuardClientSettings,
         PageProtocolAwgClientSettings,
-
-        PageProtocolXraySnapshots,
-        PageProtocolXrayTransportSettings,
-        PageProtocolXrayXmuxSettings,
-        PageProtocolXrayXPaddingSettings,
-        PageProtocolXrayFlowSettings,
-        PageProtocolXraySecuritySettings,
-        PageProtocolXrayXPaddingBytesSettings,
 
         PageSettingsLanguage,
 

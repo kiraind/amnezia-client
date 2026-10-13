@@ -36,15 +36,12 @@ set(HEADERS ${HEADERS}
     ${CLIENT_ROOT_DIR}/core/protocols/vpnProtocol.h
     ${CMAKE_CURRENT_BINARY_DIR}/version.h
     ${CLIENT_ROOT_DIR}/core/utils/networkUtilities.h
-    ${CLIENT_ROOT_DIR}/core/utils/serialization/serialization.h
-    ${CLIENT_ROOT_DIR}/core/utils/serialization/transfer.h
     ${CLIENT_ROOT_DIR}/../common/logger/logger.h
     ${CLIENT_ROOT_DIR}/../common/crypto/cryptoUtils.h
     ${CLIENT_ROOT_DIR}/ui/utils/qmlUtils.h
     ${CLIENT_ROOT_DIR}/core/utils/osSignalHandler.h
     ${CLIENT_ROOT_DIR}/core/utils/swiftBridge.h
     ${CLIENT_ROOT_DIR}/core/utils/utilities.h
-    ${CLIENT_ROOT_DIR}/core/utils/managementServer.h
     ${CLIENT_ROOT_DIR}/core/utils/constants.h
 )
 
@@ -91,21 +88,12 @@ set(SOURCES ${SOURCES}
     ${CLIENT_ROOT_DIR}/ui/utils/qAutoStart.cpp
     ${CLIENT_ROOT_DIR}/core/protocols/vpnProtocol.cpp
     ${CLIENT_ROOT_DIR}/core/utils/networkUtilities.cpp
-    ${CLIENT_ROOT_DIR}/core/utils/serialization/outbound.cpp
-    ${CLIENT_ROOT_DIR}/core/utils/serialization/inbound.cpp
-    ${CLIENT_ROOT_DIR}/core/utils/serialization/ss.cpp
-    ${CLIENT_ROOT_DIR}/core/utils/serialization/ssd.cpp
-    ${CLIENT_ROOT_DIR}/core/utils/serialization/vless.cpp
-    ${CLIENT_ROOT_DIR}/core/utils/serialization/trojan.cpp
-    ${CLIENT_ROOT_DIR}/core/utils/serialization/vmess.cpp
-    ${CLIENT_ROOT_DIR}/core/utils/serialization/vmess_new.cpp
     ${CLIENT_ROOT_DIR}/../common/logger/logger.cpp
     ${CLIENT_ROOT_DIR}/../common/crypto/cryptoUtils.cpp
     ${CLIENT_ROOT_DIR}/ui/utils/qmlUtils.cpp
     ${CLIENT_ROOT_DIR}/core/utils/serverConfigUtils.cpp
     ${CLIENT_ROOT_DIR}/core/utils/osSignalHandler.cpp
     ${CLIENT_ROOT_DIR}/core/utils/utilities.cpp
-    ${CLIENT_ROOT_DIR}/core/utils/managementServer.cpp
 )
 
 # Mozilla sources
@@ -202,14 +190,6 @@ set(SOURCES ${SOURCES}
 )
 
 if(WIN32)
-    set(HEADERS ${HEADERS}
-        ${CLIENT_ROOT_DIR}/core/protocols/ikev2VpnProtocolWindows.h
-    )
-
-    set(SOURCES ${SOURCES}
-        ${CLIENT_ROOT_DIR}/core/protocols/ikev2VpnProtocolWindows.cpp
-    )
-
     set(RESOURCES ${RESOURCES}
         ${CMAKE_CURRENT_BINARY_DIR}/amneziavpn.rc
     )
@@ -222,9 +202,7 @@ if(WIN32 OR (APPLE AND NOT IOS AND NOT MACOS_NE) OR (LINUX AND NOT ANDROID))
     set(HEADERS ${HEADERS}
         ${CLIENT_ROOT_DIR}/core/utils/ipcClient.h
         ${CLIENT_ROOT_DIR}/ui/utils/systemTrayNotificationHandler.h
-        ${CLIENT_ROOT_DIR}/core/protocols/openVpnProtocol.h
         ${CLIENT_ROOT_DIR}/core/protocols/wireGuardProtocol.h
-        ${CLIENT_ROOT_DIR}/core/protocols/xrayProtocol.h
         ${CLIENT_ROOT_DIR}/core/protocols/awgProtocol.h
         ${CLIENT_ROOT_DIR}/mozilla/localsocketcontroller.h
     )
@@ -233,9 +211,7 @@ if(WIN32 OR (APPLE AND NOT IOS AND NOT MACOS_NE) OR (LINUX AND NOT ANDROID))
         ${CLIENT_ROOT_DIR}/core/utils/ipcClient.cpp
         ${CLIENT_ROOT_DIR}/mozilla/localsocketcontroller.cpp
         ${CLIENT_ROOT_DIR}/ui/utils/systemTrayNotificationHandler.cpp
-        ${CLIENT_ROOT_DIR}/core/protocols/openVpnProtocol.cpp
         ${CLIENT_ROOT_DIR}/core/protocols/wireGuardProtocol.cpp
-        ${CLIENT_ROOT_DIR}/core/protocols/xrayProtocol.cpp
         ${CLIENT_ROOT_DIR}/core/protocols/awgProtocol.cpp
     )
 endif()

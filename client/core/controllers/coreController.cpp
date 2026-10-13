@@ -78,25 +78,11 @@ void CoreController::initModels()
     m_protocolsModel = new ProtocolsModel(this);
     setQmlContextProperty("ProtocolsModel", m_protocolsModel);
 
-    m_openVpnConfigModel = new OpenVpnConfigModel(this);
-    setQmlContextProperty("OpenVpnConfigModel", m_openVpnConfigModel);
-
     m_wireGuardConfigModel = new WireGuardConfigModel(this);
     setQmlContextProperty("WireGuardConfigModel", m_wireGuardConfigModel);
 
     m_awgConfigModel = new AwgConfigModel(this);
     setQmlContextProperty("AwgConfigModel", m_awgConfigModel);
-
-    m_xrayConfigModel = new XrayConfigModel(this);
-    setQmlContextProperty("XrayConfigModel", m_xrayConfigModel);
-
-    m_xrayConfigSnapshotsModel = new XrayConfigSnapshotsModel(m_appSettingsRepository, m_xrayConfigModel, this);
-    setQmlContextProperty("XrayConfigSnapshotsModel", m_xrayConfigSnapshotsModel);
-
-#ifdef Q_OS_WINDOWS
-    m_ikev2ConfigModel = new Ikev2ConfigModel(this);
-    setQmlContextProperty("Ikev2ConfigModel", m_ikev2ConfigModel);
-#endif
 }
 
 void CoreController::initRepositories()

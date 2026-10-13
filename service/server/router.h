@@ -21,12 +21,6 @@ public:
     static int routeDeleteList(const QString &gw, const QStringList &ips);
     static bool flushDns();
     static void resetIpStack();
-    static bool createTun(const QString &dev, const QString &subnet);
-    static bool deleteTun(const QString &dev);
-    static bool StartRoutingIpv6();
-    static bool StopRoutingIpv6();
-    static bool updateResolvers(const QString& ifname, const QList<QHostAddress>& resolvers);
-    static bool restoreResolvers();
 };
 
 #endif // ROUTER_H

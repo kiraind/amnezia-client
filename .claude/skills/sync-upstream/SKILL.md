@@ -57,7 +57,10 @@ git status   # list conflicts
   port useful toolchain bumps (Qt version, conan, packages) by hand.
 - **Translations:** take upstream's `client/translations/*.ts` (`git checkout --theirs`). Fork strings are Russian
   source text in `qsTr()`; re-add `.ts` entries only if a fork commit had added any.
-- **Submodules / conan / recipes:** take theirs.
+- **Protocols (§9.4):** keep XRay/OpenVPN/IKEv2 files deleted (incl. Android modules and service xray/TAP code); in hunk files
+  take upstream and drop the references again. New upstream code for these protocols is not added to the build.
+- **Submodules / conan / recipes:** take theirs, then drop again the requirements and recipes removed in FORK.md §9
+  (libssh §9.2; xray/openvpn/tun2socks/v2ray-rules-dat/tap-windows6/libxray/openvpn-pt-android/libcap-ng §9.4).
 - Anything not in FORK.md: take theirs.
 
 ## 5. Versions

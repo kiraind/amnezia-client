@@ -79,9 +79,6 @@ public:
     QString getInstallationUuid(bool createIfNotExists) const;
     void clearSettings();
 
-    QByteArray xraySavedConfigs() const;
-    void setXraySavedConfigs(const QByteArray &data);
-
     // VPN coordinator account (see CoordinatorController).
     QString coordinatorBaseUrl() const;
     void setCoordinatorBaseUrl(const QString &url);

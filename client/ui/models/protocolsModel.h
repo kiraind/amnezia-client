@@ -20,10 +20,7 @@ public:
         // Protocol type check roles
         IsWireGuardRole,
         IsAwgRole,
-        IsOpenVpnRole,
-        IsXrayRole,
         IsSftpRole,
-        IsIpsecRole,
         IsSocks5ProxyRole,
         IsMtProxyRole,
         IsTelemtRole,

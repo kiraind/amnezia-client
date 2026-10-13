@@ -21,7 +21,6 @@ add_library(test_common OBJECT
 
 qt_add_repc_replicas(test_common
     ../../ipc/ipc_interface.rep
-    ../../ipc/ipc_process_interface.rep
 )
 
 target_link_libraries(test_common PUBLIC
@@ -122,15 +121,6 @@ if(NOT ANDROID)
     )
 
     target_link_libraries(test_config_format_version PRIVATE
-        Qt6::Test
-        test_common
-    )
-
-    add_executable(test_xray_serialization
-        testXraySerialization.cpp
-    )
-
-    target_link_libraries(test_xray_serialization PRIVATE
         Qt6::Test
         test_common
     )
@@ -378,7 +368,6 @@ if(NOT ANDROID)
     add_test(NAME ServerRenameTest                 COMMAND test_server_rename)
     add_test(NAME SettingsSignalsTest              COMMAND test_settings_signals)
     add_test(NAME UiServersModelAndControllerTest  COMMAND test_ui_servers_model_and_controller)
-    add_test(NAME XraySerializationTest            COMMAND test_xray_serialization)
     add_test(NAME ConfigFormatVersionTest          COMMAND test_config_format_version)
     add_test(NAME UiLanguageModelAndControllerTest COMMAND test_ui_language_model_and_controller)
     add_test(NAME UiIpModelAndControllerTest       COMMAND test_ui_ip_model_and_controller)

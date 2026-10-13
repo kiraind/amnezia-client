@@ -219,13 +219,6 @@ bool ServersUiController::isDefaultServerDefaultContainerHasSplitTunneling() con
             }
         }
         return false;
-    } else if (defaultContainer == DockerContainer::OpenVpn) {
-        if (const auto* ovpnConfig = containerConfig.getOpenVpnProtocolConfig()) {
-            if (ovpnConfig->hasClientConfig()) {
-                return !ovpnConfig->clientConfig->nativeConfig.isEmpty() 
-                    && !ovpnConfig->clientConfig->nativeConfig.contains("redirect-gateway");
-            }
-        }
     }
     return false;
 }
