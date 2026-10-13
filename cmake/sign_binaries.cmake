@@ -52,5 +52,19 @@ if(APPLE)
     if (files AND CODESIGN_SIGNATURE)
         include(${CMAKE_CURRENT_LIST_DIR}/util/codesign.cmake)
         codesign_sign_files("${files}" "${CODESIGN_SIGNATURE}" "${CODESIGN_KEYCHAIN}")
+    elseif(files)
+        # Fork: unsigned builds still need valid ad-hoc signatures. macdeployqt and
+        # install_name_tool rewrite binaries after linking, which breaks the linker's
+        # ad-hoc signature, and Apple Silicon then kills the app on the first dlopen.
+        foreach(file IN LISTS files)
+            execute_process(
+                COMMAND codesign --force --sign - --timestamp=none "${file}"
+                RESULT_VARIABLE result
+                ERROR_VARIABLE error
+            )
+            if(NOT result EQUAL 0)
+                message(FATAL_ERROR "ad-hoc codesign failed for ${file}:\n${error}")
+            endif()
+        endforeach()
     endif()
 endif()
