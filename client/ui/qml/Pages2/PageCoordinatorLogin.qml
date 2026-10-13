@@ -26,10 +26,22 @@ PageType {
 
         function onLoginFinished(success, errorText) {
             if (success) {
-                PageController.closePage()
-                PageController.goToPage(PageEnum.PageCoordinatorConfigs)
+                // Straight to the main screen: add a config for this device unless one is already in the app
+                PageController.showBusyIndicator(true)
+                CoordinatorController.setupThisDevice()
             } else {
                 codeField.errorText = errorText
+            }
+        }
+
+        function onDeviceSetupFinished(success) {
+            PageController.showBusyIndicator(false)
+            if (success) {
+                PageController.goToPageHome()
+            } else {
+                // The error is already shown; let the user pick or create a config by hand
+                PageController.closePage()
+                PageController.goToPage(PageEnum.PageCoordinatorConfigs)
             }
         }
     }

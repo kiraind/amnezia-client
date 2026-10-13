@@ -2,6 +2,7 @@
 
 #include <QDateTime>
 #include <QDebug>
+#include <QRegularExpression>
 #include <QSysInfo>
 #include <QUrl>
 
@@ -223,6 +224,85 @@ void CoordinatorController::addConfigToApp(const QString &configId)
         }
         fetchRemoteConfigs();
     });
+}
+
+void CoordinatorController::setupThisDevice()
+{
+    if (!isLoggedIn()) {
+        emit deviceSetupFinished(false);
+        return;
+    }
+    if (!managedConfigs().isEmpty()) {
+        emit deviceSetupFinished(true);
+        return;
+    }
+
+    allowThroughKillSwitch();
+    emit busyChanged(true);
+    m_api->me([this](const CoordinatorApi::Reply &reply) {
+        if (!reply.ok()) {
+            emit busyChanged(false);
+            if (reply.unauthorized() || reply.notMember()) {
+                handleAuthError(reply);
+            } else {
+                emit errorOccurred(describeError(reply));
+            }
+            emit deviceSetupFinished(false);
+            return;
+        }
+
+        QStringList takenNames;
+        for (const QJsonValue &value : reply.body.value("configs").toArray()) {
+            takenNames.append(value.toObject().value("name").toString());
+        }
+        const QString name = deviceConfigName(QSysInfo::machineHostName(), QSysInfo::productType(), takenNames);
+
+        m_api->createConfig(name, [this](const CoordinatorApi::Reply &reply) {
+            emit busyChanged(false);
+            bool added = false;
+            if (reply.ok()) {
+                added = applyConfig(reply.body, QString());
+            } else if (reply.unauthorized() || reply.notMember()) {
+                handleAuthError(reply);
+            } else {
+                emit errorOccurred(describeError(reply));
+            }
+            emit deviceSetupFinished(added);
+            if (isLoggedIn()) {
+                fetchRemoteConfigs();
+            }
+        });
+    });
+}
+
+QString CoordinatorController::deviceConfigName(const QString &hostName, const QString &fallback, const QStringList &takenNames)
+{
+    static const QRegularExpression invalidChars(QStringLiteral("[^a-z0-9]+"));
+
+    QString base = hostName.toLower();
+    if (base.endsWith(QStringLiteral(".local"))) {
+        base.chop(6);
+    }
+    base.replace(invalidChars, QStringLiteral("-"));
+    base = base.left(28);
+    while (base.startsWith('-')) {
+        base.remove(0, 1);
+    }
+    while (base.endsWith('-')) {
+        base.chop(1);
+    }
+    if (base.isEmpty() || base == QStringLiteral("localhost")) {
+        base = fallback.toLower().replace(invalidChars, QStringLiteral("-")).left(28);
+    }
+    if (base.isEmpty()) {
+        base = QStringLiteral("device");
+    }
+
+    QString name = base;
+    for (int i = 2; takenNames.contains(name); ++i) {
+        name = QStringLiteral("%1-%2").arg(base).arg(i);
+    }
+    return name;
 }
 
 void CoordinatorController::deleteConfig(const QString &configId)

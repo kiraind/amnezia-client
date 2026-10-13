@@ -6,7 +6,9 @@
 #include <QNetworkAccessManager>
 #include <QNetworkProxy>
 #include <QPointer>
+#include <QRegularExpression>
 #include <QSignalSpy>
+#include <QSysInfo>
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QTest>
@@ -425,6 +427,53 @@ private slots:
         QCOMPARE(entry.value("revision").toString(), QStringLiteral("rev1"));
         QCOMPARE(entry.value("state").toString(), QStringLiteral("ok"));
         QCOMPARE(m_controller->serverIdForConfig("cfg-1"), serverId);
+    }
+
+    void testSetupThisDevice()
+    {
+        login();
+        QSignalSpy setupSpy(m_controller, &CoordinatorController::deviceSetupFinished);
+        QSignalSpy addedSpy(m_controller, &CoordinatorController::configAdded);
+        m_controller->setupThisDevice();
+        QTRY_COMPARE(setupSpy.count(), 1);
+        QVERIFY(setupSpy.at(0).at(0).toBool());
+        QCOMPARE(addedSpy.count(), 1);
+
+        const auto creates = m_server->requestsTo("POST", "/v1/configs");
+        QCOMPARE(creates.size(), 1);
+        const QString name = creates.first().json().value("name").toString();
+        QCOMPARE(name, CoordinatorController::deviceConfigName(QSysInfo::machineHostName(), QSysInfo::productType(), {}));
+        QCOMPARE(m_controller->serverIdForConfig("cfg-1"), addedSpy.at(0).at(0).toString());
+
+        // A config is already in the app: nothing new is created
+        m_controller->setupThisDevice();
+        QTRY_COMPARE(setupSpy.count(), 2);
+        QVERIFY(setupSpy.at(1).at(0).toBool());
+        QCOMPARE(m_server->requestsTo("POST", "/v1/configs").size(), 1);
+    }
+
+    void testDeviceConfigName_data()
+    {
+        QTest::addColumn<QString>("hostName");
+        QTest::addColumn<QStringList>("taken");
+        QTest::addColumn<QString>("expected");
+
+        QTest::newRow("mac") << "Noahs-MacBook-Pro.local" << QStringList() << "noahs-macbook-pro";
+        QTest::newRow("spaces and unicode") << "Ноа PC_1" << QStringList() << "pc-1";
+        QTest::newRow("localhost") << "localhost" << QStringList() << "android";
+        QTest::newRow("empty") << "" << QStringList() << "android";
+        QTest::newRow("taken") << "laptop" << QStringList { "laptop", "laptop-2" } << "laptop-3";
+        QTest::newRow("long") << QString(40, 'a') << QStringList() << QString(28, 'a');
+    }
+
+    void testDeviceConfigName()
+    {
+        QFETCH(QString, hostName);
+        QFETCH(QStringList, taken);
+        QFETCH(QString, expected);
+        const QString name = CoordinatorController::deviceConfigName(hostName, QStringLiteral("android"), taken);
+        QCOMPARE(name, expected);
+        QVERIFY(QRegularExpression(QStringLiteral("^[a-z0-9-]{1,32}$")).match(name).hasMatch());
     }
 
     void testRefreshOutdatedReplacesInPlace()

@@ -11,6 +11,7 @@ CoordinatorUiController::CoordinatorUiController(CoordinatorController *coordina
     connect(m_coordinatorController, &CoordinatorController::loggedInChanged, this, &CoordinatorUiController::loggedInChanged);
     connect(m_coordinatorController, &CoordinatorController::loginFinished, this, &CoordinatorUiController::loginFinished);
     connect(m_coordinatorController, &CoordinatorController::configAdded, this, &CoordinatorUiController::configAdded);
+    connect(m_coordinatorController, &CoordinatorController::deviceSetupFinished, this, &CoordinatorUiController::deviceSetupFinished);
     connect(m_coordinatorController, &CoordinatorController::errorOccurred, this, &CoordinatorUiController::errorOccurred);
 
     connect(m_coordinatorController, &CoordinatorController::remoteConfigsUpdated, this, [this](const QJsonArray &configs) {
@@ -110,6 +111,11 @@ void CoordinatorUiController::addConfigToApp(const QString &configId)
 void CoordinatorUiController::deleteConfig(const QString &configId)
 {
     m_coordinatorController->deleteConfig(configId);
+}
+
+void CoordinatorUiController::setupThisDevice()
+{
+    m_coordinatorController->setupThisDevice();
 }
 
 void CoordinatorUiController::refreshAll()

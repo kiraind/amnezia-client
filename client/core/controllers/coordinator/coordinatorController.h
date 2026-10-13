@@ -48,6 +48,11 @@ public:
     void addConfigToApp(const QString &configId);
     // Delete the config on the coordinator and remove its server from the app.
     void deleteConfig(const QString &configId);
+    // After login: make sure this device has a config in the app, creating one named after the device if
+    // none is added yet. Result in deviceSetupFinished().
+    void setupThisDevice();
+    // Config name for this device ([a-z0-9-]{1,32}) that is not in takenNames.
+    static QString deviceConfigName(const QString &hostName, const QString &fallback, const QStringList &takenNames);
 
     // Check every managed config (status -> fetch if outdated -> replace in place). Silent on network errors.
     void refreshAll();
@@ -68,6 +73,7 @@ signals:
     void remoteConfigsUpdated(const QJsonArray &configs); // [{ id, name, revision, createdAt, inApp: bool, state }]
     void configAdded(const QString &serverId);
     void configReplaced(const QString &serverId);
+    void deviceSetupFinished(bool success);
     void managedConfigsChanged();
     // Human-readable problem for the user (not member, suspended, revoked, re-login needed, request failed).
     void errorOccurred(const QString &text);
