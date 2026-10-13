@@ -22,6 +22,13 @@ endif()
 if(NOT CLIENT_KEYCHAIN_NAME)
     set(CLIENT_KEYCHAIN_NAME "${CLIENT_APPLICATION_NAME}-Keychain" CACHE STRING "QtKeychain service name used for encrypted settings keys")
 endif()
+if(NOT CLIENT_TUNNEL_INTERFACE_NAME)
+    # Name of the WireGuard/AmneziaWG network interface the desktop daemon creates
+    # (Linux kernel iface, Windows Wintun adapter). Deliberately looks like an ordinary
+    # NIC rather than a VPN. ASCII, <= 15 chars (Linux IFNAMSIZ). macOS forces utunN and
+    # Android's tun name is system-assigned, so this applies to Linux and Windows only.
+    set(CLIENT_TUNNEL_INTERFACE_NAME "enp0s9" CACHE STRING "Tunnel network interface name, ASCII, <=15 chars")
+endif()
 
 # -- QML entry points and UI resources
 if(NOT CLIENT_QML_ENTRYPOINT)

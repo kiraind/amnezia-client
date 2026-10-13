@@ -13,8 +13,9 @@
 #include <QStringList>
 
 #include "interfaceconfig.h"
+#include "version.h"
 
-constexpr const char* WG_INTERFACE = "amn0";
+constexpr const char* WG_INTERFACE = TUNNEL_INTERFACE_NAME;
 
 class WireguardUtils : public QObject {
   Q_OBJECT

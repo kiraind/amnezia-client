@@ -32,6 +32,7 @@
 
 #include "linuxfirewall.h"
 #include "logger.h"
+#include "version.h"
 #include <QFileInfo>
 #include <QProcess>
 
@@ -244,7 +245,9 @@ void LinuxFirewall::install()
                                                          });
 
     installAnchor(Both, QStringLiteral("200.allowVPN"), {
-                                                            QStringLiteral("-o amn0+ -j ACCEPT"),
+                                                            // Exact name (no "+"): the tunnel iface has a fixed,
+                                                            // NIC-looking name, so avoid matching a real NIC by prefix.
+                                                            QStringLiteral("-o ") + QStringLiteral(TUNNEL_INTERFACE_NAME) + QStringLiteral(" -j ACCEPT"),
                                                             QStringLiteral("-o tun0+ -j ACCEPT"),
                                                             QStringLiteral("-o tun2+ -j ACCEPT"),
                                                         });
@@ -422,7 +425,7 @@ void LinuxFirewall::updateDNSServers(const QStringList& servers)
     const QString chain = QStringLiteral("%1.320.allowDNS").arg(kAnchorName);
     executeIptables(QStringLiteral("iptables"), {QStringLiteral("-F"), chain});
     const QStringList ifaces = {
-        QStringLiteral("amn0+"), QStringLiteral("tun0+"), QStringLiteral("tun2+")
+        QStringLiteral(TUNNEL_INTERFACE_NAME), QStringLiteral("tun0+"), QStringLiteral("tun2+")
     };
     for (const QString& server : servers) {
         for (const QString& iface : ifaces) {

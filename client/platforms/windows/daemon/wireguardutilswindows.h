@@ -31,7 +31,9 @@ class WireguardUtilsWindows final : public WireguardUtils {
   QString interfaceName() override {
     return WireguardUtilsWindows::s_interfaceName();
   }
-  static const QString s_interfaceName() { return APPLICATION_NAME; }
+  // Wintun adapter name shown in Windows (Network Connections, ipconfig). Looks like an
+  // ordinary NIC rather than a VPN. The tunnel Windows service keeps its own internal name.
+  static const QString s_interfaceName() { return TUNNEL_INTERFACE_NAME; }
   bool addInterface(const InterfaceConfig& config) override;
   bool deleteInterface() override;
 
