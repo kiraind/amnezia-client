@@ -35,116 +35,14 @@ PageType {
         header: ColumnLayout {
             width: listView.width
 
-            HeaderTypeWithButton {
-                id: moreButton
-
-                property bool isVisible: SettingsController.getInstallationUuid() !== "" || PageController.isStartPageVisible()
-                
+            // Fork: the "more" button with the logs / support tag drawer is removed
+            BaseHeaderType {
                 Layout.fillWidth: true
                 Layout.topMargin: 24 + PageController.safeAreaTopMargin
                 Layout.rightMargin: 16
                 Layout.leftMargin: 16
 
                 headerText: qsTr("Connection")
-
-                actionButtonImage: isVisible ? "qrc:/images/controls/more-vertical.svg" : ""
-                actionButtonFunction: function() {
-                    moreActionsDrawer.openTriggered()
-                }
-
-                DrawerType2 {
-                    id: moreActionsDrawer
-
-                    parent: root
-
-                    anchors.fill: parent
-                    expandedHeight: root.height * 0.5
-
-                    expandedStateContent: ColumnLayout {
-                        anchors.top: parent.top
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        spacing: 0
-
-                        BaseHeaderType {
-                            Layout.fillWidth: true
-                            Layout.topMargin: 32
-                            Layout.leftMargin: 16
-                            Layout.rightMargin: 16
-
-                            headerText: qsTr("Settings")
-                        }
-
-                        SwitcherType {
-                            id: switcher
-                            Layout.fillWidth: true
-                            Layout.topMargin: 16
-                            Layout.leftMargin: 16
-                            Layout.rightMargin: 16
-
-                            text: qsTr("Enable logs")
-
-                            visible: PageController.isStartPageVisible()
-                            checked: SettingsController.isLoggingEnabled
-                            onToggled: function() {
-                                if (checked !== SettingsController.isLoggingEnabled) {
-                                    SettingsController.isLoggingEnabled = checked
-                                }
-                            }
-                        }
-
-                        LabelWithButtonType {
-                            Layout.fillWidth: true
-
-                            text: qsTr("Export client logs")
-                            rightImageSource: "qrc:/images/controls/chevron-right.svg"
-
-                            visible: PageController.isStartPageVisible()
-
-                            clickedFunction: function() {
-                                var fileName = ""
-                                if (GC.isMobile()) {
-                                    fileName = "AmneziaVPN.log"
-                                } else {
-                                    fileName = SystemController.getFileName(qsTr("Save"),
-                                                                            qsTr("Logs files (*.log)"),
-                                                                            StandardPaths.standardLocations(StandardPaths.DocumentsLocation) + "/AmneziaVPN",
-                                                                            true,
-                                                                            ".log")
-                                }
-                                if (fileName !== "") {
-                                    PageController.showBusyIndicator(true)
-                                    SettingsController.exportLogsFile(fileName)
-                                    PageController.showBusyIndicator(false)
-                                    PageController.showNotificationMessage(qsTr("Logs file saved"))
-                                }
-                            }
-                        }
-
-                        LabelWithButtonType {
-                            id: supportUuid
-                            Layout.fillWidth: true
-                            Layout.topMargin: 16
-
-                            text: qsTr("Support tag")
-                            descriptionText: SettingsController.getInstallationUuid()
-
-                            descriptionOnTop: true
-
-                            rightImageSource: "qrc:/images/controls/copy.svg"
-                            rightImageColor: AmneziaStyle.color.paleGray
-
-                            visible: SettingsController.getInstallationUuid() !== ""
-                            clickedFunction: function() {
-                                GC.copyToClipBoard(descriptionText)
-                                PageController.showNotificationMessage(qsTr("Copied"))
-                                if (!GC.isMobile()) {
-                                    this.rightButton.forceActiveFocus()
-                                }
-                            }
-                        }
-                    }
-                }
             }
 
             ParagraphTextType {

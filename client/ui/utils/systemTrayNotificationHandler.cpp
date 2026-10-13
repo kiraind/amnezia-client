@@ -32,10 +32,6 @@ SystemTrayNotificationHandler::SystemTrayNotificationHandler(QObject* parent) :
 
     m_menu.addSeparator();
 
-    m_trayActionVisitWebSite = m_menu.addAction(QIcon(":/images/tray/link.png"), tr("Visit Website"), [&](){
-        QDesktopServices::openUrl(QUrl(websiteUrl));
-    });
-
     // Quit action: disconnect VPN first on macOS NE, else quit directly
     m_trayActionQuit = m_menu.addAction(QIcon(":/images/tray/cancel.png"),
                                        tr("Quit") + " " + QString::fromUtf8(DISPLAY_NAME),
@@ -76,7 +72,6 @@ void SystemTrayNotificationHandler::onTranslationsUpdated()
     m_trayActionShow->setText(tr("Show") + " " + QString::fromUtf8(DISPLAY_NAME));
     m_trayActionConnect->setText(tr("Connect"));
     m_trayActionDisconnect->setText(tr("Disconnect"));
-    m_trayActionVisitWebSite->setText(tr("Visit Website"));
     m_trayActionQuit->setText(tr("Quit") + " " + QString::fromUtf8(DISPLAY_NAME));
 }
 

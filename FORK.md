@@ -60,10 +60,12 @@ Fork state: `variants` = `coordinatorLogin` only. Removed: "VPN by Amnezia"
 the "Site Amnezia" footer link, and (Noah, 2026-10-13) the "Insert key" field with its Continue button,
 the "Other connection options" label, and the `fileOpen`/`qrScan` entries (their QtObjects stay defined,
 just not listed), because imported configs don't auto-update. The intro text is the fork's Russian line.
+The header's "more" (⋮) button and its drawer (logs toggle/export, support tag) are removed too (Noah, 2026-10-13):
+the header is a plain `BaseHeaderType` "Connection".
 How to resolve: take upstream's file for new/changed code, then delete the removed variants again and
 keep the fork's list. Any NEW upstream option that goes to Amnezia's gateway/shop/site must also be dropped.
 Related: `PageSettingsAbout.qml`, `PageSettingsApplication.qml` (update UI removed, §4),
-`PageSettings.qml` ("О приложении %1" with `Qt.application.displayName`).
+`PageSettings.qml` (see §11).
 
 ## 4. App updates removed
 The fork ships through its own GitHub Releases, so upstream's update checker (which asks Amnezia's gateway/S3 for the
@@ -312,6 +314,16 @@ always marks the connection as a VPN, so this applies to **Linux and Windows onl
 - Windows: `client/platforms/windows/daemon/wireguardutilswindows.h` `s_interfaceName()` returns `TUNNEL_INTERFACE_NAME`
   (the visible Wintun adapter name). The tunnel Windows service keeps its own internal name (`TUNNEL_SERVICE_NAME`), unchanged.
 How to resolve: keep ours. If upstream adds a new place that hardcodes `amn0` for the interface, point it at `WG_INTERFACE`/`TUNNEL_INTERFACE_NAME`.
+
+## 11. Settings, About and tray trimmed
+Noah, 2026-10-13.
+- `client/ui/qml/Pages2/PageSettings.qml` — the "Servers" entry is removed from the list (the servers pages stay in the
+  build, just unreachable from Settings). Titles: "Аккаунт %1" (`Qt.application.displayName`) and plain "О приложении".
+- `client/ui/qml/Pages2/PageCoordinatorConfigs.qml` — header "Аккаунт %1" with the display name.
+- `client/ui/qml/Pages2/PageSettingsAbout.qml` — no donation header/paragraph, no Privacy Policy button; contacts are only
+  Telegram (https://t.me/kiraind) and GitHub (https://github.com/kiraind/amnezia-client). The version line stays.
+- `client/ui/utils/systemTrayNotificationHandler.{h,cpp}` — the tray "Visit Website" action is removed.
+How to resolve: take upstream's changes, then drop these entries again. New upstream contacts/links in About are dropped.
 
 ## Translations
 Fork UI strings are Russian source text inside `qsTr(...)` (e.g. "Аккаунт VPN"). The fork does not edit `client/translations/*.ts`,
