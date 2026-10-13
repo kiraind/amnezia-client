@@ -48,6 +48,9 @@ set(CPACK_IFW_PACKAGE_CONTROL_SCRIPT                ${CMAKE_SOURCE_DIR}/deploy/i
 set(CPACK_WIX_VERSION               4)
 # Own upgrade code (NOT the official client's {2D55AC62-...}) so MSI never upgrades/replaces it
 set(CPACK_WIX_UPGRADE_GUID          "{25866F49-DD8F-4DC5-AA76-1046D9953D0A}")
+# Russian UI strings, and above all codepage 1251: the default en-US culture uses codepage 1252,
+# which cannot encode the Cyrillic CLIENT_DISPLAY_NAME used for the shortcuts
+set(CPACK_WIX_CULTURES              "ru-RU")
 set(CPACK_WIX_PRODUCT_ICON          ${CMAKE_SOURCE_DIR}/client/images/app.ico)
 set(CPACK_WIX_CUSTOM_XMLNS          "util=http://wixtoolset.org/schemas/v4/wxs/util")
 # WiX fragment id of the service exe: CM_CP_<component>.<file name with '-' -> '_'>
