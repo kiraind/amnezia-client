@@ -53,7 +53,8 @@ android {
             storeFile = providers.environmentVariable("QT_ANDROID_KEYSTORE_PATH").orNull?.let { file(it) }
             storePassword = providers.environmentVariable("QT_ANDROID_KEYSTORE_STORE_PASS").orNull
             keyAlias = providers.environmentVariable("QT_ANDROID_KEYSTORE_ALIAS").orNull
-            keyPassword = providers.environmentVariable("QT_ANDROID_KEYSTORE_STORE_PASS").orNull
+            keyPassword = providers.environmentVariable("QT_ANDROID_KEYSTORE_KEY_PASS").orNull
+                ?: providers.environmentVariable("QT_ANDROID_KEYSTORE_STORE_PASS").orNull
         }
     }
 
