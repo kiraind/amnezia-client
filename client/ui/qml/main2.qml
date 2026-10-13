@@ -100,11 +100,6 @@ Window  {
         }
     }
 
-    Loader {
-        active: Qt.platform.os === "android"
-        source: Qt.platform.os === "android" ? "Components/GamepadLoader.qml" : ""
-    }
-
     Connections {
         objectName: "pageControllerConnections"
 
@@ -130,14 +125,6 @@ Window  {
             popupNotificationMessage.closeButtonVisible = false
             popupNotificationMessage.open()
             popupNotificationTimer.start()
-        }
-
-        function onShowPassphraseRequestDrawer() {
-            privateKeyPassphraseDrawer.openTriggered()
-        }
-
-        function onGoToPageSettingsBackup() {
-            PageController.goToPage(PageEnum.PageSettingsBackup)
         }
 
         function onShowBusyIndicator(visible) {
@@ -212,110 +199,6 @@ Window  {
     }
 
     Item {
-        objectName: "captchaDialogItem"
-
-        anchors.fill: parent
-
-        CaptchaDialogType {
-            id: captchaDialog
-
-            onCaptchaSolved: function(captchaId, solution) {
-                PageController.showBusyIndicator(true)
-                Qt.callLater(function() {
-                    SubscriptionUiController.onCaptchaSolved(captchaId, solution)
-                })
-            }
-
-            onRefreshCaptchaRequested: function() {
-                SubscriptionUiController.onRefreshCaptchaRequested()
-            }
-        }
-    }
-
-    Item {
-        objectName: "privateKeyPassphraseDrawerItem"
-
-        anchors.fill: parent
-
-        DrawerType2 {
-            id: privateKeyPassphraseDrawer
-
-            property bool isCloseByUser: false
-
-            anchors.fill: parent
-            expandedHeight: root.height * 0.35 + PageController.safeAreaBottomMargin + PageController.imeHeight
-
-            expandedStateContent: ColumnLayout {
-                anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.topMargin: 16
-                anchors.leftMargin: 16
-                anchors.rightMargin: 16
-
-                Connections {
-                    target: privateKeyPassphraseDrawer
-                    function onOpened() {
-                        passphrase.textField.text = ""
-                        passphrase.textField.forceActiveFocus()
-                    }
-
-                    function onAboutToHide() {
-                        if (privateKeyPassphraseDrawer.isCloseByUser === false) {
-                            privateKeyPassphraseDrawer.isCloseByUser = true
-                            PageController.passphraseRequestDrawerClosed("")
-                        }
-
-                        if (passphrase.textField.text !== "") {
-                            PageController.showBusyIndicator(true)
-                        }
-                    }
-
-                    function onAboutToShow() {
-                        PageController.showBusyIndicator(false)
-                    }
-                }
-
-                TextFieldWithHeaderType {
-                    id: passphrase
-
-                    property bool hidePassword: true
-
-                    Layout.fillWidth: true
-                    headerText: qsTr("Private key passphrase")
-                    textField.echoMode: hidePassword ? TextInput.Password : TextInput.Normal
-                    buttonImageSource: hidePassword ? "qrc:/images/controls/eye.svg" : "qrc:/images/controls/eye-off.svg"
-
-                    clickedFunc: function() {
-                        hidePassword = !hidePassword
-                    }
-                }
-
-                BasicButtonType {
-                    id: saveButton
-
-                    Layout.fillWidth: true
-
-                    defaultColor: AmneziaStyle.color.transparent
-                    hoveredColor: AmneziaStyle.color.translucentWhite
-                    pressedColor: AmneziaStyle.color.sheerWhite
-                    disabledColor: AmneziaStyle.color.mutedGray
-                    textColor: AmneziaStyle.color.paleGray
-                    borderWidth: 1
-
-                    text: qsTr("Save")
-
-                    clickedFunc: function() {
-                        privateKeyPassphraseDrawer.isCloseByUser = true
-                        privateKeyPassphraseDrawer.closeTriggered()
-                        PageController.passphraseRequestDrawerClosed(passphrase.textField.text)
-                    }
-                }
-            }
-        }
-    }
-
-    Item {
         objectName: "questionDrawerItem"
 
         anchors.fill: parent
@@ -324,63 +207,6 @@ Window  {
             id: questionDrawer
 
             anchors.fill: parent
-        }
-    }
-
-    Item {
-        objectName: "subscriptionExpiredDrawerItem"
-
-        anchors.fill: parent
-
-        SubscriptionExpiredDrawer {
-            id: subscriptionExpiredDrawer
-
-            anchors.fill: parent
-        }
-    }
-
-    Connections {
-        target: PageController
-
-        function onUnsupportedConnectDrawerRequested() {
-            root.showUnsupportedConnectDrawer()
-        }
-    }
-
-    Connections {
-        target: SubscriptionUiController
-
-        function onSubscriptionExpiredOnServer() {
-            subscriptionExpiredDrawer.openTriggered()
-        }
-
-        function onCaptchaRequired(captchaId, captchaImageBase64, hint) {
-            if (captchaDialog.opened) {
-                PageController.showBusyIndicator(false)
-            }
-            captchaDialog.captchaId = captchaId
-            captchaDialog.captchaImageBase64 = captchaImageBase64
-            captchaDialog.hint = hint
-            captchaDialog.open()
-        }
-
-        function onCaptchaFlowDismissRequested() {
-            PageController.showBusyIndicator(false)
-            captchaDialog.close()
-        }
-
-        function onErrorOccurred(error) {
-            if (captchaDialog.opened) {
-                PageController.showBusyIndicator(false)
-            }
-        }
-    }
-
-    Connections {
-        target: SubscriptionUiController
-
-        function onRenewalLinkReceived(url) {
-            Qt.openUrlExternally(url)
         }
     }
 
@@ -394,28 +220,6 @@ Window  {
             anchors.centerIn: parent
             z: 1
         }
-    }
-
-    function showUnsupportedConnectDrawer() {
-        let headerText = qsTr("This subscription format is no longer supported")
-        let descriptionText = qsTr("This legacy Amnezia subscription type can no longer be used to connect in this application version.\nRemove the server from the app to continue.")
-        let yesButtonText = qsTr("Continue")
-        let noButtonText = qsTr("Cancel")
-
-        let yesButtonFunction = function() {
-            if (ConnectionController.isConnected) {
-                PageController.showNotificationMessage(qsTr("Cannot remove server during active connection"))
-                return
-            }
-
-            PageController.showBusyIndicator(true)
-            InstallController.removeServer(ServersUiController.defaultServerId)
-            PageController.showBusyIndicator(false)
-        }
-        let noButtonFunction = function() {
-        }
-
-        showQuestionDrawer(headerText, descriptionText, yesButtonText, noButtonText, yesButtonFunction, noButtonFunction)
     }
 
     function showQuestionDrawer(headerText, descriptionText, yesButtonText, noButtonText, yesButtonFunction, noButtonFunction) {

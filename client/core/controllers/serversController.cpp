@@ -64,19 +64,6 @@ bool ServersController::renameServer(const QString &serverId, const QString &nam
         m_serversRepository->editServer(serverId, cfg->toJson(), kind);
         return true;
     }
-    case serverConfigUtils::ConfigType::AmneziaPremiumV2:
-    case serverConfigUtils::ConfigType::AmneziaFreeV3:
-    case serverConfigUtils::ConfigType::ExternalPremium: {
-        auto cfg = m_serversRepository->apiV2Config(serverId);
-        if (!cfg.has_value()) return false;
-        cfg->name = name;
-        cfg->displayName = name;
-        cfg->nameOverriddenByUser = true;
-        m_serversRepository->editServer(serverId, cfg->toJson(), kind);
-        return true;
-    }
-    case serverConfigUtils::ConfigType::AmneziaPremiumV1:
-    case serverConfigUtils::ConfigType::AmneziaFreeV2:
     case serverConfigUtils::ConfigType::Invalid:
     default:
         return false;
@@ -118,20 +105,45 @@ void ServersController::setDefaultContainer(const QString &serverId, DockerConta
         m_serversRepository->editServer(serverId, cfg->toJson(), kind);
         return;
     }
-    case serverConfigUtils::ConfigType::AmneziaPremiumV2:
-    case serverConfigUtils::ConfigType::AmneziaFreeV3:
-    case serverConfigUtils::ConfigType::ExternalPremium: {
-        auto cfg = m_serversRepository->apiV2Config(serverId);
-        if (!cfg.has_value()) return;
-        cfg->defaultContainer = container;
-        m_serversRepository->editServer(serverId, cfg->toJson(), kind);
-        return;
-    }
-    case serverConfigUtils::ConfigType::AmneziaPremiumV1:
-    case serverConfigUtils::ConfigType::AmneziaFreeV2:
     case serverConfigUtils::ConfigType::Invalid:
     default:
         return;
+    }
+}
+
+ErrorCode ServersController::updateClientConfig(const QString &serverId, DockerContainer container,
+                                                const ContainerConfig &newConfig)
+{
+    switch (m_serversRepository->serverKind(serverId)) {
+    case serverConfigUtils::ConfigType::SelfHostedAdmin: {
+        auto config = m_serversRepository->selfHostedAdminConfig(serverId);
+        if (!config.has_value()) {
+            return ErrorCode::InternalError;
+        }
+        config->updateContainerConfig(container, newConfig);
+        m_serversRepository->editServer(serverId, config->toJson(), serverConfigUtils::ConfigType::SelfHostedAdmin);
+        return ErrorCode::NoError;
+    }
+    case serverConfigUtils::ConfigType::SelfHostedUser: {
+        auto config = m_serversRepository->selfHostedUserConfig(serverId);
+        if (!config.has_value()) {
+            return ErrorCode::InternalError;
+        }
+        config->updateContainerConfig(container, newConfig);
+        m_serversRepository->editServer(serverId, config->toJson(), serverConfigUtils::ConfigType::SelfHostedUser);
+        return ErrorCode::NoError;
+    }
+    case serverConfigUtils::ConfigType::Native: {
+        auto config = m_serversRepository->nativeConfig(serverId);
+        if (!config.has_value()) {
+            return ErrorCode::InternalError;
+        }
+        config->updateContainerConfig(container, newConfig);
+        m_serversRepository->editServer(serverId, config->toJson(), serverConfigUtils::ConfigType::Native);
+        return ErrorCode::NoError;
+    }
+    default:
+        return ErrorCode::InternalError;
     }
 }
 
@@ -170,25 +182,6 @@ QVector<ServerDescription> ServersController::buildServerDescriptions(bool isAmn
             d = buildServerDescription(*cfg, isAmneziaDnsEnabled);
             break;
         }
-        case Kind::AmneziaPremiumV2:
-        case Kind::AmneziaFreeV3:
-        case Kind::ExternalPremium: {
-            const auto cfg = m_serversRepository->apiV2Config(id);
-            if (!cfg) {
-                continue;
-            }
-            d = buildServerDescription(*cfg, isAmneziaDnsEnabled);
-            break;
-        }
-        case Kind::AmneziaPremiumV1:
-        case Kind::AmneziaFreeV2: {
-            const auto cfg = m_serversRepository->legacyApiConfig(id);
-            if (!cfg) {
-                continue;
-            }
-            d = buildServerDescription(*cfg, isAmneziaDnsEnabled);
-            break;
-        }
         case Kind::Invalid:
         default:
             continue;
@@ -215,17 +208,6 @@ QMap<DockerContainer, ContainerConfig> ServersController::getServerContainersMap
         const auto cfg = m_serversRepository->nativeConfig(serverId);
         return cfg.has_value() ? cfg->containers : QMap<DockerContainer, ContainerConfig>{};
     }
-    case serverConfigUtils::ConfigType::AmneziaPremiumV2:
-    case serverConfigUtils::ConfigType::AmneziaFreeV3:
-    case serverConfigUtils::ConfigType::ExternalPremium: {
-        const auto cfg = m_serversRepository->apiV2Config(serverId);
-        return cfg.has_value() ? cfg->containers : QMap<DockerContainer, ContainerConfig>{};
-    }
-    case serverConfigUtils::ConfigType::AmneziaPremiumV1:
-    case serverConfigUtils::ConfigType::AmneziaFreeV2: {
-        const auto cfg = m_serversRepository->legacyApiConfig(serverId);
-        return cfg.has_value() ? cfg->containers : QMap<DockerContainer, ContainerConfig>{};
-    }
     case serverConfigUtils::ConfigType::Invalid:
     default:
         return {};
@@ -245,17 +227,6 @@ DockerContainer ServersController::getDefaultContainer(const QString &serverId) 
     }
     case serverConfigUtils::ConfigType::Native: {
         const auto cfg = m_serversRepository->nativeConfig(serverId);
-        return cfg.has_value() ? cfg->defaultContainer : DockerContainer::None;
-    }
-    case serverConfigUtils::ConfigType::AmneziaPremiumV2:
-    case serverConfigUtils::ConfigType::AmneziaFreeV3:
-    case serverConfigUtils::ConfigType::ExternalPremium: {
-        const auto cfg = m_serversRepository->apiV2Config(serverId);
-        return cfg.has_value() ? cfg->defaultContainer : DockerContainer::None;
-    }
-    case serverConfigUtils::ConfigType::AmneziaPremiumV1:
-    case serverConfigUtils::ConfigType::AmneziaFreeV2: {
-        const auto cfg = m_serversRepository->legacyApiConfig(serverId);
         return cfg.has_value() ? cfg->defaultContainer : DockerContainer::None;
     }
     case serverConfigUtils::ConfigType::Invalid:
@@ -326,25 +297,6 @@ QString ServersController::notificationDisplayName(const QString &serverId) cons
         }
         break;
     }
-    case Kind::AmneziaPremiumV2:
-    case Kind::AmneziaFreeV3:
-    case Kind::ExternalPremium: {
-        if (const auto cfg = m_serversRepository->apiV2Config(serverId)) {
-            if (!cfg->displayName.isEmpty()) {
-                return cfg->displayName;
-            }
-        }
-        break;
-    }
-    case Kind::AmneziaPremiumV1:
-    case Kind::AmneziaFreeV2: {
-        if (const auto cfg = m_serversRepository->legacyApiConfig(serverId)) {
-            if (!cfg->displayName.isEmpty()) {
-                return cfg->displayName;
-            }
-        }
-        break;
-    }
     default:
         break;
     }
@@ -354,11 +306,6 @@ QString ServersController::notificationDisplayName(const QString &serverId) cons
         return QString::number(idx + 1);
     }
     return serverId;
-}
-
-std::optional<ApiV2ServerConfig> ServersController::apiV2Config(const QString &serverId) const
-{
-    return m_serversRepository->apiV2Config(serverId);
 }
 
 std::optional<SelfHostedAdminServerConfig> ServersController::selfHostedAdminConfig(const QString &serverId) const
@@ -378,23 +325,6 @@ ServerCredentials ServersController::getServerCredentials(const QString &serverI
     return ServerCredentials {};
 }
 
-bool ServersController::isServerFromApiAlreadyExists(const QString &userCountryCode, const QString &serviceType,
-                                                      const QString &serviceProtocol) const
-{
-    const QVector<QString> ids = m_serversRepository->orderedServerIds();
-    for (const QString &id : ids) {
-        const auto apiV2 = m_serversRepository->apiV2Config(id);
-        if (!apiV2.has_value()) {
-            continue;
-        }
-        if (apiV2->apiConfig.userCountryCode == userCountryCode && apiV2->serviceType() == serviceType
-            && apiV2->serviceProtocol() == serviceProtocol) {
-            return true;
-        }
-    }
-    return false;
-}
-
 bool ServersController::hasInstalledContainers(const QString &serverId) const
 {
     const QMap<DockerContainer, ContainerConfig> containers = getServerContainersMap(serverId);
@@ -404,15 +334,28 @@ bool ServersController::hasInstalledContainers(const QString &serverId) const
         if (ContainerUtils::containerService(container) == ServiceType::Vpn) {
             return true;
         }
-        if (container == DockerContainer::SSXray) {
-            return true;
-        }
     }
     return false;
 }
 
-bool ServersController::isLegacyApiV1Server(const QString &serverId) const
+ErrorCode ServersController::validateClientConfig(const QString &serverId) const
 {
-    return !serverId.isEmpty()
-            && serverConfigUtils::isLegacyApiSubscription(m_serversRepository->serverKind(serverId));
+    switch (m_serversRepository->serverKind(serverId)) {
+    case serverConfigUtils::ConfigType::SelfHostedAdmin:
+    case serverConfigUtils::ConfigType::SelfHostedUser:
+    case serverConfigUtils::ConfigType::Native:
+        break;
+    default:
+        return ErrorCode::InternalError;
+    }
+
+    const DockerContainer container = getDefaultContainer(serverId);
+    if (container == DockerContainer::None) {
+        return ErrorCode::NoInstalledContainersError;
+    }
+
+    if (!getContainerConfig(serverId, container).protocolConfig.hasClientConfig()) {
+        return ErrorCode::InternalError;
+    }
+    return ErrorCode::NoError;
 }

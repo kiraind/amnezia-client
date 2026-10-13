@@ -49,16 +49,10 @@ private slots:
 
     void testConnect() {
         QString awgKey = getEnvValue("THIRD_PARTY_AWG_VPN_KEY");
-        QString xrayKey = getEnvValue("THIRD_PARTY_XRAY_VPN_KEY");
         QString wgKey = getEnvValue("THIRD_PARTY_WIRE_GUARD_VPN_KEY");
-        QString ovpnKey = getEnvValue("THIRD_PARTY_OPEN_VPN_KEY");
-        QString ikevKey = getEnvValue("THIRD_PARTY_IKEV_VPN_KEY");
 
         logEnvValueState("THIRD_PARTY_AWG_VPN_KEY");
-        logEnvValueState("THIRD_PARTY_XRAY_VPN_KEY");
         logEnvValueState("THIRD_PARTY_WIRE_GUARD_VPN_KEY");
-        logEnvValueState("THIRD_PARTY_OPEN_VPN_KEY");
-        logEnvValueState("THIRD_PARTY_IKEV_VPN_KEY");
 
         // toggleConnection() silently refuses to emit prepareConfig when the
         // AmneziaVPN service process is not running (isConnectionSupported returns
@@ -82,9 +76,9 @@ private slots:
             qWarning() << "Error on AWG key import";
         }
 
-        auto importResult1 = m_coreController->m_importCoreController->extractConfigFromData(xrayKey);
-        if (importResult1.errorCode == ErrorCode::NoError) {
-            m_coreController->m_importCoreController->importConfig(importResult1.config);
+        auto importResult2 = m_coreController->m_importCoreController->extractConfigFromData(wgKey);
+        if (importResult2.errorCode == ErrorCode::NoError) {
+            m_coreController->m_importCoreController->importConfig(importResult2.config);
 
             m_coreController->m_connectionUiController->toggleConnection();
             QVERIFY2(prepareConfigSpy.count() == 3, "prepareConfig signal should be emitted three times");
@@ -92,47 +86,7 @@ private slots:
             m_coreController->m_connectionUiController->toggleConnection();
             QVERIFY2(m_coreController->m_connectionUiController->isConnected() == false, "Connection should NOT be active");
         } else {
-            qWarning() << "Error on XRay key import";
-        }
-
-        auto importResult2 = m_coreController->m_importCoreController->extractConfigFromData(wgKey);
-        if (importResult2.errorCode == ErrorCode::NoError) {
-            m_coreController->m_importCoreController->importConfig(importResult2.config);
-
-            m_coreController->m_connectionUiController->toggleConnection();
-            QVERIFY2(prepareConfigSpy.count() == 5, "prepareConfig signal should be emitted five times");
-
-            m_coreController->m_connectionUiController->toggleConnection();
-            QVERIFY2(m_coreController->m_connectionUiController->isConnected() == false, "Connection should NOT be active");
-        } else {
             qWarning() << "Error on WG key import";
-        }
-
-        auto importResult3 = m_coreController->m_importCoreController->extractConfigFromData(ovpnKey);
-        if (importResult3.errorCode == ErrorCode::NoError) {
-            m_coreController->m_importCoreController->importConfig(importResult3.config);
-
-            m_coreController->m_connectionUiController->toggleConnection();
-            QVERIFY2(prepareConfigSpy.count() == 7, "prepareConfig signal should be emitted seven times");
-
-            m_coreController->m_connectionUiController->toggleConnection();
-            QVERIFY2(m_coreController->m_connectionUiController->isConnected() == false, "Connection should NOT be active");
-        } else {
-            qWarning() << "Error on OpenVPN key import";
-        }
-
-        auto importResult4 = m_coreController->m_importCoreController->extractConfigFromData(ikevKey);
-        if (importResult4.errorCode == ErrorCode::NoError) {
-            m_coreController->m_importCoreController->importConfig(importResult4.config);
-
-            m_coreController->m_connectionUiController->toggleConnection();
-            QVERIFY2(prepareConfigSpy.count() == 9, "prepareConfig signal should be emitted nine times");
-
-            m_coreController->m_connectionUiController->toggleConnection();
-            QVERIFY2(m_coreController->m_connectionUiController->isConnected() == false, "Connection should NOT be active");
-        }
-        else {
-            qWarning() << "Error on IKEV key import";
         }
     }
 };

@@ -4,9 +4,6 @@ if(NOT DEFINED APP_ANDROID_MIN_SDK)
     set(APP_ANDROID_MIN_SDK 28)
 endif()
 
-# Option to build Play variant (with Google Play Billing) instead of OSS
-# When ON, adds target android_play_apk: cmake --build . --target android_play_apk
-option(ANDROID_BUILD_PLAY "Add android_play_apk target for Google Play Billing build" OFF)
 set(ANDROID_PLATFORM "android-${APP_ANDROID_MIN_SDK}" CACHE STRING
     "The minimum API level supported by the application or library" FORCE)
 
@@ -52,13 +49,6 @@ find_package(awg-android REQUIRED)
 set(LIBS ${LIBS} amnezia::awg-android)
 set_property(TARGET ${PROJECT} APPEND PROPERTY QT_ANDROID_EXTRA_LIBS ${AMNEZIA_ANDROID_LIBWG_PATH} ${AMNEZIA_ANDROID_LIBWG_QUICK_PATH})
 
-find_package(amnezia-libxray REQUIRED)
-file(COPY ${AMNEZIA_LIBXRAY_PATH} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/android/xray/libXray)
-
-find_package(openvpn-pt-android REQUIRED)
-set(LIBS ${LIBS} amnezia::openvpn-pt-android)
-set_property(TARGET ${PROJECT} APPEND PROPERTY QT_ANDROID_EXTRA_LIBS ${OPENVPN_PT_ANDROID_LIBCK_OVPN_PLUGIN_PATH})
-
 set(APP_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android)
 
 if(APP_ANDROID_MAX_SDK)
@@ -94,33 +84,3 @@ add_custom_target(android_gradle_clean
     WORKING_DIRECTORY "${_android_build_dir}"
     COMMENT "Cleaning Android Gradle build cache"
 )
-
-# Always-available debug target: build Play Debug APK and copy to standard output path
-# so Qt Creator's deploy step picks it up automatically
-add_custom_target(android_play_debug_install
-    COMMAND ./gradlew assemblePlayDebug
-    COMMAND sh -c "cp build/outputs/apk/play/debug/*.apk build/outputs/apk/android-build-${PROJECT}-debug.apk"
-    WORKING_DIRECTORY "${_android_build_dir}"
-    COMMENT "Building Android Play Debug APK and copying to deploy path"
-    DEPENDS ${PROJECT}
-)
-
-if(ANDROID_BUILD_PLAY)
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(_gradle_suffix "Debug")
-    else()
-        set(_gradle_suffix "Release")
-    endif()
-    add_custom_target(android_play_apk
-        COMMAND ./gradlew assemblePlay${_gradle_suffix}
-        WORKING_DIRECTORY "${_android_build_dir}"
-        COMMENT "Building Android Play APK (assemblePlay${_gradle_suffix})"
-        DEPENDS ${PROJECT}
-    )
-    add_custom_target(android_play_aab
-        COMMAND ./gradlew bundlePlay${_gradle_suffix}
-        WORKING_DIRECTORY "${_android_build_dir}"
-        COMMENT "Building Android Play AAB (bundlePlay${_gradle_suffix})"
-        DEPENDS ${PROJECT}
-    )
-endif()

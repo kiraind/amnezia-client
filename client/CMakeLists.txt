@@ -25,17 +25,6 @@ execute_process(
 
 add_definitions(-DGIT_COMMIT_HASH="${GIT_COMMIT_HASH}")
 
-add_definitions(-DPROD_AGW_PUBLIC_KEY="$ENV{PROD_AGW_PUBLIC_KEY}")
-add_definitions(-DPROD_S3_ENDPOINT="$ENV{PROD_S3_ENDPOINT}")
-add_definitions(-DFALLBACK_S3_ENDPOINT="$ENV{FALLBACK_S3_ENDPOINT}")
-
-add_definitions(-DDEV_AGW_PUBLIC_KEY="$ENV{DEV_AGW_PUBLIC_KEY}")
-add_definitions(-DDEV_AGW_ENDPOINT="$ENV{DEV_AGW_ENDPOINT}")
-add_definitions(-DDEV_S3_ENDPOINT="$ENV{DEV_S3_ENDPOINT}")
-
-add_definitions(-DFREE_V2_ENDPOINT="$ENV{FREE_V2_ENDPOINT}")
-add_definitions(-DPREM_V1_ENDPOINT="$ENV{PREM_V1_ENDPOINT}")
-
 # VPN coordinator base URL offered by default on the coordinator login page (empty = user must enter it)
 set(COORDINATOR_API_URL "" CACHE STRING "Default VPN coordinator API base URL")
 if(NOT COORDINATOR_API_URL STREQUAL "")
@@ -71,16 +60,11 @@ target_compile_definitions(${PROJECT} PRIVATE
 
 if(WIN32 OR (APPLE AND NOT IOS AND NOT MACOS_NE) OR (LINUX AND NOT ANDROID))
     qt_add_repc_replicas(${PROJECT} ${CMAKE_CURRENT_LIST_DIR}/../ipc/ipc_interface.rep)
-    qt_add_repc_replicas(${PROJECT} ${CMAKE_CURRENT_LIST_DIR}/../ipc/ipc_process_interface.rep)
 endif()
 
 qt6_add_resources(QRC ${QRC}
     ${CMAKE_CURRENT_LIST_DIR}/images/images.qrc
-    ${CMAKE_CURRENT_LIST_DIR}/images/flagKit.qrc
-    ${CMAKE_CURRENT_LIST_DIR}/resources/countries.qrc
-    ${CMAKE_CURRENT_LIST_DIR}/client_scripts/clientScripts.qrc
     ${CLIENT_QML_QRC_FILE}
-    ${CMAKE_CURRENT_LIST_DIR}/server_scripts/serverScripts.qrc
     ${CLIENT_EXTRA_QRC}
 )
 
@@ -185,7 +169,6 @@ if(WIN32)
 
     set(LIBS ${LIBS}
         user32
-        rasapi32
         shlwapi
         iphlpapi
         ws2_32
@@ -296,30 +279,9 @@ install(SCRIPT ${QT_DEPLOY_SCRIPT}
 )
 
 if (APPLE AND NOT IOS AND NOT MACOS_NE)
-    list(APPEND OVPN_SCRIPTS "${CMAKE_SOURCE_DIR}/deploy/data/macos/update-resolv-conf.sh")
     set_target_properties(${PROJECT} PROPERTIES
         XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED "NO"
         XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO"
-    )
-endif()
-if (LINUX AND NOT ANDROID)
-    list(APPEND OVPN_SCRIPTS "${CMAKE_SOURCE_DIR}/deploy/data/linux/update-resolv-conf.sh")
-endif()
-
-if(OVPN_SCRIPTS)
-    add_custom_command(TARGET ${PROJECT} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${OVPN_SCRIPTS}
-        "$<TARGET_FILE_DIR:${PROJECT}>"
-    )
-
-    install(FILES ${OVPN_SCRIPTS}
-        DESTINATION ${CMAKE_INSTALL_BINDIR}
-        COMPONENT AmneziaVPN
-        PERMISSIONS
-            OWNER_READ OWNER_EXECUTE
-            GROUP_READ GROUP_EXECUTE
-            WORLD_READ WORLD_EXECUTE
     )
 endif()
 

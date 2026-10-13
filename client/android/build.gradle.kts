@@ -74,16 +74,12 @@ android {
         }
     }
 
+    // Fork: Play Billing flavor removed; the single "oss" flavor stays so output paths (outputs/apk/oss/...) are unchanged
     flavorDimensions += "billing"
 
     productFlavors {
         create("oss") {
             dimension = "billing"
-            buildConfigField("boolean", "IS_PLAY_BUILD", "false")
-        }
-        create("play") {
-            dimension = "billing"
-            buildConfigField("boolean", "IS_PLAY_BUILD", "true")
         }
     }
 
@@ -95,14 +91,6 @@ android {
             // androyddeployqt creates the folders below
             assets.setSrcDirs(listOf("assets"))
             jniLibs.setSrcDirs(listOf("libs"))
-        }
-
-        getByName("oss") {
-            java.setSrcDirs(listOf("oss"))
-        }
-
-        getByName("play") {
-            java.setSrcDirs(listOf("play"))
         }
     }
 
@@ -134,9 +122,7 @@ android {
     //   AAB: build/outputs/bundle/{buildType}/{base}-{buildType}.aab (no flavor subdir)
     // where {base} = outputBaseName (set by Qt Creator) or "android-build" (CI fallback).
     // Release APK gets -unsigned suffix (Qt cmake signs it); debug does not.
-    // Copy only oss flavor to the flat output dir that androiddeployqt/Qt Creator expect.
-    // Play flavor is built via android_play_apk/android_play_aab cmake targets and uses
-    // its native Gradle output paths directly.
+    // Copy the oss flavor (the only one) to the flat output dir that androiddeployqt/Qt Creator expect.
     applicationVariants.all {
         val flavorName = productFlavors.firstOrNull()?.name ?: ""
         val buildTypeName = buildType.name
@@ -175,8 +161,8 @@ android {
 }
 
 // Fork CI: `-PonlyOssRelease=true` (or ORG_GRADLE_PROJECT_onlyOssRelease=true) builds only the
-// ossRelease variant. Qt's aab target runs `bundle`, which otherwise packages six bundles
-// (oss/play x debug/release/fdroid) for every ABI and overflows the CI runner disk.
+// ossRelease variant. Qt's aab target runs `bundle`, which otherwise packages a bundle per
+// build type (debug/release/fdroid) for every ABI and overflows the CI runner disk.
 androidComponents {
     beforeVariants { variant ->
         if (providers.gradleProperty("onlyOssRelease").orNull == "true") {
@@ -191,20 +177,11 @@ dependencies {
     implementation(project(":protocolApi"))
     implementation(project(":wireguard"))
     implementation(project(":awg"))
-    implementation(project(":openvpn"))
-    implementation(project(":xray"))
     implementation(libs.androidx.core)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.fragment)
     implementation(libs.kotlinx.coroutines)
     implementation(libs.kotlinx.serialization.protobuf)
-    implementation(libs.bundles.androidx.camera)
-    implementation(libs.google.mlkit)
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.biometric)
-
-    playImplementation(project(":billing"))
 }
-
-fun DependencyHandler.playImplementation(dependency: Any): Dependency? =
-    add("playImplementation", dependency)

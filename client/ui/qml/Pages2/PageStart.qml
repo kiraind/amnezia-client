@@ -36,26 +36,13 @@ PageType {
         }
 
         function onGoToPageSettings() {
-            tabBar.setCurrentIndex(2)
+            tabBar.setCurrentIndex(1)
             tabBarStackView.goToTabBarPage(PageEnum.PageSettings)
         }
 
         function onGoToPageViewConfig() {
             var pagePath = PageController.getPagePath(PageEnum.PageSetupWizardViewConfig)
             tabBarStackView.push(pagePath, { "objectName" : pagePath }, StackView.PushTransition)
-        }
-
-        function onGoToShareConnectionPage(headerText, configContentHeaderText, configCaption, configExtension, configFileName) {
-            var pagePath = PageController.getPagePath(PageEnum.PageShareConnection)
-            tabBarStackView.push(pagePath,
-                                 { "objectName" : pagePath,
-                                     "headerText" : headerText,
-                                     "configContentHeaderText" : configContentHeaderText,
-                                     "configCaption" : configCaption,
-                                     "configExtension" : configExtension,
-                                     "configFileName" : configFileName
-                                 },
-                                 StackView.PushTransition)
         }
 
         function onDisableControls(disabled) {
@@ -96,8 +83,7 @@ PageType {
             }
 
             var pageName = tabBarStackView.currentItem.objectName
-            if ((pageName === PageController.getPagePath(PageEnum.PageShare)) ||
-                    (pageName === PageController.getPagePath(PageEnum.PageSettings)) ||
+            if ((pageName === PageController.getPagePath(PageEnum.PageSettings)) ||
                     (pageName === PageController.getPagePath(PageEnum.PageSetupWizardConfigSource)) ||
                     (pageName === PageController.getPagePath(PageEnum.PageCoordinatorConfigs) && tabBarStackView.depth <= 1)) {
                 PageController.goToPageHome()
@@ -108,44 +94,9 @@ PageType {
     }
 
     Connections {
-        objectName: "connectionControllerConnections"
+        objectName: "protocolSettingsControllerConnections"
 
-        target: ConnectionController
-
-        function onNoInstalledContainers() {
-            PageController.setTriggeredByConnectButton(true)
-
-            ServersUiController.setProcessedServerId(ServersUiController.defaultServerId)
-            PageController.goToPage(PageEnum.PageSetupWizardEasy)
-        }
-    }
-
-    Connections {
-        objectName: "installControllerConnections"
-
-        target: InstallController
-
-        function onInstallationErrorOccurred(error) {
-            PageController.showBusyIndicator(false)
-
-            PageController.showErrorMessage(error)
-
-            var needCloseCurrentPage = false
-            var currentPageName = tabBarStackView.currentItem.objectName
-
-            if (currentPageName === PageController.getPagePath(PageEnum.PageSetupWizardInstalling)) {
-                needCloseCurrentPage = true
-            } else if (currentPageName === PageController.getPagePath(PageEnum.PageDeinstalling)) {
-                needCloseCurrentPage = true
-            }
-            if (needCloseCurrentPage) {
-                PageController.closePage()
-            }
-        }
-
-        function onWrongInstallationUser(message) {
-            onInstallationErrorOccurred(message)
-        }
+        target: ProtocolSettingsController
 
         function onUpdateContainerFinished(message, closePage) {
             PageController.showNotificationMessage(message)
@@ -153,10 +104,12 @@ PageType {
                 PageController.closePage()
             }
         }
+    }
 
-        function onCachedProfileCleared(message) {
-            PageController.showNotificationMessage(message)
-        }
+    Connections {
+        objectName: "serversUiControllerConnections"
+
+        target: ServersUiController
 
         function onRemoveServerFinished(finishedMessage) {
             if (!ServersUiController.getServersCount()) {
@@ -165,21 +118,6 @@ PageType {
                 PageController.goToStartPage()
                 PageController.goToPage(PageEnum.PageSettingsServersList)
             }
-            PageController.showNotificationMessage(finishedMessage)
-        }
-
-        function onRemoveAllContainersFinished(finishedMessage) {
-            if (tabBarStackView.currentItem.objectName === PageController.getPagePath(PageEnum.PageDeinstalling)) {
-                PageController.closePage()
-            }
-            PageController.showNotificationMessage(finishedMessage)
-        }
-
-        function onRemoveContainerFinished(finishedMessage) {
-            if (tabBarStackView.currentItem.objectName === PageController.getPagePath(PageEnum.PageDeinstalling)) {
-                PageController.closePage()
-            }
-            PageController.closePage()
             PageController.showNotificationMessage(finishedMessage)
         }
     }
@@ -192,12 +130,6 @@ PageType {
         function onImportErrorOccurred(error, goToPageHome) {
             PageController.showErrorMessage(error)
         }
-
-        function onRestoreAppConfig(data) {
-            PageController.showBusyIndicator(true)
-            SettingsController.restoreAppConfigFromData(data)
-            PageController.showBusyIndicator(false)
-        }
     }
 
     Connections {
@@ -209,62 +141,12 @@ PageType {
             PageController.showNotificationMessage(qsTr("Logging was disabled after 14 days, log files were deleted"))
         }
 
-        function onRestoreBackupFinished() {
-            PageController.showNotificationMessage(qsTr("Settings restored from backup file"))
-            PageController.goToPageHome()
-        }
-
         function onLoggingStateChanged() {
             if (SettingsController.isLoggingEnabled) {
                 var message = qsTr("Logging is enabled. Note that logs will be automatically" +
                                    "disabled after 14 days, and all log files will be deleted.")
                 PageController.showNotificationMessage(message)
             }
-        }
-    }
-
-    Connections {
-        target: SubscriptionUiController
-
-        function onErrorOccurred(error) {
-            PageController.showErrorMessage(error)
-        }
-    }
-
-    Connections {
-        target: SubscriptionUiController
-
-        function onApiConfigRemoved(message) {
-            PageController.showNotificationMessage(message)
-        }
-
-        function onApiServerRemoved(message) {
-            if (!ServersUiController.getServersCount()) {
-                PageController.goToPageHome()
-            } else {
-                PageController.goToStartPage()
-                PageController.goToPage(PageEnum.PageSettingsServersList)
-            }
-            PageController.showNotificationMessage(message)
-        }
-
-        function onInstallServerFromApiFinished(message, preferredDefaultIndex) {
-            PageController.goToPageHome()
-            PageController.showNotificationMessage(message)
-        }
-
-        function onBackgroundPurchaseCompleted(message) {
-            PageController.showNotificationMessage(message)
-        }
-
-        function onChangeApiCountryFinished(message) {
-            PageController.goToPageHome()
-            PageController.showNotificationMessage(message)
-        }
-
-        function onReloadServerFromApiFinished(message) {
-            PageController.goToPageHome()
-            PageController.showNotificationMessage(message)
         }
     }
 
@@ -376,47 +258,14 @@ PageType {
         }
 
         TabImageButtonType {
-            id: shareTabButton
-            objectName: "shareTabButton"
-
-            Connections {
-                target: ServersModel
-
-                function onModelReset() {
-                    if (!SettingsController.isOnTv()) {
-                        var hasServerWithWriteAccess = ServersUiController.hasServerWithWriteAccess()
-                        shareTabButton.visible = hasServerWithWriteAccess
-                        shareTabButton.width = hasServerWithWriteAccess ? undefined : 0
-                    }
-                }
-            }
-
-            visible: !SettingsController.isOnTv() && ServersUiController.hasServerWithWriteAccess()
-            width: !SettingsController.isOnTv() && ServersUiController.hasServerWithWriteAccess() ? undefined : 0
-
-            isSelected: tabBar.currentIndex === 1
-            image: "qrc:/images/controls/share-2.svg"
-            clickedFunc: function () {
-                tabBarStackView.goToTabBarPage(PageEnum.PageShare)
-                tabBar.currentIndex = 1
-            }
-        }
-
-        TabImageButtonType {
             id: settingsTabButton
             objectName: "settingsTabButton"
 
-            isSelected: tabBar.currentIndex === 2
-            image: (ServersUiController.hasServersFromGatewayApi && NewsModel.hasUnread && SettingsController.isNewsNotificationsEnabled()) ? "qrc:/images/controls/settings-news.svg" : "qrc:/images/controls/settings.svg"
-            Binding {
-                target: settingsTabButton
-                property: "defaultColor"
-                value: "transparent"
-                when: (ServersUiController.hasServersFromGatewayApi && NewsModel.hasUnread)
-            }
+            isSelected: tabBar.currentIndex === 1
+            image: "qrc:/images/controls/settings.svg"
             clickedFunc: function () {
                 tabBarStackView.goToTabBarPage(PageEnum.PageSettings)
-                tabBar.currentIndex = 2
+                tabBar.currentIndex = 1
             }
         }
 
@@ -424,13 +273,13 @@ PageType {
             id: plusTabButton
             objectName: "plusTabButton"
 
-            isSelected: tabBar.currentIndex === 3
+            isSelected: tabBar.currentIndex === 2
             image: "qrc:/images/controls/plus.svg"
             clickedFunc: function () {
                 // Fork: once logged in, "+" opens the VPN account instead of the connection screen
                 tabBarStackView.goToTabBarPage(CoordinatorController.loggedIn ? PageEnum.PageCoordinatorConfigs
                                                                               : PageEnum.PageSetupWizardConfigSource)
-                tabBar.currentIndex = 3
+                tabBar.currentIndex = 2
             }
         }
     }

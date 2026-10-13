@@ -37,9 +37,6 @@ public:
 
     void clearLogs();
 
-    QByteArray backupAppConfig() const;
-    ErrorCode restoreAppConfigFromData(const QByteArray &data);
-    int unsupportedFormatConfigsSkippedCount() const;
 
     QString getAppVersion() const;
 
@@ -57,12 +54,6 @@ public:
     bool isScreenshotsEnabled() const;
     void toggleScreenshotsEnabled(bool enable);
 
-    bool isNewsNotificationsEnabled() const;
-    void toggleNewsNotificationsEnabled(bool enable);
-
-    bool isAutoUpdateCheckEnabled() const;
-    void toggleAutoUpdateCheckEnabled(bool enable);
-
     bool isKillSwitchEnabled() const;
     void toggleKillSwitch(bool enable);
 
@@ -71,19 +62,7 @@ public:
 
     QString getInstallationUuid(bool createIfNotExists = true) const;
 
-    void enableDevMode();
-    
     QString nextAvailableServerName() const;
-    bool isDevModeEnabled() const;
-
-    void resetGatewayEndpoint();
-    void setGatewayEndpoint(const QString &endpoint);
-    QString getGatewayEndpoint() const;
-    bool isDevGatewayEnv() const;
-    void toggleDevGatewayEnv(bool enabled);
-
-    bool isHomeAdLabelVisible() const;
-    void disableHomeAdLabel();
 
     void checkIfNeedDisableLogs();
 
@@ -95,17 +74,13 @@ signals:
     void siteSplitTunnelingToggled(bool enabled);
     void appSplitTunnelingRouteModeChanged(AppsRouteMode mode);
     void appSplitTunnelingToggled(bool enabled);
-    void appSplitTunnelingClearAppsList();
 
 private:
-    QString getPlatform() const;
-
     SecureServersRepository* m_serversRepository;
     SecureAppSettingsRepository* m_appSettingsRepository;
 
     QString m_appVersion;
     QDateTime m_loggingDisableDate;
-    bool m_isDevModeEnabled = false;
 };
 
 #endif

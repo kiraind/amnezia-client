@@ -12,45 +12,13 @@ Item {
     }
 
     ValueFilter {
-        id: serviceTypeFilter
-        roleName: "isServiceContainer"
-        value: true
-    }
-
-    ValueFilter {
-        id: supportedFilter
-        roleName: "isSupported"
-        value: true
-    }
-
-    ValueFilter {
         id: installedFilter
         roleName: "isInstalled"
         value: true
     }
 
-    ValueFilter {
-        id: installationAllowedFilter
-        roleName: "isInstallationAllowed"
-        value: true
-    }
-
-    AnyOf {
-        id: showProtocolFilter
-        filters: [ installedFilter, installationAllowedFilter ]
-    }
-
-    function getWriteAccessProtocolsListFilters() {
-        return [ vpnTypeFilter, showProtocolFilter ]
-    }
+    // Fork: no install/services UI, only installed VPN protocols are ever listed
     function getReadAccessProtocolsListFilters() {
         return [vpnTypeFilter, installedFilter]
-    }
-
-    function getWriteAccessServicesListFilters() {
-        return [serviceTypeFilter]
-    }
-    function getReadAccessServicesListFilters() {
-        return [serviceTypeFilter, installedFilter]
     }
 }

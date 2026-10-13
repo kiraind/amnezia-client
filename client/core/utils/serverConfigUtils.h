@@ -6,6 +6,8 @@
 namespace serverConfigUtils
 {
 
+// Fork: the Amnezia gateway kinds (AmneziaFree*/AmneziaPremium*/ExternalPremium) are no longer produced
+// (configTypeFromJson returns Invalid for gateway configs); the values are kept so the numbering stays stable.
 enum ConfigType {
     AmneziaFreeV2 = 0,
     AmneziaFreeV3,
@@ -33,13 +35,7 @@ bool isConfigFormatVersionSupported(const QJsonObject &serverConfigObject);
 
 bool isServerFromApi(const QJsonObject &serverConfigObject);
 
-ConfigSource getConfigSource(const QJsonObject &serverConfigObject);
-
 ConfigType configTypeFromJson(const QJsonObject &serverConfigObject);
-
-bool isLegacyApiSubscription(ConfigType configType);
-
-bool isApiV2Subscription(ConfigType configType);
 
 } // namespace serverConfigUtils
 

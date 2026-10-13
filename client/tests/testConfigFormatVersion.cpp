@@ -6,7 +6,6 @@
 #include <QUuid>
 
 #include "utils/testCoreController.h"
-#include "core/models/api/apiV2ServerConfig.h"
 #include "core/models/selfhosted/nativeServerConfig.h"
 #include "core/models/selfhosted/selfHostedAdminServerConfig.h"
 #include "core/models/selfhosted/selfHostedUserServerConfig.h"
@@ -96,10 +95,6 @@ private slots:
         NativeServerConfig native;
         native.hostName = "1.1.1.1";
         QCOMPARE(native.toJson().value(configKey::formatVersion).toInt(-1), serverConfigUtils::currentConfigFormatVersion);
-
-        ApiV2ServerConfig api;
-        api.hostName = "1.1.1.1";
-        QCOMPARE(api.toJson().value(configKey::formatVersion).toInt(-1), serverConfigUtils::currentConfigFormatVersion);
     }
 
     void testImportAcceptsMissingAndCurrentVersion()
@@ -173,32 +168,6 @@ private slots:
                 serverConfigUtils::ConfigType::SelfHostedAdmin);
         QVERIFY(!rejected.isEmpty());
         QCOMPARE(m_coreController->m_serversRepository->serversCount(), 2);
-    }
-
-    void testRestoreBackupReportsSkippedConfigs()
-    {
-        QJsonObject backup;
-        backup["Servers/serversList"] = QString::fromUtf8(serversListBytes(
-                { adminConfigJson("1.1.1.1"),
-                  adminConfigJson("2.2.2.2", serverConfigUtils::currentConfigFormatVersion + 1) }));
-
-        QSignalSpy errorSpy(m_coreController->m_settingsUiController, &SettingsUiController::errorOccurred);
-        QSignalSpy restoredSpy(m_coreController->m_settingsUiController, &SettingsUiController::restoreBackupFinished);
-
-        m_coreController->m_settingsUiController->restoreAppConfigFromData(QJsonDocument(backup).toJson());
-
-        QCOMPARE(restoredSpy.count(), 1);
-        QCOMPARE(errorSpy.count(), 1);
-        QCOMPARE(errorSpy.first().at(0).value<ErrorCode>(), ErrorCode::RestoreBackupUnsupportedConfigsSkipped);
-        QCOMPARE(m_coreController->m_serversRepository->serversCount(), 1);
-
-        errorSpy.clear();
-        restoredSpy.clear();
-        QJsonObject cleanBackup;
-        cleanBackup["Servers/serversList"] = QString::fromUtf8(serversListBytes({ adminConfigJson("5.5.5.5") }));
-        m_coreController->m_settingsUiController->restoreAppConfigFromData(QJsonDocument(cleanBackup).toJson());
-        QCOMPARE(restoredSpy.count(), 1);
-        QCOMPARE(errorSpy.count(), 0);
     }
 };
 

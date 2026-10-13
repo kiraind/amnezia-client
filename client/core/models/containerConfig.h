@@ -45,12 +45,6 @@ struct ContainerConfig {
     WireGuardProtocolConfig* getWireGuardProtocolConfig();
     const WireGuardProtocolConfig* getWireGuardProtocolConfig() const;
     
-    OpenVpnProtocolConfig* getOpenVpnProtocolConfig();
-    const OpenVpnProtocolConfig* getOpenVpnProtocolConfig() const;
-    
-    XrayProtocolConfig* getXrayProtocolConfig();
-    const XrayProtocolConfig* getXrayProtocolConfig() const;
-    
     SftpProtocolConfig* getSftpProtocolConfig();
     const SftpProtocolConfig* getSftpProtocolConfig() const;
     
@@ -66,9 +60,6 @@ struct ContainerConfig {
     TProxyProtocolConfig* getTProxyProtocolConfig();
     const TProxyProtocolConfig* getTProxyProtocolConfig() const;
 
-    Ikev2ProtocolConfig* getIkev2ProtocolConfig();
-    const Ikev2ProtocolConfig* getIkev2ProtocolConfig() const;
-    
     TorProtocolConfig* getTorProtocolConfig();
     const TorProtocolConfig* getTorProtocolConfig() const;
     

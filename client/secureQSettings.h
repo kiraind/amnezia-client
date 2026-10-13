@@ -21,9 +21,6 @@ public:
     void setValue(const QString &key, const QVariant &value);
     void remove(const QString &key);
 
-    QByteArray backupAppConfig() const;
-    bool restoreAppConfig(const QByteArray &json);
-
     void clearSettings();
 
 private:
@@ -43,10 +40,6 @@ private:
     mutable QHash<QString, QVariant> m_cache;
 
     QStringList encryptedKeys; // encode only key listed here
-    // only this fields need for backup
-    QStringList m_fieldsToBackup = {
-        "Conf/", "Servers/",
-    };
 
     mutable QByteArray m_key;
     mutable QByteArray m_iv;

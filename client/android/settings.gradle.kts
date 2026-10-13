@@ -30,13 +30,9 @@ rootProject.buildFileName = "build.gradle.kts"
 
 include(":qt")
 include(":utils")
-include(":billing")
 include(":protocolApi")
 include(":wireguard")
 include(":awg")
-include(":openvpn")
-include(":xray")
-include(":xray:libXray")
 
 // get values from gradle or local properties
 val androidBuildToolsVersion: String by gradleProperties

@@ -4,6 +4,7 @@
 #include <QEventLoop>
 #include <QFile>
 #include <QHostInfo>
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QObject>
 #include <QSharedPointer>
@@ -11,7 +12,6 @@
 #include <QStringList>
 #include <QTimer>
 
-#include <core/configurators/openVpnConfigurator.h>
 #include <core/configurators/wireguardConfigurator.h>
 
 #ifdef AMNEZIA_DESKTOP
@@ -104,18 +104,6 @@ void VpnConnection::onConnectionStateChanged(Vpn::ConnectionState state)
         }
         break;
     }
-    case serverConfigUtils::ConfigType::AmneziaPremiumV2:
-    case serverConfigUtils::ConfigType::AmneziaFreeV3:
-    case serverConfigUtils::ConfigType::ExternalPremium: {
-        const auto cfg = m_serversRepository->apiV2Config(defaultServerId);
-        if (cfg.has_value()) {
-            container = cfg->defaultContainer;
-        }
-        break;
-    }
-    case serverConfigUtils::ConfigType::AmneziaPremiumV1:
-    case serverConfigUtils::ConfigType::AmneziaFreeV2:
-        break;
     case serverConfigUtils::ConfigType::Invalid:
     default:
         break;

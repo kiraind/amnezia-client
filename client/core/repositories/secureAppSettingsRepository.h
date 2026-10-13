@@ -58,15 +58,6 @@ public:
     bool isAppsSplitTunnelingEnabled() const;
     void setAppsSplitTunnelingEnabled(bool enabled);
 
-    QString getGatewayEndpoint(bool isTestPurchase = false) const;
-    void setGatewayEndpoint(const QString &endpoint);
-    void resetGatewayEndpoint();
-    void setDevGatewayEndpoint();
-    bool isDevGatewayEnv(bool isTestPurchase = false) const;
-    void toggleDevGatewayEnv(bool enabled);
-    QByteArray readGatewayProxyUrls(const QString &cacheKey) const;
-    void writeGatewayProxyUrls(const QString &cacheKey, const QByteArray &proxyUrlsEncrypted);
-
     bool isKillSwitchEnabled() const;
     void setKillSwitchEnabled(bool enabled);
     bool isStrictKillSwitchEnabled() const;
@@ -79,34 +70,16 @@ public:
     bool isScreenshotsEnabled() const;
     void setScreenshotsEnabled(bool enabled);
 
-    int countryListSortMode(const QString &listId) const;
-    void setCountryListSortMode(const QString &listId, int mode);
-    QStringList favoriteLocations() const;
-    void setFavoriteLocations(const QStringList &codes);
-    bool isNewsNotifications() const;
-    void setNewsNotifications(bool enabled);
 
-    bool isAutoUpdateCheckEnabled() const;
-    void setAutoUpdateCheckEnabled(bool enabled);
     bool isSaveLogs() const;
     void setSaveLogs(bool enabled);
     QDateTime getLogEnableDate() const;
     void setLogEnableDate(const QDateTime &date);
     
     QString getInstallationUuid(bool createIfNotExists) const;
-    QStringList getReadNewsIds() const;
-    void setReadNewsIds(const QStringList &ids);
-
-    bool isHomeAdLabelVisible() const;
-    void disableHomeAdLabel();
-    QByteArray backupAppConfig() const;
-    bool restoreAppConfig(const QByteArray &cfg);
     void clearSettings();
 
-    QByteArray xraySavedConfigs() const;
-    void setXraySavedConfigs(const QByteArray &data);
-
-    // VPN coordinator account (see CoordinatorController). Not part of app backups.
+    // VPN coordinator account (see CoordinatorController).
     QString coordinatorBaseUrl() const;
     void setCoordinatorBaseUrl(const QString &url);
     QString coordinatorToken() const;
@@ -143,7 +116,6 @@ private:
     void setValue(const QString &key, const QVariant &value);
 
     SecureQSettings* m_settings;
-    QString m_gatewayEndpoint;
 };
 
 #endif // SECUREAPPSETTINGSREPOSITORY_H

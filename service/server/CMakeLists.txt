@@ -25,13 +25,11 @@ set(HEADERS
     ${CMAKE_CURRENT_LIST_DIR}/../../client/core/utils/networkUtilities.h
     ${CMAKE_CURRENT_LIST_DIR}/../../ipc/ipc.h
     ${CMAKE_CURRENT_LIST_DIR}/../../ipc/ipcserver.h
-    ${CMAKE_CURRENT_LIST_DIR}/../../ipc/ipcserverprocess.h
     ${CMAKE_CURRENT_LIST_DIR}/localserver.h
     ${CMAKE_CURRENT_LIST_DIR}/../../common/logger/logger.h
     ${CMAKE_CURRENT_LIST_DIR}/router.h
     ${CMAKE_CURRENT_LIST_DIR}/killswitch.h
     ${CMAKE_CURRENT_LIST_DIR}/systemservice.h
-    ${CMAKE_CURRENT_LIST_DIR}/xray.h
     ${CMAKE_CURRENT_BINARY_DIR}/version.h
 )
 
@@ -41,14 +39,12 @@ set(SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/../../client/secureQSettings.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../../client/core/utils/networkUtilities.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../../ipc/ipcserver.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/../../ipc/ipcserverprocess.cpp
     ${CMAKE_CURRENT_LIST_DIR}/localserver.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../../common/logger/logger.cpp
     ${CMAKE_CURRENT_LIST_DIR}/main.cpp
     ${CMAKE_CURRENT_LIST_DIR}/router.cpp
     ${CMAKE_CURRENT_LIST_DIR}/killswitch.cpp
     ${CMAKE_CURRENT_LIST_DIR}/systemservice.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/xray.cpp
 )
 
 # Mozilla headres
@@ -128,7 +124,6 @@ if(WIN32)
     )
 
     set(HEADERS ${HEADERS}
-        ${CMAKE_CURRENT_LIST_DIR}/tapcontroller_win.h
         ${CMAKE_CURRENT_LIST_DIR}/router_win.h
         ${CMAKE_CURRENT_SOURCE_DIR}/../../client/platforms/windows/daemon/windowsdaemon.h
         ${CMAKE_CURRENT_SOURCE_DIR}/../../client/platforms/windows/daemon/windowsdaemontunnel.h
@@ -148,7 +143,6 @@ if(WIN32)
     )
 
     set(SOURCES ${SOURCES}
-        ${CMAKE_CURRENT_LIST_DIR}/tapcontroller_win.cpp
         ${CMAKE_CURRENT_LIST_DIR}/router_win.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/../../client/platforms/windows/daemon/windowsdaemon.cpp
@@ -173,7 +167,6 @@ if(WIN32)
 
     set(LIBS
         user32
-        rasapi32
         shlwapi
         iphlpapi
         ws2_32
@@ -291,9 +284,6 @@ add_executable(${PROJECT} ${SOURCES} ${HEADERS} ${RESOURCES})
 target_link_libraries(${PROJECT} PRIVATE Qt6::Core Qt6::Widgets Qt6::Network Qt6::RemoteObjects Qt6::Core5Compat Qt6::DBus Qt6::Concurrent ${LIBS})
 target_compile_definitions(${PROJECT} PRIVATE "MZ_$<UPPER_CASE:${MZ_PLATFORM_NAME}>")
 
-find_package(amnezia-xray-bindings REQUIRED)
-target_link_libraries(${PROJECT} PRIVATE amnezia::xray-bindings)
-
 find_package(OpenSSL REQUIRED)
 target_link_libraries(${PROJECT} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 
@@ -326,7 +316,6 @@ if(APPLE)
 endif()
 
 qt_add_repc_sources(${PROJECT} ${CMAKE_CURRENT_LIST_DIR}/../../ipc/ipc_interface.rep)
-qt_add_repc_sources(${PROJECT} ${CMAKE_CURRENT_LIST_DIR}/../../ipc/ipc_process_interface.rep)
 
 if(APPLE)
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/deploy/data/macos/pf
@@ -355,46 +344,11 @@ else()
     list(APPEND CONAN_EXECS $<TARGET_FILE:amnezia::awg-go>)
 endif()
 
-find_package(openvpn REQUIRED)
-list(APPEND CONAN_EXECS $<TARGET_FILE:openvpn::openvpn>)
-
-find_package(tun2socks REQUIRED)
-list(APPEND CONAN_EXECS $<TARGET_FILE:xjasonlyu::tun2socks>)
-
-find_package(v2ray-rules-dat REQUIRED)
-list(APPEND CONAN_BINS ${GEOSITE_DAT_PATH} ${GEOIP_DAT_PATH})
-
 add_custom_command(TARGET ${PROJECT} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         ${CONAN_EXECS} ${CONAN_BINS}
         "$<TARGET_FILE_DIR:${PROJECT}>"
 )
-
-# prebuilt openvpn carries the rpath of whatever machine baked it; point the
-# build-tree copy at the local conan openssl (install rewrites it to $ORIGIN)
-if(LINUX)
-    file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/set_openvpn_rpath.cmake
-        CONTENT "file(RPATH_SET FILE \"$<TARGET_FILE_DIR:${PROJECT}>/openvpn\" NEW_RPATH \"$<TARGET_FILE_DIR:OpenSSL::SSL>\")\n"
-    )
-    add_custom_command(TARGET ${PROJECT} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/set_openvpn_rpath.cmake
-    )
-elseif(APPLE)
-    # bracket arguments don't expand variables, so the target name is substituted below
-    set(_set_openvpn_rpath
-[=[
-set(ovpn "$<TARGET_FILE_DIR:@SERVICE_TARGET@>/openvpn")
-set(dir "$<TARGET_FILE_DIR:OpenSSL::SSL>")
-execute_process(COMMAND install_name_tool -delete_rpath "${dir}" "${ovpn}" ERROR_QUIET)
-execute_process(COMMAND install_name_tool -add_rpath "${dir}" "${ovpn}")
-]=]
-    )
-    string(REPLACE "@SERVICE_TARGET@" "${PROJECT}" _set_openvpn_rpath "${_set_openvpn_rpath}")
-    file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/set_openvpn_rpath.cmake CONTENT "${_set_openvpn_rpath}")
-    add_custom_command(TARGET ${PROJECT} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/set_openvpn_rpath.cmake
-    )
-endif()
 
 if(WIN32)
     # using PERMISSIONS on Windows appends read-only flag
@@ -404,11 +358,7 @@ if(WIN32)
         COMPONENT AmneziaVPN
     )
 else()
-    set(CONAN_EXECS_INSTALL ${CONAN_EXECS})
-    if(LINUX)
-        list(REMOVE_ITEM CONAN_EXECS_INSTALL "$<TARGET_FILE:openvpn::openvpn>")
-    endif()
-    install(FILES ${CONAN_EXECS_INSTALL}
+    install(FILES ${CONAN_EXECS}
         DESTINATION ${CMAKE_INSTALL_BINDIR}
         COMPONENT AmneziaVPN
         PERMISSIONS
@@ -422,50 +372,8 @@ install(FILES ${CONAN_BINS}
     COMPONENT AmneziaVPN
 )
 
-# install openvpn via the service's dep set to ship its openssl, then
-# rewrite conan's absolute build rpath to a relative one for the package
-if(LINUX)
-    install(IMPORTED_RUNTIME_ARTIFACTS openvpn::openvpn
-        RUNTIME_DEPENDENCY_SET service_deps
-        PERMISSIONS
-            OWNER_READ OWNER_EXECUTE
-            GROUP_READ GROUP_EXECUTE
-            WORLD_READ WORLD_EXECUTE
-        COMPONENT AmneziaVPN
-    )
-    install(CODE "
-        set(_ovpn \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/openvpn\")
-        file(CHMOD \"\${_ovpn}\" PERMISSIONS
-            OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-        file(RPATH_SET FILE \"\${_ovpn}\" NEW_RPATH \"$ORIGIN:$ORIGIN/../lib\")
-        file(CHMOD \"\${_ovpn}\" PERMISSIONS
-            OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-    "
-        COMPONENT AmneziaVPN
-    )
-elseif(APPLE)
-    install(CODE "
-        set(_ovpn \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/openvpn\")
-        execute_process(COMMAND install_name_tool -delete_rpath \"$<TARGET_FILE_DIR:OpenSSL::SSL>\" \"\${_ovpn}\" ERROR_QUIET)
-        execute_process(COMMAND install_name_tool -add_rpath \"@executable_path/../Frameworks\" \"\${_ovpn}\")
-    "
-        COMPONENT AmneziaVPN
-    )
-endif()
-
 # install drivers
 if (WIN32)
-    find_package(tap-windows6 REQUIRED)
-    add_custom_command(TARGET ${PROJECT} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${TAP_WINDOWS6_BIN}"
-            "$<TARGET_FILE_DIR:${PROJECT}>/tap"
-    )
-    install(DIRECTORY "${TAP_WINDOWS6_BIN}/"
-        DESTINATION "${CMAKE_INSTALL_BINDIR}/tap"
-        COMPONENT AmneziaVPN
-    )
-
     find_package(win-split-tunnel REQUIRED)
     add_custom_command(TARGET ${PROJECT} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory

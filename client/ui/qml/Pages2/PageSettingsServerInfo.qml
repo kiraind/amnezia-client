@@ -18,18 +18,9 @@ PageType {
     id: root
 
     readonly property int pageSettingsServerProtocols: 0
-    readonly property int pageSettingsServerServices: 1
-    readonly property int pageSettingsServerData: 2
+    readonly property int pageSettingsServerData: 1
 
     property var processedServer
-
-    Connections {
-        target: PageController
-
-        function onGoToPageSettingsServerServices() {
-            tabBar.setCurrentIndex(root.pageSettingsServerServices)
-        }
-    }
 
     Connections {
         target: ServersUiController
@@ -93,9 +84,7 @@ PageType {
                 if (root.processedServer == null) {
                     return ""
                 }
-                if (ServersUiController.isServerFromApi(ServersUiController.processedServerId)) {
-                    return root.processedServer.serverDescription
-                } else if (ServersUiController.isProcessedServerHasWriteAccess()) {
+                if (ServersUiController.isProcessedServerHasWriteAccess()) {
                     return root.processedServer.credentialsLogin + " · " + root.processedServer.hostName
                 } else {
                     return root.processedServer.hostName
@@ -123,9 +112,7 @@ PageType {
 
             Layout.fillWidth: true
 
-            currentIndex: (ServersUiController.isServerFromApi(ServersUiController.processedServerId)
-                           && !ServersUiController.serverHasInstalledContainers(ServersUiController.processedServerId)) ?
-                              root.pageSettingsServerData : root.pageSettingsServerProtocols
+            currentIndex: root.pageSettingsServerProtocols
 
             background: Rectangle {
                 color: AmneziaStyle.color.transparent
@@ -141,17 +128,6 @@ PageType {
 
                 Keys.onReturnPressed: TabBar.tabBar.setCurrentIndex(root.pageSettingsServerProtocols)
                 Keys.onEnterPressed: TabBar.tabBar.setCurrentIndex(root.pageSettingsServerProtocols)
-            }
-
-            TabButtonType {
-                id: servicesTab
-                visible: servicesPage.installedServicesCount
-                width: servicesPage.installedServicesCount ? undefined : 0
-                isSelected: TabBar.tabBar.currentIndex === root.pageSettingsServerServices
-                text: qsTr("Services")
-
-                Keys.onReturnPressed: TabBar.tabBar.setCurrentIndex(root.pageSettingsServerServices)
-                Keys.onEnterPressed: TabBar.tabBar.setCurrentIndex(root.pageSettingsServerServices)
             }
 
             TabButtonType {
@@ -173,11 +149,6 @@ PageType {
 
             PageSettingsServerProtocols {
                 id: protocolsPage
-                stackView: root.stackView
-            }
-
-            PageSettingsServerServices {
-                id: servicesPage
                 stackView: root.stackView
             }
 

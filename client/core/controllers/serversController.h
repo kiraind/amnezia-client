@@ -20,9 +20,6 @@
 #include "core/models/containerConfig.h"
 #include "core/models/serverDescription.h"
 
-class SshSession;
-class InstallController;
-
 using namespace amnezia;
 
 class ServersController : public QObject
@@ -42,6 +39,9 @@ public:
 
     // Container management
     void setDefaultContainer(const QString &serverId, DockerContainer container);
+    // Rewrites the stored client-side container config (AWG/WireGuard client settings). Fork: moved here from the
+    // removed InstallController, no SSH involved.
+    ErrorCode updateClientConfig(const QString &serverId, DockerContainer container, const ContainerConfig &newConfig);
 
     // Getters
     QVector<ServerDescription> buildServerDescriptions(bool isAmneziaDnsEnabled) const;
@@ -51,7 +51,6 @@ public:
     QString getServerId(int serverIndex) const;
     int indexOfServerId(const QString &serverId) const;
     QString notificationDisplayName(const QString &serverId) const;
-    std::optional<ApiV2ServerConfig> apiV2Config(const QString &serverId) const;
     std::optional<SelfHostedAdminServerConfig> selfHostedAdminConfig(const QString &serverId) const;
     ServerCredentials getServerCredentials(const QString &serverId) const;
     QMap<DockerContainer, ContainerConfig> getServerContainersMap(const QString &serverId) const;
@@ -59,9 +58,10 @@ public:
     ContainerConfig getContainerConfig(const QString &serverId, DockerContainer container) const;
 
     // Validation
-    bool isServerFromApiAlreadyExists(const QString &userCountryCode, const QString &serviceType, const QString &serviceProtocol) const;
     bool hasInstalledContainers(const QString &serverId) const;
-    bool isLegacyApiV1Server(const QString &serverId) const;
+    // Fork: self-hosted/native servers connect only with the client config they already hold; nothing is provisioned
+    // over SSH any more (replaces InstallController::validateAndPrepareConfig).
+    ErrorCode validateClientConfig(const QString &serverId) const;
 
 private:
     void ensureDefaultServerValid();

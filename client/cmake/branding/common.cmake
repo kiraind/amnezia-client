@@ -65,11 +65,6 @@ if(NOT CLIENT_NOTIFICATION_IDENTIFIER)
     set(CLIENT_NOTIFICATION_IDENTIFIER "${CLIENT_TS_PREFIX}" CACHE STRING "Local notification request identifier")
 endif()
 
-# Off in this fork: upstream updates come from Amnezia's gateway and would offer the official app
-if(NOT DEFINED CLIENT_ENABLE_APP_UPDATES)
-    set(CLIENT_ENABLE_APP_UPDATES 0)
-endif()
-
 # CLIENT_DISPLAY_NAME as a C string-literal body of \xNN escapes (UTF-8 bytes), for version.h's DISPLAY_NAME.
 # INTERNAL cache so the sibling service/ directory sees it too; recomputed on every configure.
 string(HEX "${CLIENT_DISPLAY_NAME}" _client_display_name_hex)

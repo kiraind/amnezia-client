@@ -166,52 +166,6 @@ PageType {
             }
 
             DividerType {
-                visible: !GC.isMobile() && ServersUiController.hasServersFromGatewayApi
-            }
-
-            SwitcherType {
-                id: switcherNewsNotificationEnabled
-
-                visible: ServersUiController.hasServersFromGatewayApi
-
-                Layout.fillWidth: true
-                Layout.margins: 16
-
-                text: qsTr("News Notification")
-                descriptionText: qsTr("Show a notification icon for unread news")
-
-                checked: SettingsController.isNewsNotificationsEnabled()
-                onToggled: function() {
-                    if (checked !== SettingsController.isNewsNotificationsEnabled()) {
-                        SettingsController.toggleNewsNotificationsEnabled(checked)
-                    }
-                }
-            }
-
-            DividerType {
-                visible: ServersUiController.hasServersFromGatewayApi
-            }
-
-            SwitcherType {
-                id: switcherAutoUpdateCheck
-
-                visible: IsAppUpdatesEnabled
-
-                Layout.fillWidth: true
-                Layout.margins: 16
-
-                text: qsTr("Check for updates automatically")
-                descriptionText: qsTr("Check for a new app version at startup")
-
-                checked: SettingsController.isAutoUpdateCheckEnabled()
-                onToggled: function() {
-                    if (checked !== SettingsController.isAutoUpdateCheckEnabled()) {
-                        SettingsController.toggleAutoUpdateCheckEnabled(checked)
-                    }
-                }
-            }
-
-            DividerType {
                 visible: !GC.isMobile()
             }
         }

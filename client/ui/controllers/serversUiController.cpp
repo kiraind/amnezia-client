@@ -1,6 +1,5 @@
 #include "serversUiController.h"
 
-#include "core/utils/api/apiUtils.h"
 #include "core/utils/containerEnum.h"
 #include "core/utils/containers/containerUtils.h"
 #include "core/utils/protocolEnum.h"
@@ -23,16 +22,6 @@ int rowForServerId(const QVector<ServerDescription> &list, const QString &server
         }
     }
     return -1;
-}
-
-bool descriptionsHaveGatewayServers(const QVector<ServerDescription> &list)
-{
-    for (const auto &d : list) {
-        if (d.isServerFromGatewayApi) {
-            return true;
-        }
-    }
-    return false;
 }
 
 const ServerDescription &emptyServerDescription()
@@ -61,8 +50,10 @@ void ServersUiController::removeServer(const QString &serverId)
     if (serverId.isEmpty()) {
         return;
     }
+    const QString serverName = m_serversController->notificationDisplayName(serverId);
     m_serversController->removeServer(serverId);
     updateModel();
+    emit removeServerFinished(tr("Server '%1' was removed").arg(serverName));
 }
 
 void ServersUiController::removeServerAtIndex(int index)
@@ -96,8 +87,6 @@ void ServersUiController::editServerName(const QString &serverId, const QString 
     }
 
     if (!m_serversController->renameServer(serverId, name)) {
-        emit errorOccurred(tr("Legacy API v1 configs are no longer supported. Remove this server to continue."));
-        emit finished(tr("Use the remove action to delete this legacy config."));
         return;
     }
     updateModel();
@@ -141,8 +130,6 @@ void ServersUiController::updateModel()
         m_serversController->buildServerDescriptions(m_settingsController->isAmneziaDnsEnabled());
 
     const QString defaultServerId = m_serversController->getDefaultServerId();
-    const bool hadServersFromGatewayBefore = descriptionsHaveGatewayServers(m_orderedServerDescriptions);
-    const bool hasServersFromGatewayNow = descriptionsHaveGatewayServers(descriptions);
 
     m_orderedServerDescriptions = descriptions;
 
@@ -160,21 +147,9 @@ void ServersUiController::updateModel()
     m_serversModel->updateModel(m_orderedServerDescriptions, defaultServerId);
 
     if (!m_processedServerId.isEmpty()) {
-        if (isServerFromApi(m_processedServerId)) {
-            const auto &description = serverDescriptionById(m_processedServerId);
-            if (description.isApiV2 && description.isCountrySelectionAvailable
-                && !description.apiAvailableCountries.isEmpty()) {
-                emit updateApiCountryModel();
-            }
-        } else {
-            updateContainersModel();
-        }
+        updateContainersModel();
     }
     updateDefaultServerContainersModel();
-
-    if (hadServersFromGatewayBefore != hasServersFromGatewayNow) {
-        emit hasServersFromGatewayApiChanged();
-    }
 
     emit defaultServerIdChanged(defaultServerId);
 }
@@ -201,19 +176,6 @@ QString ServersUiController::getDefaultServerDefaultContainerName() const
 QString ServersUiController::getDefaultServerDescriptionCollapsed() const
 {
     return serverDescriptionById(getDefaultServerId()).collapsedServerDescription;
-}
-
-QString ServersUiController::getDefaultServerImagePathCollapsed() const
-{
-    const auto &description = serverDescriptionById(getDefaultServerId());
-    if (!description.isApiV2) {
-        return "";
-    }
-    const QString flagCode = apiUtils::getCountryFlagCode(description.apiServerCountryCodeL10n, description.apiServerCountryCode);
-    if (flagCode.isEmpty()) {
-        return "";
-    }
-    return QString("qrc:/countriesFlags/images/flagKit/%1.svg").arg(flagCode);
 }
 
 QString ServersUiController::getDefaultServerDescriptionExpanded() const
@@ -257,20 +219,8 @@ bool ServersUiController::isDefaultServerDefaultContainerHasSplitTunneling() con
             }
         }
         return false;
-    } else if (defaultContainer == DockerContainer::OpenVpn) {
-        if (const auto* ovpnConfig = containerConfig.getOpenVpnProtocolConfig()) {
-            if (ovpnConfig->hasClientConfig()) {
-                return !ovpnConfig->clientConfig->nativeConfig.isEmpty() 
-                    && !ovpnConfig->clientConfig->nativeConfig.contains("redirect-gateway");
-            }
-        }
     }
     return false;
-}
-
-bool ServersUiController::isDefaultServerFromApi() const
-{
-    return isServerFromApi(getDefaultServerId());
 }
 
 bool ServersUiController::hasServerWithWriteAccess() const
@@ -299,16 +249,6 @@ int ServersUiController::serverDefaultContainer(const QString &serverId) const
     return description.serverId.isEmpty() ? -1 : static_cast<int>(description.defaultContainer);
 }
 
-bool ServersUiController::isServerFromApi(const QString &serverId) const
-{
-    return serverDescriptionById(serverId).isServerFromGatewayApi;
-}
-
-bool ServersUiController::isServerCountrySelectionAvailable(const QString &serverId) const
-{
-    return serverDescriptionById(serverId).isCountrySelectionAvailable;
-}
-
 bool ServersUiController::isServerHasWriteAccess(const QString &serverId) const
 {
     return serverDescriptionById(serverId).hasWriteAccess;
@@ -317,26 +257,6 @@ bool ServersUiController::isServerHasWriteAccess(const QString &serverId) const
 bool ServersUiController::serverHasInstalledContainers(const QString &serverId) const
 {
     return serverDescriptionById(serverId).hasInstalledVpnContainers;
-}
-
-QString ServersUiController::serverAdEndpoint(const QString &serverId) const
-{
-    return serverDescriptionById(serverId).adEndpoint;
-}
-
-bool ServersUiController::isServerRenewalAvailable(const QString &serverId) const
-{
-    return serverDescriptionById(serverId).isRenewalAvailable;
-}
-
-bool ServersUiController::isServerSubscriptionExpired(const QString &serverId) const
-{
-    return serverDescriptionById(serverId).isSubscriptionExpired;
-}
-
-bool ServersUiController::isServerSubscriptionExpiringSoon(const QString &serverId) const
-{
-    return serverDescriptionById(serverId).isSubscriptionExpiringSoon;
 }
 
 int ServersUiController::getProcessedContainerIndex() const
@@ -367,24 +287,11 @@ void ServersUiController::setProcessedServerId(const QString &serverId)
         m_processedServerId = normalizedServerId;
 
         if (newIndex >= 0) {
-            if (isServerFromApi(m_processedServerId)) {
-                const auto &description = serverDescriptionById(m_processedServerId);
-                if (description.isApiV2 && description.isCountrySelectionAvailable
-                    && !description.apiAvailableCountries.isEmpty()) {
-                    emit updateApiCountryModel();
-                }
-            } else {
-                updateContainersModel();
-            }
+            updateContainersModel();
         }
 
         emit processedServerIdChanged(m_processedServerId);
     }
-}
-
-bool ServersUiController::processedServerIsPremium() const
-{
-    return processedServerDescription().isPremium;
 }
 
 bool ServersUiController::isDefaultServerCurrentlyProcessed() const
@@ -465,53 +372,6 @@ const ServerDescription &ServersUiController::serverDescriptionById(const QStrin
     return emptyServerDescription();
 }
 
-bool ServersUiController::hasServersFromGatewayApi() const
-{
-    return listHasServersFromGatewayApi();
-}
-
-bool ServersUiController::isAdVisible() const
-{
-    const QString defaultServerId = m_serversController->getDefaultServerId();
-    if (defaultServerId.isEmpty()) {
-        return false;
-    }
-    for (const auto &description : m_orderedServerDescriptions) {
-        if (description.serverId == defaultServerId) {
-            return description.isAdVisible;
-        }
-    }
-    return false;
-}
-
-QString ServersUiController::adHeader() const
-{
-    const QString defaultServerId = m_serversController->getDefaultServerId();
-    if (defaultServerId.isEmpty()) {
-        return QString();
-    }
-    for (const auto &description : m_orderedServerDescriptions) {
-        if (description.serverId == defaultServerId) {
-            return description.adHeader;
-        }
-    }
-    return QString();
-}
-
-QString ServersUiController::adDescription() const
-{
-    const QString defaultServerId = m_serversController->getDefaultServerId();
-    if (defaultServerId.isEmpty()) {
-        return QString();
-    }
-    for (const auto &description : m_orderedServerDescriptions) {
-        if (description.serverId == defaultServerId) {
-            return description.adDescription;
-        }
-    }
-    return QString();
-}
-
 QString ServersUiController::getServerId(int index) const
 {
     if (index < 0 || index >= m_orderedServerDescriptions.size()) {
@@ -585,9 +445,3 @@ int ServersUiController::serverIndexForId(const QString &serverId) const
 {
     return rowForServerId(m_orderedServerDescriptions, serverId);
 }
-
-bool ServersUiController::listHasServersFromGatewayApi() const
-{
-    return descriptionsHaveGatewayServers(m_orderedServerDescriptions);
-}
-

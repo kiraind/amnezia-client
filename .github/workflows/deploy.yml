@@ -11,7 +11,7 @@ name: 'Build'
 #
 # Secrets (all optional; without them CI still goes green):
 #   ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD
-#     release keystore for the APK/AAB; when absent a throwaway key is generated per run
+#     release keystore for the APK; when absent a throwaway key is generated per run
 #   MAC_* / APPLE_DEV_* / IOS_* / APPSTORE_CONNECT_*: Apple signing, see the macOS and iOS jobs
 #
 # Third-party dependencies come from conan: prebuilt packages are downloaded anonymously
@@ -25,9 +25,8 @@ on:
       - 'claude/**'
     tags:
       - 'v*'
-  pull_request:
-    branches:
-      - dev
+  # No pull_request trigger: a PR from a pushed branch already gets the push run's checks, and
+  # both triggers would build every commit twice.
   workflow_dispatch:
 
 concurrency:
@@ -87,9 +86,19 @@ jobs:
         submodules: 'true'
         fetch-depth: 10
 
+    # Compiler cache: a rebuild after a small change recompiles only what changed.
+    # CMake picks the launcher up from CMAKE_<LANG>_COMPILER_LAUNCHER in the environment.
+    - name: 'Setup ccache'
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ccache-${{ github.job }}-linux
+        max-size: 1G
+
     - name: 'Build project'
       shell: bash
       env:
+        CMAKE_C_COMPILER_LAUNCHER: ccache
+        CMAKE_CXX_COMPILER_LAUNCHER: ccache
         QT_INSTALL_DIR: ${{ runner.temp }}
         AMNEZIA_BUILD_TESTS: ON
       run: deploy/build.sh --generator Ninja --installer all
@@ -261,8 +270,18 @@ jobs:
     - name: 'Install conan'
       run: pip install "conan==2.28.0"
 
+    # Compiler cache: a rebuild after a small change recompiles only what changed.
+    # CMake picks the launcher up from CMAKE_<LANG>_COMPILER_LAUNCHER in the environment.
+    - name: 'Setup ccache'
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ccache-${{ github.job }}-macos
+        max-size: 1G
+
     - name: 'Build project'
       env:
+        CMAKE_C_COMPILER_LAUNCHER: ccache
+        CMAKE_CXX_COMPILER_LAUNCHER: ccache
         QT_INSTALL_DIR: ${{ runner.temp }}
         CODESIGN_SIGNATURE: ${{ vars.APPLE_SIGNING == 'true' && secrets.MAC_SIGNER_ID || '' }}
         CODESIGN_INSTALLER_SIGNATURE: ${{ vars.APPLE_SIGNING == 'true' && secrets.MAC_INSTALLER_SIGNER_ID || '' }}
@@ -408,7 +427,7 @@ jobs:
     steps:
     - name: 'Free disk space'
       run: |
-        # gradle packages several APK/AAB variants for four ABIs, which overflows the default runner disk
+        # gradle packages several APK variants, which can overflow the default runner disk
         df -h /
         sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /usr/local/share/boost \
           /usr/local/share/powershell /usr/share/swift /opt/hostedtoolcache /opt/microsoft /opt/google \
@@ -429,30 +448,6 @@ jobs:
         host: 'linux'
         target: 'desktop'
         arch: 'linux_gcc_64'
-        modules: ${{ env.QT_MODULES }}
-        dir: ${{ runner.temp }}
-        py7zrversion: '==0.22.*'
-        extra: '--base ${{ env.QT_MIRROR }}'
-
-    - name: 'Install android_x86_64 Qt'
-      uses: jurplel/install-qt-action@v4.3.1
-      with:
-        version: ${{ env.QT_VERSION }}
-        host: 'all_os'
-        target: 'android'
-        arch: 'android_x86_64'
-        modules: ${{ env.QT_MODULES }}
-        dir: ${{ runner.temp }}
-        py7zrversion: '==0.22.*'
-        extra: '--base ${{ env.QT_MIRROR }}'
-
-    - name: 'Install android_x86 Qt'
-      uses: jurplel/install-qt-action@v4.3.1
-      with:
-        version: ${{ env.QT_VERSION }}
-        host: 'all_os'
-        target: 'android'
-        arch: 'android_x86'
         modules: ${{ env.QT_MODULES }}
         dir: ${{ runner.temp }}
         py7zrversion: '==0.22.*'
@@ -518,8 +513,18 @@ jobs:
           echo "APK_SUFFIX=_unofficial-key" >> "$GITHUB_ENV"
         fi
 
+    # Compiler cache: a rebuild after a small change recompiles only what changed.
+    # CMake picks the launcher up from CMAKE_<LANG>_COMPILER_LAUNCHER in the environment.
+    - name: 'Setup ccache'
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ccache-${{ github.job }}-${{ matrix.label }}
+        max-size: 2G
+
     - name: 'Build project'
       env:
+        CMAKE_C_COMPILER_LAUNCHER: ccache
+        CMAKE_CXX_COMPILER_LAUNCHER: ccache
         QT_INSTALL_DIR: ${{ runner.temp }}
         LABEL: ${{ matrix.label }}
         # package only the ossRelease variant (see client/android/build.gradle.kts)
@@ -529,7 +534,9 @@ jobs:
         OUT=deploy/artifacts
         rm -rf $OUT && mkdir -p $OUT
 
-        deploy/build.sh -t android --sign --aab
+        # arm only: x86/x86_64 Android devices are emulators; Intel phones never got Android 9+,
+        # and x86 Chromebooks run arm apps through translation. No AAB: we don't publish to Play.
+        deploy/build.sh -t android --sign --abi arm64-v8a --abi armeabi-v7a
 
         # LESHA_FULL_VERSION, e.g. 5.0.3.1-lesha.1 (see the root CMakeLists.txt)
         VERSION=$(grep '^LESHA_FULL_VERSION:INTERNAL=' deploy/build/CMakeCache.txt | cut -d= -f2)
@@ -539,18 +546,13 @@ jobs:
         test -n "$APK"
         mv "$APK" "$OUT/LeshaVPN_${VERSION}_${LABEL}_universal${APK_SUFFIX}.apk"
 
-        mv deploy/build/client/android-build/build/outputs/bundle/ossRelease/android-build-oss-release.aab \
-           "$OUT/LeshaVPN_${VERSION}_${LABEL}${APK_SUFFIX}.aab"
-
         ls -l $OUT
 
     - name: 'Upload Android artifacts'
       uses: actions/upload-artifact@v4
       with:
         name: release-android-${{ matrix.min_sdk }}
-        path: |
-          deploy/artifacts/*.apk
-          deploy/artifacts/*.aab
+        path: deploy/artifacts/*.apk
         if-no-files-found: error
         retention-days: 14
 
@@ -616,9 +618,7 @@ jobs:
           export LD_LIBRARY_PATH="$PWD/deploy/build/client/tests:$QT_ROOT/lib:${LD_LIBRARY_PATH:-}"
           export QT_QPA_PLATFORM=offscreen
 
-          # Self-hosted server tests need a real VPS; they are never run here.
-          ctest --test-dir deploy/build/client/tests --output-on-failure \
-            -E "^(SelfHostedServerSetupTest|MultipleExportsTest|AdminSelfHostedExportTest)$"
+          ctest --test-dir deploy/build/client/tests --output-on-failure
 
 # ------------------------------------------------------
 

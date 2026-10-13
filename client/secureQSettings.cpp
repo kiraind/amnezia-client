@@ -26,7 +26,7 @@ namespace {
 }
 
 SecureQSettings::SecureQSettings(const QString &organization, const QString &application, QObject *parent, bool enableEncryption)
-    : QObject { parent }, m_settings(organization, application, parent), encryptedKeys({ "Servers/serversList", "Conf/favoriteLocations", "Coordinator/token" }), m_encryptionEnabled(enableEncryption)
+    : QObject { parent }, m_settings(organization, application, parent), encryptedKeys({ "Servers/serversList", "Coordinator/token" }), m_encryptionEnabled(enableEncryption)
 {
     bool encrypted = m_settings.value("Conf/encrypted").toBool();
 
@@ -118,61 +118,6 @@ void SecureQSettings::remove(const QString &key)
 
     m_settings.remove(key);
     m_cache.remove(key);
-}
-
-QByteArray SecureQSettings::backupAppConfig() const
-{
-    QMutexLocker locker(&m_mutex);
-
-    QJsonObject cfg;
-
-    const auto needToBackup = [this](const auto &key) {
-      for (const auto &item : m_fieldsToBackup)
-      {
-        if (key == "Conf/installationUuid")
-        {
-          return false;
-        }
-
-        if (key.startsWith(item))
-        {
-            return true;
-        }
-      }
-
-      return false;
-    };
-
-    for (const QString &key : m_settings.allKeys()) {
-
-        if (!needToBackup(key))
-        {
-            continue;
-        }
-
-        cfg.insert(key, QJsonValue::fromVariant(value(key)));
-    }
-
-    return QJsonDocument(cfg).toJson();
-}
-
-bool SecureQSettings::restoreAppConfig(const QByteArray &json)
-{
-    QMutexLocker locker(&m_mutex);
-
-    QJsonObject cfg = QJsonDocument::fromJson(json).object();
-    if (cfg.isEmpty())
-        return false;
-
-    for (const QString &key : cfg.keys()) {
-        if (key == "Conf/installationUuid") {
-            continue;
-        }
-
-        setValue(key, cfg.value(key).toVariant());
-    }
-
-    return true;
 }
 
 void SecureQSettings::clearSettings()

@@ -82,29 +82,13 @@ PageType {
                             servicesNameString += servicesName[i] + " · "
                         }
 
-                        if (ServersUiController.isServerFromApi(serverId)) {
-                            return servicesNameString + serverDescription
-                        } else {
-                            return servicesNameString + hostName
-                        }
+                        return servicesNameString + hostName
                     }
                     rightImageSource: "qrc:/images/controls/chevron-right.svg"
 
                     clickedFunction: function() {
                         ServersUiController.setProcessedServerId(serverId)
-
-                        if (ServersUiController.isServerFromApi(ServersUiController.processedServerId)) {
-                            PageController.showBusyIndicator(true)
-                            let result = SubscriptionUiController.getAccountInfo(ServersUiController.processedServerId, false)
-                            PageController.showBusyIndicator(false)
-                            if (!result) {
-                                return
-                            }
-
-                            PageController.goToPage(PageEnum.PageSettingsApiServerInfo)
-                        } else {
-                            PageController.goToPage(PageEnum.PageSettingsServerInfo)
-                        }
+                        PageController.goToPage(PageEnum.PageSettingsServerInfo)
                     }
                 }
 
