@@ -135,6 +135,42 @@ void ServersController::setDefaultContainer(const QString &serverId, DockerConta
     }
 }
 
+ErrorCode ServersController::updateClientConfig(const QString &serverId, DockerContainer container,
+                                                const ContainerConfig &newConfig)
+{
+    switch (m_serversRepository->serverKind(serverId)) {
+    case serverConfigUtils::ConfigType::SelfHostedAdmin: {
+        auto config = m_serversRepository->selfHostedAdminConfig(serverId);
+        if (!config.has_value()) {
+            return ErrorCode::InternalError;
+        }
+        config->updateContainerConfig(container, newConfig);
+        m_serversRepository->editServer(serverId, config->toJson(), serverConfigUtils::ConfigType::SelfHostedAdmin);
+        return ErrorCode::NoError;
+    }
+    case serverConfigUtils::ConfigType::SelfHostedUser: {
+        auto config = m_serversRepository->selfHostedUserConfig(serverId);
+        if (!config.has_value()) {
+            return ErrorCode::InternalError;
+        }
+        config->updateContainerConfig(container, newConfig);
+        m_serversRepository->editServer(serverId, config->toJson(), serverConfigUtils::ConfigType::SelfHostedUser);
+        return ErrorCode::NoError;
+    }
+    case serverConfigUtils::ConfigType::Native: {
+        auto config = m_serversRepository->nativeConfig(serverId);
+        if (!config.has_value()) {
+            return ErrorCode::InternalError;
+        }
+        config->updateContainerConfig(container, newConfig);
+        m_serversRepository->editServer(serverId, config->toJson(), serverConfigUtils::ConfigType::Native);
+        return ErrorCode::NoError;
+    }
+    default:
+        return ErrorCode::InternalError;
+    }
+}
+
 QVector<ServerDescription> ServersController::buildServerDescriptions(bool isAmneziaDnsEnabled) const
 {
     QVector<ServerDescription> out;
@@ -409,6 +445,28 @@ bool ServersController::hasInstalledContainers(const QString &serverId) const
         }
     }
     return false;
+}
+
+ErrorCode ServersController::validateClientConfig(const QString &serverId) const
+{
+    switch (m_serversRepository->serverKind(serverId)) {
+    case serverConfigUtils::ConfigType::SelfHostedAdmin:
+    case serverConfigUtils::ConfigType::SelfHostedUser:
+    case serverConfigUtils::ConfigType::Native:
+        break;
+    default:
+        return ErrorCode::InternalError;
+    }
+
+    const DockerContainer container = getDefaultContainer(serverId);
+    if (container == DockerContainer::None) {
+        return ErrorCode::NoInstalledContainersError;
+    }
+
+    if (!getContainerConfig(serverId, container).protocolConfig.hasClientConfig()) {
+        return ErrorCode::InternalError;
+    }
+    return ErrorCode::NoError;
 }
 
 bool ServersController::isLegacyApiV1Server(const QString &serverId) const

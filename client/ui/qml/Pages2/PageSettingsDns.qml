@@ -85,7 +85,7 @@ PageType {
 
                 textField.text: SettingsController.primaryDns
                 textField.validator: RegularExpressionValidator {
-                    regularExpression: InstallController.ipAddressRegExp()
+                    regularExpression: SettingsController.ipAddressRegExp()
                 }
             }
 
@@ -100,7 +100,7 @@ PageType {
 
                 textField.text: SettingsController.secondaryDns
                 textField.validator: RegularExpressionValidator {
-                    regularExpression: InstallController.ipAddressRegExp()
+                    regularExpression: SettingsController.ipAddressRegExp()
                 }
             }
 

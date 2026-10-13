@@ -14,7 +14,6 @@
 #include "core/utils/api/gatewayPayloadBuilder.h"
 #include "core/utils/appUiConfig.h"
 #include "core/utils/constants/apiKeys.h"
-#include "core/utils/selfhosted/scriptsRegistry.h"
 
 #if defined(Q_OS_ANDROID)
     #include "platforms/android/android_controller.h"
@@ -347,8 +346,12 @@ int UpdateController::runMacInstaller(const QString &installerPath)
         return -1;
     }
 
-    // Get script content from registry
-    QString scriptContent = amnezia::scriptData(amnezia::ClientScriptType::mac_installer);
+    // Get script content from resources (fork: read directly, the server scripts registry was removed)
+    QString scriptContent;
+    QFile scriptResource(QStringLiteral(":/client_scripts/mac_installer.sh"));
+    if (scriptResource.open(QIODevice::ReadOnly)) {
+        scriptContent = QString::fromUtf8(scriptResource.readAll()).remove(QLatin1Char('\r'));
+    }
     if (scriptContent.isEmpty()) {
         logger.error() << "macOS installer script content is empty";
         scriptFile.close();

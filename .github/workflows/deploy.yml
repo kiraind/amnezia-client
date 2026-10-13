@@ -618,9 +618,7 @@ jobs:
           export LD_LIBRARY_PATH="$PWD/deploy/build/client/tests:$QT_ROOT/lib:${LD_LIBRARY_PATH:-}"
           export QT_QPA_PLATFORM=offscreen
 
-          # Self-hosted server tests need a real VPS; they are never run here.
-          ctest --test-dir deploy/build/client/tests --output-on-failure \
-            -E "^(SelfHostedServerSetupTest|MultipleExportsTest|AdminSelfHostedExportTest)$"
+          ctest --test-dir deploy/build/client/tests --output-on-failure
 
 # ------------------------------------------------------
 

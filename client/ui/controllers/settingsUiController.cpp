@@ -8,6 +8,7 @@
 #include "core/utils/errorCodes.h"
 #include "core/utils/routeModes.h"
 #include "core/utils/commonStructs.h"
+#include "core/utils/networkUtilities.h"
 #include "logger.h"
 #include "systemController.h"
 #include "amneziaApplication.h"
@@ -70,6 +71,11 @@ void SettingsUiController::setSecondaryDns(const QString &dns)
 {
     m_settingsController->setSecondaryDns(dns);
     emit secondaryDnsChanged();
+}
+
+QRegularExpression SettingsUiController::ipAddressRegExp()
+{
+    return NetworkUtilities::ipAddressRegExp();
 }
 
 bool SettingsUiController::isLoggingEnabled()

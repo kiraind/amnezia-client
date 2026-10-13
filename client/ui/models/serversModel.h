@@ -4,7 +4,6 @@
 #include <QAbstractListModel>
 #include <QVector>
 
-#include "core/utils/selfhosted/sshSession.h"
 #include "core/models/serverDescription.h"
 
 class ServersModel : public QAbstractListModel
@@ -47,7 +46,7 @@ protected:
     QHash<int, QByteArray> roleNames() const override;
 
 private:
-    ServerCredentials serverCredentials(int index) const;
+    amnezia::ServerCredentials serverCredentials(int index) const;
 
     QVector<amnezia::ServerDescription> m_descriptions;
 

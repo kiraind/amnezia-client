@@ -127,10 +127,6 @@ Window  {
             popupNotificationTimer.start()
         }
 
-        function onShowPassphraseRequestDrawer() {
-            privateKeyPassphraseDrawer.openTriggered()
-        }
-
         function onGoToPageSettingsBackup() {
             PageController.goToPage(PageEnum.PageSettingsBackup)
         }
@@ -223,89 +219,6 @@ Window  {
 
             onRefreshCaptchaRequested: function() {
                 SubscriptionUiController.onRefreshCaptchaRequested()
-            }
-        }
-    }
-
-    Item {
-        objectName: "privateKeyPassphraseDrawerItem"
-
-        anchors.fill: parent
-
-        DrawerType2 {
-            id: privateKeyPassphraseDrawer
-
-            property bool isCloseByUser: false
-
-            anchors.fill: parent
-            expandedHeight: root.height * 0.35 + PageController.safeAreaBottomMargin + PageController.imeHeight
-
-            expandedStateContent: ColumnLayout {
-                anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.topMargin: 16
-                anchors.leftMargin: 16
-                anchors.rightMargin: 16
-
-                Connections {
-                    target: privateKeyPassphraseDrawer
-                    function onOpened() {
-                        passphrase.textField.text = ""
-                        passphrase.textField.forceActiveFocus()
-                    }
-
-                    function onAboutToHide() {
-                        if (privateKeyPassphraseDrawer.isCloseByUser === false) {
-                            privateKeyPassphraseDrawer.isCloseByUser = true
-                            PageController.passphraseRequestDrawerClosed("")
-                        }
-
-                        if (passphrase.textField.text !== "") {
-                            PageController.showBusyIndicator(true)
-                        }
-                    }
-
-                    function onAboutToShow() {
-                        PageController.showBusyIndicator(false)
-                    }
-                }
-
-                TextFieldWithHeaderType {
-                    id: passphrase
-
-                    property bool hidePassword: true
-
-                    Layout.fillWidth: true
-                    headerText: qsTr("Private key passphrase")
-                    textField.echoMode: hidePassword ? TextInput.Password : TextInput.Normal
-                    buttonImageSource: hidePassword ? "qrc:/images/controls/eye.svg" : "qrc:/images/controls/eye-off.svg"
-
-                    clickedFunc: function() {
-                        hidePassword = !hidePassword
-                    }
-                }
-
-                BasicButtonType {
-                    id: saveButton
-
-                    Layout.fillWidth: true
-
-                    defaultColor: AmneziaStyle.color.transparent
-                    hoveredColor: AmneziaStyle.color.translucentWhite
-                    pressedColor: AmneziaStyle.color.sheerWhite
-                    disabledColor: AmneziaStyle.color.mutedGray
-                    textColor: AmneziaStyle.color.paleGray
-                    borderWidth: 1
-
-                    text: qsTr("Save")
-
-                    clickedFunc: function() {
-                        privateKeyPassphraseDrawer.isCloseByUser = true
-                        privateKeyPassphraseDrawer.closeTriggered()
-                        PageController.passphraseRequestDrawerClosed(passphrase.textField.text)
-                    }
-                }
             }
         }
     }
@@ -404,7 +317,7 @@ Window  {
             }
 
             PageController.showBusyIndicator(true)
-            InstallController.removeServer(ServersUiController.defaultServerId)
+            ServersUiController.removeServer(ServersUiController.defaultServerId)
             PageController.showBusyIndicator(false)
         }
         let noButtonFunction = function() {

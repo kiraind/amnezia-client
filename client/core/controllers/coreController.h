@@ -15,12 +15,10 @@
 #include "ui/controllers/appSplitTunnelingUiController.h"
 #include "ui/controllers/allowedDnsUiController.h"
 #include "ui/controllers/connectionUiController.h"
-#include "ui/controllers/selfhosted/exportUiController.h"
-#include "core/controllers/selfhosted/exportController.h"
 #include "ui/controllers/qml/focusController.h"
 #include "ui/controllers/importUiController.h"
 #include "core/controllers/selfhosted/importController.h"
-#include "ui/controllers/selfhosted/installUiController.h"
+#include "ui/controllers/protocolSettingsUiController.h"
 #include "ui/controllers/qml/pageController.h"
 #include "ui/controllers/settingsUiController.h"
 #include "ui/controllers/serversUiController.h"
@@ -32,7 +30,6 @@
 #include "ui/controllers/networkReachabilityController.h"
 
 #include "core/controllers/serversController.h"
-#include "core/controllers/selfhosted/usersController.h"
 #include "core/controllers/appSplitTunnelingController.h"
 #include "core/controllers/ipSplitTunnelingController.h"
 #include "core/controllers/allowedDnsController.h"
@@ -42,7 +39,6 @@
 #include "core/controllers/api/newsController.h"
 #include "core/controllers/coordinator/coordinatorApi.h"
 #include "core/controllers/coordinator/coordinatorController.h"
-#include "core/controllers/selfhosted/installController.h"
 #include "core/controllers/settingsController.h"
 #include "core/controllers/connectionController.h"
 #include "core/controllers/updateController.h"
@@ -65,20 +61,13 @@
 #include "ui/models/api/apiServicesModel.h"
 #include "ui/models/api/apiSubscriptionPlansModel.h"
 #include "ui/models/appSplitTunnelingModel.h"
-#include "ui/models/clientManagementModel.h"
 #include "ui/models/protocols/awgConfigModel.h"
 #include "ui/models/protocols/openvpnConfigModel.h"
 #include "ui/models/protocols/wireguardConfigModel.h"
 #include "ui/models/protocols/xrayConfigModel.h"
 #include "ui/models/protocols/xrayConfigSnapshotsModel.h"
 #include "ui/models/protocolsModel.h"
-#include "ui/models/services/torConfigModel.h"
 #include "ui/models/serversModel.h"
-#include "ui/models/services/sftpConfigModel.h"
-#include "ui/models/services/socks5ProxyConfigModel.h"
-#include "ui/models/services/mtProxyConfigModel.h"
-#include "ui/models/services/telemtConfigModel.h"
-#include "ui/models/services/tProxyConfigModel.h"
 
 #include "ui/models/ipSplitTunnelingModel.h"
 #include "ui/models/newsModel.h"
@@ -123,10 +112,8 @@ protected:
     IpSplitTunnelingModel* ipSplitTunnelingModelProtected() const { return m_ipSplitTunnelingModel; }
     LanguageModel* languageModelProtected() const { return m_languageModel; }
     ConnectionUiController* connectionUiControllerProtected() const { return m_connectionUiController; }
-    InstallUiController* installUiControllerProtected() const { return m_installUiController; }
+    ProtocolSettingsUiController* protocolSettingsUiControllerProtected() const { return m_protocolSettingsUiController; }
     ImportController* importCoreControllerProtected() const { return m_importCoreController; }
-    ExportController* exportControllerProtected() const { return m_exportController; }
-    InstallController* installControllerProtected() const { return m_installController; }
     ServersController* serversControllerProtected() const { return m_serversController; }
     SettingsUiController* settingsUiControllerProtected() const { return m_settingsUiController; }
     SettingsController* settingsControllerProtected() const { return m_settingsController; }
@@ -169,10 +156,9 @@ private:
     ConnectionUiController* m_connectionUiController;
     FocusController* m_focusController;
     PageController* m_pageController;
-    InstallUiController* m_installUiController;
+    ProtocolSettingsUiController* m_protocolSettingsUiController;
     ImportUiController* m_importController;
     ImportController* m_importCoreController;
-    ExportUiController* m_exportUiController;
     SettingsUiController* m_settingsUiController;
     ServersUiController* m_serversUiController;
     IpSplitTunnelingUiController* m_ipSplitTunnelingUiController;
@@ -190,7 +176,6 @@ private:
     ServicesCatalogUiController* m_servicesCatalogUiController;
 
     ServersController* m_serversController;
-    UsersController* m_usersController;
     AppSplitTunnelingController* m_appSplitTunnelingController;
     IpSplitTunnelingController* m_ipSplitTunnelingController;
     AllowedDnsController* m_allowedDnsController;
@@ -199,8 +184,6 @@ private:
     StorePurchaseController* m_storePurchaseController;
     NewsController* m_newsController;
     UpdateController* m_updateController;
-    InstallController* m_installController;
-    ExportController* m_exportController;
     ConnectionController* m_connectionController;
     SettingsController* m_settingsController;
     CoordinatorApi* m_coordinatorApi;
@@ -215,7 +198,6 @@ private:
     NewsModel* m_newsModel;
     AllowedDnsModel* m_allowedDnsModel;
     AppSplitTunnelingModel* m_appSplitTunnelingModel;
-    ClientManagementModel* m_clientManagementModel;
 
     ApiServicesModel* m_apiServicesModel;
     ApiSubscriptionPlansModel* m_apiSubscriptionPlansModel;
@@ -229,17 +211,11 @@ private:
     OpenVpnConfigModel* m_openVpnConfigModel;
     XrayConfigModel* m_xrayConfigModel;
     XrayConfigSnapshotsModel* m_xrayConfigSnapshotsModel;
-    TorConfigModel* m_torConfigModel;
     WireGuardConfigModel* m_wireGuardConfigModel;
     AwgConfigModel* m_awgConfigModel;
 #ifdef Q_OS_WINDOWS
     Ikev2ConfigModel* m_ikev2ConfigModel;
 #endif
-    SftpConfigModel* m_sftpConfigModel;
-    Socks5ProxyConfigModel* m_socks5ConfigModel;
-    MtProxyConfigModel* m_mtProxyConfigModel;
-    TelemtConfigModel* m_telemtConfigModel;
-    TProxyConfigModel* m_tProxyConfigModel;
 
     CoreSignalHandlers* m_signalHandlers;
 };

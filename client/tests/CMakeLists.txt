@@ -6,10 +6,6 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-qt6_add_resources(TEST_QRC
-    ../server_scripts/serverScripts.qrc
-)
-
 set(_main_cpp "${CMAKE_CURRENT_SOURCE_DIR}/../main.cpp")
 get_filename_component(_main_cpp "${_main_cpp}" REALPATH)
 
@@ -21,7 +17,6 @@ add_library(test_common OBJECT
     ${HEADERS}
     ../ui/utils/pageEnum.h
     utils/testUtils.cpp
-    ${TEST_QRC}
 )
 
 qt_add_repc_replicas(test_common
@@ -395,7 +390,6 @@ print('SONAME patch done.')
 endif()
 
 if(NOT ANDROID)
-    add_subdirectory(selfHostedAdmin)
     add_subdirectory(api)
 endif()
 

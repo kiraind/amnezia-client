@@ -3,7 +3,6 @@
         <file>Components/UpdateSupportDrawer.qml</file>
         <file>Components/AdLabel.qml</file>
         <file>Components/ConnectButton.qml</file>
-        <file>Components/ConnectionTypeSelectionDrawer.qml</file>
         <file>Components/CountryListStickyHeader.qml</file>
         <file>Components/CountrySearchField.qml</file>
         <file>Components/CountrySearchRow.qml</file>
@@ -32,7 +31,6 @@
         <file>Controls2/BasicButtonType.qml</file>
         <file>Controls2/BusyIndicatorType.qml</file>
         <file>Controls2/CaptchaDialogType.qml</file>
-        <file>Controls2/CardType.qml</file>
         <file>Controls2/ChangelogSectionType.qml</file>
         <file>Controls2/BackdropBlurType.qml</file>
         <file>Controls2/TagBadgeType.qml</file>
@@ -89,13 +87,10 @@
         <file>main2.qml</file>
         <file>Modules/Style/AmneziaStyle.qml</file>
         <file>Modules/Style/qmldir</file>
-        <file>Pages2/PageDeinstalling.qml</file>
         <file>Pages2/PageDevMenu.qml</file>
         <file>Pages2/PageHome.qml</file>
-        <file>Pages2/PageProtocolAwgSettings.qml</file>
         <file>Pages2/PageProtocolOpenVpnSettings.qml</file>
         <file>Pages2/PageProtocolRaw.qml</file>
-        <file>Pages2/PageProtocolWireGuardSettings.qml</file>
         <file>Pages2/PageProtocolXraySettings.qml</file>
 
         <file>Pages2/PageProtocolXraySnapshots.qml</file>
@@ -107,13 +102,6 @@
         <file>Pages2/PageProtocolXrayXPaddingBytesSettings.qml</file>
         <file>Controls2/MinMaxRowType.qml</file>
 
-        <file>Pages2/PageServiceDnsSettings.qml</file>
-        <file>Pages2/PageServiceMtProxySettings.qml</file>
-        <file>Pages2/PageServiceTelemtSettings.qml</file>
-        <file>Pages2/PageServiceTProxySettings.qml</file>
-        <file>Pages2/PageServiceSftpSettings.qml</file>
-        <file>Pages2/PageServiceSocksProxySettings.qml</file>
-        <file>Pages2/PageServiceTorWebsiteSettings.qml</file>
         <file>Pages2/PageSettings.qml</file>
         <file>Pages2/PageSettingsAbout.qml</file>
         <file>Pages2/PageSettingsApiAvailableCountries.qml</file>
@@ -130,7 +118,6 @@
         <file>Pages2/PageSettingsServerInfo.qml</file>
         <file>Pages2/PageSettingsServerProtocol.qml</file>
         <file>Pages2/PageSettingsServerProtocols.qml</file>
-        <file>Pages2/PageSettingsServerServices.qml</file>
         <file>Pages2/PageSettingsServersList.qml</file>
         <file>Pages2/PageSettingsSplitTunneling.qml</file>
         <file>Pages2/PageSettingsNewsNotifications.qml</file>
@@ -143,18 +130,10 @@
         <file>Pages2/PageSetupWizardApiTrialEmail.qml</file>
         <file>Pages2/PageSetupWizardApiServicesList.qml</file>
         <file>Pages2/PageSetupWizardConfigSource.qml</file>
-        <file>Pages2/PageSetupWizardCredentials.qml</file>
-        <file>Pages2/PageSetupWizardEasy.qml</file>
-        <file>Pages2/PageSetupWizardInstalling.qml</file>
-        <file>Pages2/PageSetupWizardProtocols.qml</file>
-        <file>Pages2/PageSetupWizardProtocolSettings.qml</file>
         <file>Pages2/PageSetupWizardQrReader.qml</file>
         <file>Pages2/PageSetupWizardStart.qml</file>
         <file>Pages2/PageSetupWizardTextKey.qml</file>
         <file>Pages2/PageSetupWizardViewConfig.qml</file>
-        <file>Pages2/PageShare.qml</file>
-        <file>Pages2/PageShareFullAccess.qml</file>
-        <file>Pages2/PageShareConnection.qml</file>
         <file>Pages2/PageStart.qml</file>
         <file>Components/RenameServerDrawer.qml</file>
         <file>Controls2/ListViewType.qml</file>

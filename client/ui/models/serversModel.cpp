@@ -9,7 +9,6 @@
 #include "core/utils/serverConfigUtils.h"
 #include "core/utils/constants/apiKeys.h"
 #include "core/utils/constants/apiConstants.h"
-#include "core/utils/selfhosted/sshSession.h"
 #include "core/utils/networkUtilities.h"
 
 #if defined(Q_OS_IOS) || defined(MACOS_NE)
@@ -145,10 +144,10 @@ QHash<int, QByteArray> ServersModel::roleNames() const
     return roles;
 }
 
-ServerCredentials ServersModel::serverCredentials(int index) const
+amnezia::ServerCredentials ServersModel::serverCredentials(int index) const
 {
     if (index < 0 || index >= m_descriptions.size()) {
-        return ServerCredentials();
+        return amnezia::ServerCredentials();
     }
     return m_descriptions.at(index).selfHostedSshCredentials;
 }

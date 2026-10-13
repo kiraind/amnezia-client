@@ -160,6 +160,41 @@ removed feature, don't add it to the build.
   (`isCameraPresent()` is false on Android), `client/cmake/3rdparty.cmake` (qtgamepad block), `ui/qml/main2.qml`
   (gamepad `Loader`), `ui/qml/qml.qrc`.
 
+### 9.2 Self-hosted server installation, server services and sharing
+The app can no longer install or manage a server over SSH, add services (Tor website, SFTP, SOCKS5, MTProxy, Telemt,
+TProxy, AmneziaDNS) or share access/configs with other users. Stored self-hosted (admin) servers still load, connect with the
+client config they already hold, can be renamed and removed; the `SelfHostedAdmin` config type and every
+`core/models/protocols/*ProtocolConfig` (part of the `ProtocolConfig` variant) are kept for that. libssh is no longer a dependency.
+- Deleted: `client/core/utils/selfhosted/{sshClient,sshSession,scriptsRegistry}.*`, `client/core/installers/*`,
+  `client/core/controllers/selfhosted/{installController,usersController,exportController}.*`,
+  `client/ui/controllers/selfhosted/{installUiController,exportUiController}.*`, `client/server_scripts/` (with `serverScripts.qrc`),
+  `client/ui/models/services/*`, `client/ui/models/clientManagementModel.*`, `client/ui/utils/mtProxyPublicHostInput.*`,
+  `client/core/configurators/awgConfigurator.*` (AWG uses `WireguardConfigurator`), `recipes/libssh/`, `client/tests/selfHostedAdmin/`,
+  QML `Pages2/{PageSetupWizardCredentials,PageSetupWizardEasy,PageSetupWizardInstalling,PageSetupWizardProtocols,PageSetupWizardProtocolSettings,
+  PageDeinstalling,PageSettingsServerServices,PageService*,PageShare,PageShareConnection,PageShareFullAccess,PageProtocolAwgSettings,
+  PageProtocolWireGuardSettings}.qml`, `Components/ConnectionTypeSelectionDrawer.qml`, `Controls2/CardType.qml`.
+- Added: `client/ui/controllers/protocolSettingsUiController.{h,cpp}` (QML `ProtocolSettingsController`: `updateProtocols`,
+  `openClientSettings`, `updateClientConfig` — the client-only part of the old `InstallController`).
+- Hunks: `conanfile.py` (libssh), `client/cmake/3rdparty.cmake` (`find_package(libssh)`), `client/main.cpp` (`ssh_init`),
+  `client/CMakeLists.txt` (`serverScripts.qrc`), `client/cmake/sources.cmake`, `client/core/configurators/*` (no `SshSession`,
+  `createConfig` and `processConfigWithExportSettings` removed; only `processConfigWithLocalSettings` and
+  `WireguardConfigurator::genClientKeys` remain), `core/controllers/connectionController.cpp` (`ConfiguratorBase::create`),
+  `core/controllers/serversController.{h,cpp}` (`updateClientConfig`, `validateClientConfig` moved from `InstallController`),
+  `core/controllers/coreController.{h,cpp}`, `core/controllers/coreSignalHandlers.{h,cpp}` (connect of a self-hosted/native server
+  validates via `ServersController::validateClientConfig`, no SSH provisioning), `core/controllers/updateController.cpp`
+  (reads `:/client_scripts/mac_installer.sh` directly), `ui/controllers/connectionUiController.{h,cpp}` (`noInstalledContainers`,
+  `isRevokeBlockedDuringActiveConnection`), `ui/controllers/serversUiController.{h,cpp}` (`removeServerFinished`),
+  `ui/controllers/settingsUiController.{h,cpp}` (`ipAddressRegExp`), `ui/controllers/qml/pageController.h` (passphrase, share and
+  services signals), `ui/models/protocolsModel.{h,cpp}` (`serverProtocolPage` role), `ui/models/serversModel.{h,cpp}`,
+  `core/models/serverDescription.h`, `amneziaApplication.cpp` (`PublicHostInputValidator`), `ui/utils/pageEnum.h`, `ui/qml/qml.qrc`,
+  `ui/qml/main2.qml` (passphrase drawer), `ui/qml/Filters/ContainersModelFilters.qml` (installed VPN protocols only),
+  `Pages2/PageStart.qml` (share tab — tab indices shifted, `InstallController` connections), `Pages2/{PageHome,PageSettingsServerInfo,
+  PageSettingsServerData,PageSettingsServerProtocols,PageSettingsServerProtocol,PageProtocolRaw,PageSettingsDns,
+  PageProtocolAwgClientSettings,PageProtocolWireGuardClientSettings}.qml`, `Components/{SettingsContainersListView,HomeContainersListView}.qml`,
+  `client/tests/{CMakeLists.txt,utils/testCoreController.h}`, `.github/workflows/deploy.yml` (ctest `-E` list), `THIRD_PARTY_LICENSES.md`.
+- Left for the protocol cleanup: `Pages2/PageProtocol{OpenVpnSettings,Xray*}.qml` (server-side settings) are no longer reachable
+  (the "server settings" entry and `ProtocolsModel`'s `serverProtocolPage` role are gone) and still call the removed `InstallController`.
+
 ## Translations
 Fork UI strings are Russian source text inside `qsTr(...)` (e.g. "Аккаунт VPN"). The fork does not edit `client/translations/*.ts`,
 so on conflict take upstream's `.ts` files. Only if a fork commit ever added entries to them, re-add those entries.

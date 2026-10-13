@@ -61,8 +61,10 @@ void ServersUiController::removeServer(const QString &serverId)
     if (serverId.isEmpty()) {
         return;
     }
+    const QString serverName = m_serversController->notificationDisplayName(serverId);
     m_serversController->removeServer(serverId);
     updateModel();
+    emit removeServerFinished(tr("Server '%1' was removed").arg(serverName));
 }
 
 void ServersUiController::removeServerAtIndex(int index)

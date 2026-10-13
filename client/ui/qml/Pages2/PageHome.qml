@@ -541,11 +541,8 @@ PageType {
                             }
 
                             function updateContainersModelFilters() {
-                                if (ServersUiController.isServerHasWriteAccess(ServersUiController.defaultServerId)) {
-                                    proxyDefaultServerContainersModel.filters = ContainersModelFilters.getWriteAccessProtocolsListFilters()
-                                } else {
-                                    proxyDefaultServerContainersModel.filters = ContainersModelFilters.getReadAccessProtocolsListFilters()
-                                }
+                                // Fork: protocols can't be installed from the app, so only installed ones are listed
+                                proxyDefaultServerContainersModel.filters = ContainersModelFilters.getReadAccessProtocolsListFilters()
                             }
 
                             model: SortFilterProxyModel {

@@ -62,10 +62,7 @@ signals:
     void goToPageHome();
     void goToPageSettings();
     void goToPageViewConfig();
-    void goToPageSettingsServerServices();
     void goToPageSettingsBackup();
-    void goToShareConnectionPage(QString headerText, QString configContentHeaderText, QString configCaption, QString configExtension,
-                                 QString configFileName);
 
     void closePage();
 
@@ -81,9 +78,6 @@ signals:
 
     void hideMainWindow();
     void raiseMainWindow();
-
-    void showPassphraseRequestDrawer();
-    void passphraseRequestDrawerClosed(QString passphrase);
 
     void unsupportedConnectDrawerRequested();
 

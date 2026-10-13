@@ -22,10 +22,8 @@ public:
         , m_ipSplitTunnelingModel(ipSplitTunnelingModelProtected())
         , m_languageModel(languageModelProtected())
         , m_connectionUiController(connectionUiControllerProtected())
-        , m_installUiController(installUiControllerProtected())
+        , m_protocolSettingsUiController(protocolSettingsUiControllerProtected())
         , m_importCoreController(importCoreControllerProtected())
-        , m_exportController(exportControllerProtected())
-        , m_installController(installControllerProtected())
         , m_serversController(serversControllerProtected())
         , m_settingsUiController(settingsUiControllerProtected())
         , m_settingsController(settingsControllerProtected())
@@ -54,10 +52,8 @@ public:
     LanguageModel *m_languageModel;
 
     ConnectionUiController *m_connectionUiController;
-    InstallUiController *m_installUiController;
+    ProtocolSettingsUiController *m_protocolSettingsUiController;
     ImportController *m_importCoreController;
-    ExportController *m_exportController;
-    InstallController *m_installController;
     ServersController *m_serversController;
     SettingsUiController *m_settingsUiController;
     SettingsController *m_settingsController;

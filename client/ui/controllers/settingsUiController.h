@@ -2,6 +2,7 @@
 #define SETTINGSUICONTROLLER_H
 
 #include <QObject>
+#include <QRegularExpression>
 
 #include "core/controllers/settingsController.h"
 #include "core/controllers/serversController.h"
@@ -41,6 +42,9 @@ public slots:
 
     QString getSecondaryDns();
     void setSecondaryDns(const QString &dns);
+
+    // Validator for the DNS fields (moved from the removed InstallController)
+    QRegularExpression ipAddressRegExp();
 
     bool isLoggingEnabled();
     void toggleLogging(bool enable);

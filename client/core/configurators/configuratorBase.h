@@ -13,31 +13,21 @@
 #include "core/models/containerConfig.h"
 #include "core/models/protocolConfig.h"
 
-class SshSession;
-
 class ConfiguratorBase : public QObject
 {
     Q_OBJECT
 public:
-    explicit ConfiguratorBase(SshSession* sshSession, QObject *parent = nullptr);
+    // Fork: server-side config creation over SSH (createConfig) and export processing were removed together with
+    // self-hosted server management; configurators only adapt stored client configs to local settings.
+    explicit ConfiguratorBase(QObject *parent = nullptr);
 
-    static QScopedPointer<ConfiguratorBase> create(amnezia::Proto protocol,
-                                                   SshSession* sshSession);
-
-    virtual amnezia::ProtocolConfig createConfig(const amnezia::ServerCredentials &credentials, amnezia::DockerContainer container,
-                                        const amnezia::ContainerConfig &containerConfig,
-                                        const amnezia::DnsSettings &dnsSettings,
-                                        amnezia::ErrorCode &errorCode) = 0;
+    static QScopedPointer<ConfiguratorBase> create(amnezia::Proto protocol);
 
     virtual amnezia::ProtocolConfig processConfigWithLocalSettings(const amnezia::ConnectionSettings &settings,
                                                                    amnezia::ProtocolConfig protocolConfig);
-    virtual amnezia::ProtocolConfig processConfigWithExportSettings(const amnezia::ExportSettings &settings,
-                                                                     amnezia::ProtocolConfig protocolConfig);
 
 protected:
     void applyDnsToNativeConfig(const amnezia::DnsSettings &dns, amnezia::ProtocolConfig &protocolConfig);
-
-    SshSession* m_sshSession;
 };
 
 #endif // CONFIGURATORBASE_H

@@ -114,6 +114,7 @@ public slots:
 signals:
     void errorOccurred(const QString &errorMessage);
     void finished(const QString &message);
+    void removeServerFinished(const QString &finishedMessage);
     void defaultServerIdChanged(const QString &serverId);
     void processedServerIdChanged(const QString &serverId);
     void processedContainerIndexChanged(int index);

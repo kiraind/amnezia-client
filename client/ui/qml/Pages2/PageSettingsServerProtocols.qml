@@ -38,11 +38,8 @@ PageType {
         }
 
         function updateContainersModelFilters() {
-            if (ServersUiController.isProcessedServerHasWriteAccess()) {
-                proxyContainersModel.filters = ContainersModelFilters.getWriteAccessProtocolsListFilters()
-            } else {
-                proxyContainersModel.filters = ContainersModelFilters.getReadAccessProtocolsListFilters()
-            }
+            // Fork: protocols can't be installed from the app, so only installed ones are listed
+            proxyContainersModel.filters = ContainersModelFilters.getReadAccessProtocolsListFilters()
             root.installedProtocolsCount = proxyContainersModel.count
         }
 
