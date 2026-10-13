@@ -29,6 +29,7 @@ constexpr QLatin1String configId("configId");
 constexpr QLatin1String name("name");
 constexpr QLatin1String revision("revision");
 constexpr QLatin1String state("state");
+constexpr QLatin1String displayName("displayName"); // server name the app last set from the coordinator
 } // namespace entryKey
 
 constexpr qint64 errorRefreshThrottleMsecs = 60 * 1000;
@@ -503,16 +504,25 @@ bool CoordinatorController::applyConfig(const QJsonObject &config, const QString
         return false;
     }
 
+    // The server is named after the exit country ("serverName"); older coordinators only send the config name
+    const QString displayName = config.value("serverName").toString().trimmed().isEmpty()
+            ? name
+            : config.value("serverName").toString().trimmed();
+
     QJsonObject serverJson = result.config;
-    serverJson[configKey::description] = name;
+    serverJson[configKey::description] = displayName;
     const serverConfigUtils::ConfigType kind = serverConfigUtils::configTypeFromJson(serverJson);
 
     const bool replace = !existingServerId.isEmpty() && m_serversRepository->indexOfServerId(existingServerId) >= 0;
     QString serverId = existingServerId;
     if (replace) {
-        // Keep the name the user may have given the server in the app.
+        // Keep a name the user gave the server in the app; a name the coordinator set follows the coordinator.
         const auto current = m_serversRepository->nativeConfig(existingServerId);
-        if (current.has_value() && !current->description.isEmpty()) {
+        const QJsonObject previous = managedConfigs().value(existingServerId).toObject();
+        const QString previousDisplayName = previous.contains(entryKey::displayName)
+                ? previous.value(entryKey::displayName).toString()
+                : previous.value(entryKey::name).toString();
+        if (current.has_value() && !current->description.isEmpty() && current->description != previousDisplayName) {
             serverJson[configKey::description] = current->description;
         }
         m_serversRepository->editServer(existingServerId, serverJson, kind);
@@ -534,6 +544,7 @@ bool CoordinatorController::applyConfig(const QJsonObject &config, const QString
     QJsonObject entry;
     entry[entryKey::configId] = configId;
     entry[entryKey::name] = name;
+    entry[entryKey::displayName] = displayName;
     entry[entryKey::revision] = config.value("revision").toString();
     entry[entryKey::state] = QStringLiteral("ok");
     setManagedEntry(serverId, entry);

@@ -567,6 +567,44 @@ private slots:
         QCOMPARE(entry.value("state").toString(), QStringLiteral("ok"));
     }
 
+    void testServerNamedAfterExitCountry()
+    {
+        login();
+        const QString serverId = createPhone(); // old coordinator: no serverName, named after the config
+        QCOMPARE(m_core->m_serversRepository->nativeConfig(serverId)->description, QStringLiteral("phone"));
+
+        // The coordinator starts sending serverName: the server is renamed
+        m_currentConfig = configJson("cfg-1", "phone", "rev2", "198.51.100.7:51821");
+        m_currentConfig["serverName"] = QStringLiteral("🇳🇱 Нидерланды");
+        m_statusState = "outdated";
+        QSignalSpy replacedSpy(m_controller, &CoordinatorController::configReplaced);
+        m_controller->refreshAll();
+        QTRY_COMPARE(replacedSpy.count(), 1);
+        QCOMPARE(m_core->m_serversRepository->nativeConfig(serverId)->description, QStringLiteral("🇳🇱 Нидерланды"));
+
+        // The user renames it in the app: later updates keep the user's name
+        QJsonObject serverJson = m_core->m_serversRepository->nativeConfig(serverId)->toJson();
+        serverJson[configKey::description] = QStringLiteral("Мой VPN");
+        m_core->m_serversRepository->editServer(serverId, serverJson, serverConfigUtils::configTypeFromJson(serverJson));
+        m_currentConfig["revision"] = "rev3";
+        m_currentConfig["serverName"] = QStringLiteral("🇩🇪 Германия");
+        m_controller->refreshAll();
+        QTRY_COMPARE(replacedSpy.count(), 2);
+        QCOMPARE(m_core->m_serversRepository->nativeConfig(serverId)->description, QStringLiteral("Мой VPN"));
+    }
+
+    void testCreatedServerUsesServerName()
+    {
+        login();
+        m_currentConfig = configJson("cfg-1", "phone", "rev1", "203.0.113.10:51820");
+        m_currentConfig["serverName"] = QStringLiteral("🇳🇱 Нидерланды");
+        QSignalSpy addedSpy(m_controller, &CoordinatorController::configAdded);
+        m_controller->addConfigToApp("cfg-1");
+        QTRY_COMPARE(addedSpy.count(), 1);
+        QCOMPARE(m_core->m_serversRepository->nativeConfig(addedSpy.at(0).at(0).toString())->description,
+                 QStringLiteral("🇳🇱 Нидерланды"));
+    }
+
     void testSuspendedReportedOnce()
     {
         login();
