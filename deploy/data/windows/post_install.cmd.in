@@ -1,0 +1,5 @@
+sc stop AmneziaWGTunnel$@CLIENT_APPLICATION_NAME@
+sc delete AmneziaWGTunnel$@CLIENT_APPLICATION_NAME@
+taskkill /IM "@CLIENT_SERVICE_NAME@.exe" /F
+taskkill /IM "@CLIENT_APPLICATION_NAME@.exe" /F
+exit /b 0

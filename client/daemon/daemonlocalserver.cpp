@@ -11,15 +11,19 @@
 #include "daemonlocalserverconnection.h"
 #include "leakdetector.h"
 #include "logger.h"
+#include "version.h"
 
 #if defined(MZ_MACOS) || defined(MZ_LINUX)
 #  include <sys/stat.h>
 #  include <sys/types.h>
 #  include <unistd.h>
 
-constexpr const char* TMP_PATH = "/tmp/amneziavpn.socket";
-constexpr const char* VAR_PATH = "/var/run/amneziavpn/daemon.socket";
 #endif
+
+namespace {
+// Derived from the branded app name so side-by-side installs don't share a daemon socket
+QString daemonDirName() { return QString(APPLICATION_NAME).toLower(); }
+}  // namespace
 
 namespace {
 Logger logger("DaemonLocalServer");
@@ -67,28 +71,33 @@ bool DaemonLocalServer::initialize() {
 
 QString DaemonLocalServer::daemonPath() const {
 #if defined(MZ_WINDOWS)
-  return "\\\\.\\pipe\\amneziavpn";
+  return "\\\\.\\pipe\\" + daemonDirName();
 #endif
 #if defined(MZ_MACOS) || defined(MZ_LINUX)
+  const QString dirName = daemonDirName();
+  const QString TMP_PATH = "/tmp/" + dirName + ".socket";
+  const QString VAR_DIR = "/var/run/" + dirName;
+  const QString VAR_PATH = VAR_DIR + "/daemon.socket";
+
   QDir dir("/var/run");
   if (!dir.exists()) {
     logger.warning() << "/var/run doesn't exist. Fallback /tmp.";
     return TMP_PATH;
   }
 
-  if (dir.exists("amneziavpn")) {
-    logger.debug() << "/var/run/amneziavpn seems to be usable";
+  if (dir.exists(dirName)) {
+    logger.debug() << VAR_DIR << "seems to be usable";
     return VAR_PATH;
   }
 
-  if (!dir.mkdir("amneziavpn")) {
-    logger.warning() << "Failed to create /var/run/amneziavpn";
+  if (!dir.mkdir(dirName)) {
+    logger.warning() << "Failed to create" << VAR_DIR;
     return TMP_PATH;
   }
 
-  if (chmod("/var/run/amneziavpn", S_IRWXU | S_IRWXG | S_IRWXO) < 0) {
+  if (chmod(qPrintable(VAR_DIR), S_IRWXU | S_IRWXG | S_IRWXO) < 0) {
     logger.warning()
-        << "Failed to set the right permissions to /var/run/amneziavpn";
+        << "Failed to set the right permissions to" << VAR_DIR;
     return TMP_PATH;
   }
 

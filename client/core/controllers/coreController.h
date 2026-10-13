@@ -11,6 +11,7 @@
 
 #include "ui/controllers/api/subscriptionUiController.h"
 #include "ui/controllers/api/apiNewsUiController.h"
+#include "ui/controllers/coordinator/coordinatorUiController.h"
 #include "ui/controllers/appSplitTunnelingUiController.h"
 #include "ui/controllers/allowedDnsUiController.h"
 #include "ui/controllers/connectionUiController.h"
@@ -39,6 +40,8 @@
 #include "core/controllers/api/storePurchaseController.h"
 #include "core/controllers/api/subscriptionController.h"
 #include "core/controllers/api/newsController.h"
+#include "core/controllers/coordinator/coordinatorApi.h"
+#include "core/controllers/coordinator/coordinatorController.h"
 #include "core/controllers/selfhosted/installController.h"
 #include "core/controllers/settingsController.h"
 #include "core/controllers/connectionController.h"
@@ -182,6 +185,7 @@ private:
 
     SubscriptionUiController* m_subscriptionUiController;
     ApiNewsUiController* m_apiNewsUiController;
+    CoordinatorUiController* m_coordinatorUiController;
     
     ServicesCatalogUiController* m_servicesCatalogUiController;
 
@@ -199,6 +203,8 @@ private:
     ExportController* m_exportController;
     ConnectionController* m_connectionController;
     SettingsController* m_settingsController;
+    CoordinatorApi* m_coordinatorApi;
+    CoordinatorController* m_coordinatorController;
 
     ContainersModel* m_containersModel;
     ContainersModel* m_defaultServerContainersModel;

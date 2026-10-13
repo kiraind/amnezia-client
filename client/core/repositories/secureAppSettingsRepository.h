@@ -10,6 +10,7 @@
 #include <QVector>
 #include <QDateTime>
 #include <QByteArray>
+#include <QJsonObject>
 
 #include "core/utils/routeModes.h"
 #include "core/utils/commonStructs.h"
@@ -104,6 +105,21 @@ public:
 
     QByteArray xraySavedConfigs() const;
     void setXraySavedConfigs(const QByteArray &data);
+
+    // VPN coordinator account (see CoordinatorController). Not part of app backups.
+    QString coordinatorBaseUrl() const;
+    void setCoordinatorBaseUrl(const QString &url);
+    QString coordinatorToken() const;
+    void setCoordinatorToken(const QString &token);
+    QJsonObject coordinatorUser() const;
+    void setCoordinatorUser(const QJsonObject &user);
+    // Last known IPv4 of the coordinator host: bypasses the tunnel and is the fallback when DNS fails
+    QString coordinatorApiAddress() const;
+    void setCoordinatorApiAddress(const QString &address);
+    // storageServerId -> { configId, name, revision, state }
+    QJsonObject coordinatorConfigs() const;
+    void setCoordinatorConfigs(const QJsonObject &configs);
+    void clearCoordinatorAccount(); // token and user only; managed configs are kept
 
 signals:
     void appLanguageChanged(QLocale locale);

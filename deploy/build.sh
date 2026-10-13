@@ -211,6 +211,7 @@ args=()
 [[ -n "$QT_ANDROID_ABIS" ]]           && args+=("-DQT_ANDROID_ABIS=$QT_ANDROID_ABIS")
 [[ -n "$QT_ANDROID_BUILD_ALL_ABIS" ]] && args+=("-DQT_ANDROID_BUILD_ALL_ABIS=$QT_ANDROID_BUILD_ALL_ABIS")
 [[ -n "$BUILD_PLAY" ]]                && args+=("-DANDROID_BUILD_PLAY=ON")
+[[ -n "$COORDINATOR_API_URL" ]]       && args+=("-DCOORDINATOR_API_URL=$COORDINATOR_API_URL")
 
 if [[ -n "$FORCE" ]]; then
     run_traced rm -rf "$BUILD_PATH"

@@ -36,6 +36,12 @@ add_definitions(-DDEV_S3_ENDPOINT="$ENV{DEV_S3_ENDPOINT}")
 add_definitions(-DFREE_V2_ENDPOINT="$ENV{FREE_V2_ENDPOINT}")
 add_definitions(-DPREM_V1_ENDPOINT="$ENV{PREM_V1_ENDPOINT}")
 
+# VPN coordinator base URL offered by default on the coordinator login page (empty = user must enter it)
+set(COORDINATOR_API_URL "" CACHE STRING "Default VPN coordinator API base URL")
+if(NOT COORDINATOR_API_URL STREQUAL "")
+    add_definitions(-DCOORDINATOR_API_URL="${COORDINATOR_API_URL}")
+endif()
+
 if(WIN32 OR (APPLE AND NOT IOS) OR (LINUX AND NOT ANDROID))
     set(PACKAGES ${PACKAGES} Widgets)
 endif()
@@ -251,7 +257,7 @@ install(TARGETS ${PROJECT}
 )
 
 if(APPLE)
-    set(RUNTIME_DEPS_DIR ${CMAKE_INSTALL_BINDIR}/AmneziaVPN.app/Contents/Frameworks)
+    set(RUNTIME_DEPS_DIR ${CMAKE_INSTALL_BINDIR}/${PROJECT}.app/Contents/Frameworks)
 else()
     set(RUNTIME_DEPS_DIR ${CMAKE_INSTALL_BINDIR})
 endif()

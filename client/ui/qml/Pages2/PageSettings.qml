@@ -103,6 +103,7 @@ PageType {
 
     property list<QtObject> settingsEntries: [
         servers,
+        coordinatorAccount,
         connection,
         application,
         news,
@@ -119,6 +120,21 @@ PageType {
         property bool isVisible: true
         readonly property var clickedHandler: function() {
             PageController.goToPage(PageEnum.PageSettingsServersList)
+        }
+    }
+
+    QtObject {
+        id: coordinatorAccount
+
+        property string title: qsTr("Аккаунт VPN")
+        readonly property string leftImagePath: "qrc:/images/controls/telegram.svg"
+        property bool isVisible: true
+        readonly property var clickedHandler: function() {
+            if (CoordinatorController.loggedIn) {
+                PageController.goToPage(PageEnum.PageCoordinatorConfigs)
+            } else {
+                PageController.goToPage(PageEnum.PageCoordinatorLogin)
+            }
         }
     }
 
@@ -174,7 +190,7 @@ PageType {
     QtObject {
         id: about
 
-        property string title: qsTr("About AmneziaVPN")
+        property string title: qsTr("О приложении %1").arg(Qt.application.displayName)
         readonly property string leftImagePath: "qrc:/images/controls/amnezia.svg"
         property bool isVisible: true
         readonly property var clickedHandler: function() {

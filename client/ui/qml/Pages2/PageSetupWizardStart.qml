@@ -42,7 +42,9 @@ PageType {
             text: qsTr("Let's get started")
 
             clickedFunc: function() {
-                PageController.goToPage(PageEnum.PageSetupWizardConfigSource)
+                // Fork: once logged in, go straight to the VPN account
+                PageController.goToPage(CoordinatorController.loggedIn ? PageEnum.PageCoordinatorConfigs
+                                                                       : PageEnum.PageSetupWizardConfigSource)
             }
         }
     }

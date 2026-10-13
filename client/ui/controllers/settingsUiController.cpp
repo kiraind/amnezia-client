@@ -84,7 +84,7 @@ void SettingsUiController::toggleLogging(bool enable)
     SWIFT_BRIDGE_NAMESPACE::toggleLogging(enable);
 #endif
     if (enable == true) {
-        qInfo().noquote() << QString("Logging has enabled on %1 version %2 %3").arg(APPLICATION_NAME, APP_VERSION, GIT_COMMIT_HASH);
+        qInfo().noquote() << QString("Logging has enabled on %1 version %2 %3").arg(APPLICATION_NAME, APP_FULL_VERSION, GIT_COMMIT_HASH);
         qInfo().noquote() << QString("%1 (%2)").arg(QSysInfo::prettyProductName(), QSysInfo::currentCpuArchitecture());
     }
     emit loggingStateChanged();
@@ -126,7 +126,7 @@ void SettingsUiController::clearLogs()
 {
     m_settingsController->clearLogs();
 
-    qInfo().noquote() << QString("Started %1 version %2 %3").arg(APPLICATION_NAME, APP_VERSION, GIT_COMMIT_HASH);
+    qInfo().noquote() << QString("Started %1 version %2 %3").arg(APPLICATION_NAME, APP_FULL_VERSION, GIT_COMMIT_HASH);
     qInfo().noquote() << QString("%1 (%2)").arg(QSysInfo::prettyProductName(), QSysInfo::currentCpuArchitecture());
     qInfo().noquote() << QString("SSL backend: %1").arg(QSslSocket::sslLibraryVersionString());
 }

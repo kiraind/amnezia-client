@@ -195,6 +195,8 @@ PageType {
             SwitcherType {
                 id: switcherAutoUpdateCheck
 
+                visible: IsAppUpdatesEnabled
+
                 Layout.fillWidth: true
                 Layout.margins: 16
 

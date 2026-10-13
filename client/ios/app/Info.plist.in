@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>${QT_INTERNAL_DOLLAR_VAR}{PRODUCT_NAME}</string>
+	<string>${CLIENT_DISPLAY_NAME}</string>
 	<key>CFBundleExecutable</key>
 	<string>${MACOSX_BUNDLE_EXECUTABLE_NAME}</string>
 	<key>CFBundleIdentifier</key>
@@ -74,7 +74,7 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>${CLIENT_APPLICATION_NAME} needs access to the camera for reading QR-codes.</string>
+	<string>${CLIENT_DISPLAY_NAME} needs access to the camera for reading QR-codes.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -116,7 +116,7 @@
 				<string>public.data</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>${CLIENT_APPLICATION_NAME} config</string>
+			<string>${CLIENT_DISPLAY_NAME} config</string>
 			<key>UTTypeIconFiles</key>
 			<array/>
 			<key>UTTypeIdentifier</key>
@@ -186,7 +186,7 @@
                                 <string>public.data</string>
                         </array>
                         <key>UTTypeDescription</key>
-                        <string>${CLIENT_APPLICATION_NAME} backup file</string>
+                        <string>${CLIENT_DISPLAY_NAME} backup file</string>
                         <key>UTTypeIconFiles</key>
                         <array/>
                         <key>UTTypeIdentifier</key>
@@ -208,7 +208,7 @@
         <array>
                 <dict>
                         <key>CFBundleTypeName</key>
-                        <string>${CLIENT_APPLICATION_NAME} config</string>
+                        <string>${CLIENT_DISPLAY_NAME} config</string>
                         <key>LSHandlerRank</key>
                         <string>Alternate</string>
                         <key>LSItemContentTypes</key>

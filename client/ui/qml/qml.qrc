@@ -163,6 +163,8 @@
         <file>Pages2/PageSettingsApiInstructions.qml</file>
         <file>Pages2/PageSettingsApiNativeConfigs.qml</file>
         <file>Pages2/PageSettingsApiDevices.qml</file>
+        <file>Pages2/PageCoordinatorLogin.qml</file>
+        <file>Pages2/PageCoordinatorConfigs.qml</file>
         <file>Components/AwgTextField.qml</file>
         <file>Pages2/PageSettingsApiSubscriptionKey.qml</file>
         <file>Components/SmartScroll.qml</file>

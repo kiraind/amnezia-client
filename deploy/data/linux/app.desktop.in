@@ -1,11 +1,11 @@
 #!/usr/bin/env xdg-open
 [Desktop Entry]
 Type=Application
-Name=AmneziaVPN
+Name=@CLIENT_DISPLAY_NAME@
 Version=1.0
 Comment=Client of your self-hosted VPN
-Exec=AmneziaVPN
-Icon=/usr/share/pixmaps/AmneziaVPN.png
+Exec=@CLIENT_APPLICATION_NAME@
+Icon=/usr/share/pixmaps/@CLIENT_APPLICATION_NAME@.png
 Categories=Network;Qt;Security;
 Terminal=false
-StartupWMClass=AmneziaVPN
+StartupWMClass=@CLIENT_APPLICATION_NAME@

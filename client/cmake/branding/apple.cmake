@@ -9,14 +9,18 @@ if(NOT CLIENT_NETWORK_EXTENSION_NAME)
 endif()
 
 if(NOT BUILD_OSX_APP_IDENTIFIER)
-    set(BUILD_OSX_APP_IDENTIFIER org.amnezia.AmneziaVPN CACHE STRING "OSX Application identifier")
+    set(BUILD_OSX_APP_IDENTIFIER "${CLIENT_APP_DOMAIN}" CACHE STRING "OSX Application identifier")
 endif()
 if(NOT BUILD_IOS_APP_IDENTIFIER)
-    set(BUILD_IOS_APP_IDENTIFIER org.amnezia.AmneziaVPN CACHE STRING "iOS Application identifier")
+    set(BUILD_IOS_APP_IDENTIFIER "${CLIENT_APP_DOMAIN}" CACHE STRING "iOS Application identifier")
 endif()
 if(NOT BUILD_IOS_GROUP_IDENTIFIER)
-    set(BUILD_IOS_GROUP_IDENTIFIER group.org.amnezia.AmneziaVPN CACHE STRING "iOS Group identifier")
+    set(BUILD_IOS_GROUP_IDENTIFIER "group.${CLIENT_APP_DOMAIN}" CACHE STRING "iOS Group identifier")
+    # NOTE: the app group is also written literally in client/ios/**/*.entitlements and
+    # client/macos/**/*.entitlements; keep them in sync when overriding this.
 endif()
+# Apple Developer Team ID used for signing. Deliberately empty in this fork (upstream used
+# Amnezia's team); the fork owner passes their own: -DBUILD_VPN_DEVELOPMENT_TEAM=<TEAMID>
 if(NOT BUILD_VPN_DEVELOPMENT_TEAM)
-    set(BUILD_VPN_DEVELOPMENT_TEAM X7UJ388FXK CACHE STRING "Amnezia VPN Development Team")
+    set(BUILD_VPN_DEVELOPMENT_TEAM "" CACHE STRING "Apple Development Team ID (set by the fork owner)")
 endif()

@@ -91,6 +91,9 @@ namespace PageLoader
         PageSettingsLanguage,
 
         PageUpdate,
+
+        PageCoordinatorLogin,
+        PageCoordinatorConfigs,
     };
     Q_ENUM_NS(PageEnum)
 

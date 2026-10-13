@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 
 #include "qAutoStart.h"
+#include "version.h"
 
 #include <QCoreApplication>
 #include <QTextStream>
@@ -126,9 +127,9 @@ void Autostart::setAutostart(bool autostart) {
             stream << "[Desktop Entry]" << Qt::endl;
             stream << "Exec=" << appPath() << Qt::endl;
             stream << "Type=Application" << Qt::endl;
-            stream << "Name=AmneziaVPN" << Qt::endl;
+            stream << "Name=" << QString::fromUtf8(DISPLAY_NAME) << Qt::endl;
             stream << "Comment=Client of your self-hosted VPN" << Qt::endl;
-            stream << "Icon=/usr/share/pixmaps/AmneziaVPN.png" << Qt::endl;
+            stream << "Icon=/usr/share/pixmaps/" << appName() << ".png" << Qt::endl;
             stream << "Categories=Network;Qt;Security;" << Qt::endl;
             stream << "Terminal=false" << Qt::endl;
         }

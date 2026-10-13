@@ -3,16 +3,16 @@
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>AmneziaVPN-service</string>
+    <string>@CLIENT_SERVICE_NAME@</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/Applications/AmneziaVPN.app/Contents/MacOS/AmneziaVPN-service</string>
+        <string>/Applications/@CLIENT_APPLICATION_NAME@.app/Contents/MacOS/@CLIENT_SERVICE_NAME@</string>
     </array>
     <key>KeepAlive</key>
     <true/>
     <key>RunAtLoad</key>
     <true/>
     <key>GroupName</key>
-    <string>amnvpn</string>
+    <string>@AMN_SERVICE_GROUP@</string>
 </dict>
 </plist>

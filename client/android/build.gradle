@@ -4,5 +4,5 @@
 // disable adding gradle property android.bundle.enableUncompressedNativeLibs by androiddeployqt
 useLegacyPackaging
 
-// package name for androiddeployqt
-namespace = "org.amnezia.vpn"
+// package name for androiddeployqt (must match applicationId in build.gradle.kts)
+namespace = "ru.kiraind.vpn"

@@ -33,17 +33,38 @@ if(APPLE)
     list(GET bundle 0 bundle)
 
     file(GLOB_RECURSE execs "${bundle}/Contents/MacOS/*")
+    # names come from the branding via CPack.cmake (fallbacks: upstream names)
+    if(NOT CPACK_AMNEZIA_CLIENT_EXEC_NAME)
+        set(CPACK_AMNEZIA_CLIENT_EXEC_NAME AmneziaVPN)
+    endif()
+    if(NOT CPACK_AMNEZIA_SERVICE_EXEC_NAME)
+        set(CPACK_AMNEZIA_SERVICE_EXEC_NAME AmneziaVPN-service)
+    endif()
     set(client_exec ${execs})
-    list(FILTER client_exec INCLUDE REGEX [[AmneziaVPN$]])
+    list(FILTER client_exec INCLUDE REGEX "/${CPACK_AMNEZIA_CLIENT_EXEC_NAME}$")
     set(service_exec ${execs})
-    list(FILTER service_exec INCLUDE REGEX [[AmneziaVPN-service$]])
+    list(FILTER service_exec INCLUDE REGEX "/${CPACK_AMNEZIA_SERVICE_EXEC_NAME}$")
     set(other_execs ${execs})
-    list(FILTER other_execs EXCLUDE REGEX [[AmneziaVPN$|AmneziaVPN-service$]])
+    list(FILTER other_execs EXCLUDE REGEX "/${CPACK_AMNEZIA_CLIENT_EXEC_NAME}$|/${CPACK_AMNEZIA_SERVICE_EXEC_NAME}$")
 
     list(APPEND files "${frameworks}" "${dylibs}" "${other_execs}" "${service_exec}" "${client_exec}" "${bundle}")
 
     if (files AND CODESIGN_SIGNATURE)
         include(${CMAKE_CURRENT_LIST_DIR}/util/codesign.cmake)
         codesign_sign_files("${files}" "${CODESIGN_SIGNATURE}" "${CODESIGN_KEYCHAIN}")
+    elseif(files)
+        # Fork: unsigned builds still need valid ad-hoc signatures. macdeployqt and
+        # install_name_tool rewrite binaries after linking, which breaks the linker's
+        # ad-hoc signature, and Apple Silicon then kills the app on the first dlopen.
+        foreach(file IN LISTS files)
+            execute_process(
+                COMMAND codesign --force --sign - --timestamp=none "${file}"
+                RESULT_VARIABLE result
+                ERROR_VARIABLE error
+            )
+            if(NOT result EQUAL 0)
+                message(FATAL_ERROR "ad-hoc codesign failed for ${file}:\n${error}")
+            endif()
+        endforeach()
     endif()
 endif()

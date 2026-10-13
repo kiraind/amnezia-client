@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.25.0 FATAL_ERROR)
 
-set(PROJECT AmneziaVPN-service)
+set(PROJECT ${CLIENT_SERVICE_NAME})
 project(${PROJECT} VERSION ${AMNEZIAVPN_VERSION})
 
 if (APPLE)
     # CMAKE_INSTALL_BINDIR must be called before find_package(Qt6) for
     # Qt to configure prefixes properly
     # FIXME: make Amnezia-service a bundle and remove this hack completely
-    set(CMAKE_INSTALL_BINDIR "AmneziaVPN.app/Contents/MacOS")
+    set(CMAKE_INSTALL_BINDIR "${CLIENT_APPLICATION_NAME}.app/Contents/MacOS")
 endif()
 
 set(CMAKE_CXX_STANDARD 20)
@@ -380,14 +380,17 @@ if(LINUX)
         COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/set_openvpn_rpath.cmake
     )
 elseif(APPLE)
-    file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/set_openvpn_rpath.cmake CONTENT
+    # bracket arguments don't expand variables, so the target name is substituted below
+    set(_set_openvpn_rpath
 [=[
-set(ovpn "$<TARGET_FILE_DIR:AmneziaVPN-service>/openvpn")
+set(ovpn "$<TARGET_FILE_DIR:@SERVICE_TARGET@>/openvpn")
 set(dir "$<TARGET_FILE_DIR:OpenSSL::SSL>")
 execute_process(COMMAND install_name_tool -delete_rpath "${dir}" "${ovpn}" ERROR_QUIET)
 execute_process(COMMAND install_name_tool -add_rpath "${dir}" "${ovpn}")
 ]=]
     )
+    string(REPLACE "@SERVICE_TARGET@" "${PROJECT}" _set_openvpn_rpath "${_set_openvpn_rpath}")
+    file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/set_openvpn_rpath.cmake CONTENT "${_set_openvpn_rpath}")
     add_custom_command(TARGET ${PROJECT} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/set_openvpn_rpath.cmake
     )

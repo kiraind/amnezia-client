@@ -1,4 +1,5 @@
 #include "secureQSettings.h"
+#include "version.h"
 
 #include "core/utils/utilities.h"
 #include "cryptoUtils.h"
@@ -18,13 +19,14 @@ namespace {
     constexpr const char *settingsKeyTag = "settingsKeyTag";
     constexpr const char *settingsIvTag = "settingsIvTag";
 #ifndef CLIENT_KEYCHAIN_NAME_STR
-#define CLIENT_KEYCHAIN_NAME_STR "AmneziaVPN-Keychain"
+// same default as CLIENT_KEYCHAIN_NAME in branding/common.cmake (targets that do not pass the define, e.g. the service)
+#define CLIENT_KEYCHAIN_NAME_STR APPLICATION_NAME "-Keychain"
 #endif
     constexpr const char *keyChainName = CLIENT_KEYCHAIN_NAME_STR;
 }
 
 SecureQSettings::SecureQSettings(const QString &organization, const QString &application, QObject *parent, bool enableEncryption)
-    : QObject { parent }, m_settings(organization, application, parent), encryptedKeys({ "Servers/serversList", "Conf/favoriteLocations" }), m_encryptionEnabled(enableEncryption)
+    : QObject { parent }, m_settings(organization, application, parent), encryptedKeys({ "Servers/serversList", "Conf/favoriteLocations", "Coordinator/token" }), m_encryptionEnabled(enableEncryption)
 {
     bool encrypted = m_settings.value("Conf/encrypted").toBool();
 

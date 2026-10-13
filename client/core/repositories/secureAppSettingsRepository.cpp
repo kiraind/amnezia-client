@@ -504,3 +504,59 @@ void SecureAppSettingsRepository::setXraySavedConfigs(const QByteArray &data)
 {
     setValue("Xray/savedConfigs", data);
 }
+
+QString SecureAppSettingsRepository::coordinatorBaseUrl() const
+{
+    return value("Coordinator/baseUrl").toString();
+}
+
+void SecureAppSettingsRepository::setCoordinatorBaseUrl(const QString &url)
+{
+    setValue("Coordinator/baseUrl", url);
+}
+
+QString SecureAppSettingsRepository::coordinatorToken() const
+{
+    return value("Coordinator/token").toString();
+}
+
+void SecureAppSettingsRepository::setCoordinatorToken(const QString &token)
+{
+    setValue("Coordinator/token", token);
+}
+
+QJsonObject SecureAppSettingsRepository::coordinatorUser() const
+{
+    return QJsonDocument::fromJson(value("Coordinator/user").toByteArray()).object();
+}
+
+void SecureAppSettingsRepository::setCoordinatorUser(const QJsonObject &user)
+{
+    setValue("Coordinator/user", QJsonDocument(user).toJson(QJsonDocument::Compact));
+}
+
+QJsonObject SecureAppSettingsRepository::coordinatorConfigs() const
+{
+    return QJsonDocument::fromJson(value("Coordinator/configs").toByteArray()).object();
+}
+
+void SecureAppSettingsRepository::setCoordinatorConfigs(const QJsonObject &configs)
+{
+    setValue("Coordinator/configs", QJsonDocument(configs).toJson(QJsonDocument::Compact));
+}
+
+QString SecureAppSettingsRepository::coordinatorApiAddress() const
+{
+    return value("Coordinator/apiAddress").toString();
+}
+
+void SecureAppSettingsRepository::setCoordinatorApiAddress(const QString &address)
+{
+    setValue("Coordinator/apiAddress", address);
+}
+
+void SecureAppSettingsRepository::clearCoordinatorAccount()
+{
+    setValue("Coordinator/token", QString());
+    setValue("Coordinator/user", QByteArray());
+}

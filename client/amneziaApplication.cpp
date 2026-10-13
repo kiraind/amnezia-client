@@ -147,6 +147,7 @@ void AmneziaApplication::init()
 #else
     m_engine->rootContext()->setContextProperty("IsMacOsNeBuild", false);
 #endif
+    m_engine->rootContext()->setContextProperty("IsAppUpdatesEnabled", bool(CLIENT_ENABLE_APP_UPDATES));
 
 #ifdef Q_OS_IOS
     m_engine->rootContext()->setContextProperty("IosContextMenu", new IosContextMenu(this));
@@ -263,7 +264,7 @@ void AmneziaApplication::loadFonts()
 
 bool AmneziaApplication::parseCommands()
 {
-    m_parser.setApplicationDescription(APPLICATION_NAME);
+    m_parser.setApplicationDescription(QString::fromUtf8(DISPLAY_NAME));
     m_parser.addHelpOption();
     m_parser.addVersionOption();
 

@@ -37,7 +37,7 @@ android {
     val abiList = qtTargetAbiList.split(",")
 
     defaultConfig {
-        applicationId = "org.amnezia.vpn"
+        applicationId = "ru.kiraind.vpn"
         targetSdk = qtTargetSdkVersion.toInt()
 
         // keeps language resources for only the locales specified below
@@ -53,7 +53,8 @@ android {
             storeFile = providers.environmentVariable("QT_ANDROID_KEYSTORE_PATH").orNull?.let { file(it) }
             storePassword = providers.environmentVariable("QT_ANDROID_KEYSTORE_STORE_PASS").orNull
             keyAlias = providers.environmentVariable("QT_ANDROID_KEYSTORE_ALIAS").orNull
-            keyPassword = providers.environmentVariable("QT_ANDROID_KEYSTORE_STORE_PASS").orNull
+            keyPassword = providers.environmentVariable("QT_ANDROID_KEYSTORE_KEY_PASS").orNull
+                ?: providers.environmentVariable("QT_ANDROID_KEYSTORE_STORE_PASS").orNull
         }
     }
 
@@ -170,6 +171,17 @@ android {
 
     lint {
         disable += "InvalidFragmentVersionForActivityResult"
+    }
+}
+
+// Fork CI: `-PonlyOssRelease=true` (or ORG_GRADLE_PROJECT_onlyOssRelease=true) builds only the
+// ossRelease variant. Qt's aab target runs `bundle`, which otherwise packages six bundles
+// (oss/play x debug/release/fdroid) for every ABI and overflows the CI runner disk.
+androidComponents {
+    beforeVariants { variant ->
+        if (providers.gradleProperty("onlyOssRelease").orNull == "true") {
+            variant.enable = variant.flavorName == "oss" && variant.buildType == "release"
+        }
     }
 }
 

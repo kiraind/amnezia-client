@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 
     app.setApplicationName(APPLICATION_NAME);
     app.setOrganizationName(ORGANIZATION_NAME);
-    app.setApplicationDisplayName(APPLICATION_NAME);
+    app.setApplicationDisplayName(QString::fromUtf8(DISPLAY_NAME));
 
     app.loadFonts();
 
@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
     if (doExec) {
         app.init();
 
-        qInfo().noquote() << QString("Started %1 version %2 %3").arg(APPLICATION_NAME, APP_VERSION, GIT_COMMIT_HASH);
+        qInfo().noquote() << QString("Started %1 version %2 %3").arg(APPLICATION_NAME, APP_FULL_VERSION, GIT_COMMIT_HASH);
         qInfo().noquote() << QString("%1 (%2)").arg(QSysInfo::prettyProductName(), QSysInfo::currentCpuArchitecture());
 
         return app.exec();

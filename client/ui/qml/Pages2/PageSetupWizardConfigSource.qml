@@ -158,53 +158,7 @@ PageType {
                 Layout.leftMargin: 16
                 Layout.bottomMargin: 24
 
-                text: qsTr("Insert the key, add a configuration file or scan the QR-code")
-            }
-
-            TextFieldWithHeaderType {
-                id: textKey
-
-                Layout.fillWidth: true
-                Layout.rightMargin: 16
-                Layout.leftMargin: 16
-
-                headerText: qsTr("Insert key")
-                buttonText: qsTr("Insert")
-
-                clickedFunc: function() {
-                    textField.text = ""
-                    textField.paste()
-                }
-            }
-
-            BasicButtonType {
-                id: continueButton
-
-                Layout.fillWidth: true
-                Layout.topMargin: 16
-                Layout.rightMargin: 16
-                Layout.leftMargin: 16
-
-                visible: textKey.textField.text !== ""
-
-                text: qsTr("Continue")
-
-                clickedFunc: function() {
-                    if (ImportController.extractConfigFromData(textKey.textField.text)) {
-                        PageController.goToPage(PageEnum.PageSetupWizardViewConfig)
-                    }
-                }
-            }
-
-            ParagraphTextType {
-                Layout.fillWidth: true
-                Layout.topMargin: 32
-                Layout.rightMargin: 16
-                Layout.leftMargin: 16
-                Layout.bottomMargin: 24
-
-                color: AmneziaStyle.color.charcoalGray
-                text: qsTr("Other connection options")
+                text: qsTr("Войдите по коду из Telegram-бота: приложение само получит и будет обновлять настройки подключения")
             }
         }
 
@@ -239,73 +193,27 @@ PageType {
             }
         }
 
-        footer: ColumnLayout {
-            width: listView.width
-
-            BasicButtonType {
-                id: siteLink2
-                Layout.topMargin: 24
-                Layout.bottomMargin: 16
-                Layout.alignment: Qt.AlignHCenter
-                implicitHeight: 32
-
-                visible: Qt.platform.os !== "ios" && !IsMacOsNeBuild
-
-                defaultColor: AmneziaStyle.color.transparent
-                hoveredColor: AmneziaStyle.color.translucentWhite
-                pressedColor: AmneziaStyle.color.sheerWhite
-                disabledColor: AmneziaStyle.color.mutedGray
-                textColor: AmneziaStyle.color.goldenApricot
-
-                text: qsTr("Site Amnezia")
-
-                rightImageSource: "qrc:/images/controls/external-link.svg"
-
-                clickedFunc: function() {
-                    Qt.openUrlExternally(LanguageUiController.getCurrentSiteUrl())
-                }
-            }
-        }
     }
 
+    // Fork: only the coordinator login; key, file and QR imports are hidden (configs from them don't auto-update)
     property list<QtObject> variants: [
-        amneziaVpn,
-        selfHostVpn,
-        backupRestore,
-        fileOpen,
-        qrScan,
-        restorePurchases,
-        siteLink
+        coordinatorLogin
     ]
     
     QtObject {
-        id: amneziaVpn
-
-        property string title: qsTr("VPN by Amnezia")
-        property string description: qsTr("The easiest way to connect to the VPN")
-        property string imageSource: "qrc:/images/controls/amnezia.svg"
-        property bool featuredAmneziaConnection: true
-        property bool isVisible: true
-        property var handler: function() {
-            PageController.showBusyIndicator(true)
-            var result = SubscriptionUiController.fillAvailableServices()
-            PageController.showBusyIndicator(false)
-            if (result) {
-                PageController.goToPage(PageEnum.PageSetupWizardApiServicesList)
-            }
-        }
-    }
-
-    QtObject {
-        id: selfHostVpn
+        id: coordinatorLogin
 
         property bool featuredAmneziaConnection: false
-        property string title: qsTr("Self-hosted VPN")
-        property string description: qsTr("Configure Amnezia VPN on your own server")
-        property string imageSource: "qrc:/images/controls/server.svg"
+        property string title: qsTr("Войти по коду из Telegram")
+        property string description: qsTr("Получите код командой /login в боте")
+        property string imageSource: "qrc:/images/controls/telegram.svg"
         property bool isVisible: true
         property var handler: function() {
-            PageController.goToPage(PageEnum.PageSetupWizardCredentials)
+            if (CoordinatorController.loggedIn) {
+                PageController.goToPage(PageEnum.PageCoordinatorConfigs)
+            } else {
+                PageController.goToPage(PageEnum.PageCoordinatorLogin)
+            }
         }
     }
 
@@ -367,34 +275,6 @@ PageType {
             if (Qt.platform.os === "ios") {
                 PageController.goToPage(PageEnum.PageSetupWizardQrReader)
             }
-        }
-    }
-
-    QtObject {
-        id: restorePurchases
-
-        property bool featuredAmneziaConnection: false
-        property string title: qsTr("Restore purchases")
-        property string description: qsTr("")
-        property string imageSource: "qrc:/images/controls/refresh-cw.svg"
-        property bool isVisible: Qt.platform.os === "ios" || IsMacOsNeBuild || IsPlayBuild
-        property var handler: function() {
-            PageController.showBusyIndicator(true)
-            SubscriptionUiController.restoreServiceFromStore()
-            PageController.showBusyIndicator(false)
-        }
-    }
-
-    QtObject {
-        id: siteLink
-
-        property bool featuredAmneziaConnection: false
-        property string title: qsTr("I have nothing")
-        property string description: qsTr("")
-        property string imageSource: "qrc:/images/controls/help-circle.svg"
-        property bool isVisible: PageController.isStartPageVisible() && Qt.platform.os !== "ios" && !IsMacOsNeBuild
-        property var handler: function() {
-            Qt.openUrlExternally(LanguageUiController.getCurrentSiteUrl())
         }
     }
 }

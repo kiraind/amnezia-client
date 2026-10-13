@@ -98,7 +98,8 @@ PageType {
             var pageName = tabBarStackView.currentItem.objectName
             if ((pageName === PageController.getPagePath(PageEnum.PageShare)) ||
                     (pageName === PageController.getPagePath(PageEnum.PageSettings)) ||
-                    (pageName === PageController.getPagePath(PageEnum.PageSetupWizardConfigSource))) {
+                    (pageName === PageController.getPagePath(PageEnum.PageSetupWizardConfigSource)) ||
+                    (pageName === PageController.getPagePath(PageEnum.PageCoordinatorConfigs) && tabBarStackView.depth <= 1)) {
                 PageController.goToPageHome()
             } else {
                 PageController.closePage()
@@ -426,7 +427,9 @@ PageType {
             isSelected: tabBar.currentIndex === 3
             image: "qrc:/images/controls/plus.svg"
             clickedFunc: function () {
-                tabBarStackView.goToTabBarPage(PageEnum.PageSetupWizardConfigSource)
+                // Fork: once logged in, "+" opens the VPN account instead of the connection screen
+                tabBarStackView.goToTabBarPage(CoordinatorController.loggedIn ? PageEnum.PageCoordinatorConfigs
+                                                                              : PageEnum.PageSetupWizardConfigSource)
                 tabBar.currentIndex = 3
             }
         }
