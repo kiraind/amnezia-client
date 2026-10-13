@@ -112,18 +112,19 @@ with the branding variable/macro. If upstream changed a deploy file the fork ren
 git shows modify/delete or rename conflicts: port upstream's change into the `.in` template, keep the `@VAR@` placeholders, delete the upstream literal file.
 Translated strings mentioning "AmneziaVPN" in user-visible UI should use `Qt.application.displayName` / `DISPLAY_NAME`.
 
-## 6. Flipped logo icons and "Лёша VPN" wordmarks (binary assets)
-Commits `9df8e81`, `440d780`. Files: `client/images/{icon.png,app.ico,app.icns,AmneziaVPN.png,amneziaBigLogo.png,AmneziaVPN_Full_logo.svg}`,
+## 6. ЛЁША monogram logo and "Лёша VPN" wordmarks (binary assets)
+Commits `9df8e81`, `440d780` (first flipped-logo version), replaced by the ЛЁША monogram. Files: `client/images/{icon.png,app.ico,app.icns,AmneziaVPN.png,amneziaBigLogo.png,AmneziaVPN_Full_logo.svg}`,
 `client/images/controls/amnezia.svg`, `client/images/tray/*.png`, `client/android/res/drawable*/logo.png`,
 `client/android/res/drawable/ic_amnezia_round.xml`, `client/android/res/mipmap-*/{icon,icon_round,ic_launcher_foreground,ic_banner}.png`,
 `client/ios/app/Media.xcassets/AppIcon.appiconset/*.png`, `client/ios/app/launch.png`,
 `client/macos/app/Images.xcassets/AppIcon.appiconset/*.png`, `deploy/data/linux/AmneziaVPN.png`, `metadata/en-US/images/icon.png`.
-Rule (generator scripts are not in the repo): the logo glyph is **rotated 180° about its mask centroid** (visual center of the
-non-background pixels), background/shape kept as is. Wordmarks (`AmneziaVPN_Full_logo.svg`, `amneziaBigLogo.png`, `ic_banner`, launch screen)
-show the text **"Лёша VPN"** set in `client/fonts/pt-root-ui_vf.ttf`, next to the flipped logo.
+Fork-only generators: `branding/lesha-logo/` (see its README). The logo is a ligature of Л, Ё, Ш, А in the rough "graffiti" style
+of the old mark with flat pastel patches; icons keep their original shape and background (circle/square/squircle), only the glyph changes.
+Wordmarks (`AmneziaVPN_Full_logo.svg`, `amneziaBigLogo.png`, `ic_banner`) show the text **"Лёша VPN"** set in
+`client/fonts/pt-root-ui_vf.ttf`, next to the monogram; `AmneziaVPN.png` and `drawable*/logo.png` are text only.
 How to resolve: binary conflicts — keep ours (`git checkout --ours <file>`). If upstream changed/added an icon that contains the logo,
-take upstream's new image and re-apply the rule (Python + Pillow: compute alpha/mask centroid, rotate 180° around it, composite onto the original background;
-SVG: wrap the glyph in `transform="rotate(180 cx cy)"`). Never ship the upright Amnezia logo or the "AmneziaVPN" wordmark.
+take upstream's new image and re-run the generators in `branding/lesha-logo/` (add new files to the job table in `make_assets.py`).
+Never ship the Amnezia logo or the "AmneziaVPN" wordmark.
 
 ## 7. CI workflow
 Commit `affb205`. `.github/workflows/deploy.yml` is fully rewritten: builds LeshaVPN for Linux, Windows, macOS, Android
