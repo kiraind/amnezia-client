@@ -52,31 +52,6 @@ PageType {
                 Layout.preferredHeight: 224
             }
 
-            Header2TextType {
-                Layout.fillWidth: true
-                Layout.topMargin: 16
-                Layout.leftMargin: 16
-                Layout.rightMargin: 16
-
-                text: qsTr("Support Amnezia")
-                horizontalAlignment: Text.AlignHCenter
-            }
-
-            ParagraphTextType {
-                Layout.fillWidth: true
-                Layout.topMargin: 16
-                Layout.leftMargin: 16
-                Layout.rightMargin: 16
-
-                horizontalAlignment: Text.AlignHCenter
-
-                height: 20
-                font.pixelSize: 14
-
-                text: qsTr("Amnezia is a free and open-source application. You can support the developers if you like it.")
-                color: AmneziaStyle.color.paleGray
-            }
-
             ParagraphTextType {
                 Layout.fillWidth: true
                 Layout.topMargin: 32
@@ -113,62 +88,29 @@ PageType {
             CaptionTextType {
                 Layout.fillWidth: true
                 Layout.topMargin: 40
+                Layout.bottomMargin: 16
 
                 horizontalAlignment: Text.AlignHCenter
 
                 text: qsTr("Software version: %1").arg(SettingsController.getAppVersion())
                 color: AmneziaStyle.color.mutedGray
             }
-
-            BasicButtonType {
-                id: privacyPolicyButton
-
-                Layout.alignment: Qt.AlignHCenter
-                Layout.bottomMargin: 16
-                Layout.topMargin: -15
-                implicitHeight: 25
-
-                defaultColor: AmneziaStyle.color.transparent
-                hoveredColor: AmneziaStyle.color.translucentWhite
-                pressedColor: AmneziaStyle.color.sheerWhite
-                disabledColor: AmneziaStyle.color.mutedGray
-                textColor: AmneziaStyle.color.goldenApricot
-
-                text: qsTr("Privacy Policy")
-
-                clickedFunc: function() {
-                    Qt.openUrlExternally(LanguageUiController.getCurrentSiteUrl("policy"))
-                }
-            }
         }
     }
     
     property list<QtObject> contacts: [
-        telegramGroup,
-        mail,
-        github,
-        website
+        telegram,
+        github
     ]
 
     QtObject {
-        id: telegramGroup
+        id: telegram
 
-        readonly property string title: qsTr("Telegram group")
-        readonly property string description: qsTr("To discuss features")
+        readonly property string title: qsTr("Telegram")
+        readonly property string description: qsTr("@kiraind")
         readonly property string imageSource: "qrc:/images/controls/telegram.svg"
         readonly property var handler: function() {
-            Qt.openUrlExternally(qsTr("https://telegram.me/amnezia_vpn_en"))
-        }
-    }
-
-    QtObject {
-        id: mail
-
-        readonly property string title: qsTr("support@amnezia.org")
-        readonly property string description: qsTr("For reviews and bug reports")
-        readonly property string imageSource: "qrc:/images/controls/mail.svg"
-        readonly property var handler: function() {
-            Qt.openUrlExternally(qsTr("mailto:support@amnezia.org"))
+            Qt.openUrlExternally("https://t.me/kiraind")
         }
     }
 
@@ -179,18 +121,7 @@ PageType {
         readonly property string description: qsTr("Discover the source code")
         readonly property string imageSource: "qrc:/images/controls/github.svg"
         readonly property var handler: function() {
-            Qt.openUrlExternally(qsTr("https://github.com/amnezia-vpn/amnezia-client"))
-        }
-    }
-
-    QtObject {
-        id: website
-
-        readonly property string title: qsTr("Website")
-        readonly property string description: qsTr("Visit official website")
-        readonly property string imageSource: "qrc:/images/controls/amnezia.svg"
-        readonly property var handler: function() {
-            Qt.openUrlExternally(LanguageUiController.getCurrentSiteUrl())
+            Qt.openUrlExternally("https://github.com/kiraind/amnezia-client")
         }
     }
 }

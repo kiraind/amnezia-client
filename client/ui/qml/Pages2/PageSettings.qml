@@ -87,7 +87,6 @@ PageType {
     }
 
     property list<QtObject> settingsEntries: [
-        servers,
         coordinatorAccount,
         connection,
         application,
@@ -95,20 +94,9 @@ PageType {
     ]
 
     QtObject {
-        id: servers
-
-        property string title: qsTr("Servers")
-        readonly property string leftImagePath: "qrc:/images/controls/server.svg"
-        property bool isVisible: true
-        readonly property var clickedHandler: function() {
-            PageController.goToPage(PageEnum.PageSettingsServersList)
-        }
-    }
-
-    QtObject {
         id: coordinatorAccount
 
-        property string title: qsTr("Аккаунт VPN")
+        property string title: qsTr("Аккаунт %1").arg(Qt.application.displayName)
         readonly property string leftImagePath: "qrc:/images/controls/telegram.svg"
         property bool isVisible: true
         readonly property var clickedHandler: function() {
@@ -145,7 +133,7 @@ PageType {
     QtObject {
         id: about
 
-        property string title: qsTr("О приложении %1").arg(Qt.application.displayName)
+        property string title: qsTr("О приложении")
         readonly property string leftImagePath: "qrc:/images/controls/amnezia.svg"
         property bool isVisible: true
         readonly property var clickedHandler: function() {

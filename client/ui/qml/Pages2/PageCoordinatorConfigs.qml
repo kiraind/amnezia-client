@@ -88,7 +88,7 @@ PageType {
                 Layout.rightMargin: 16
                 Layout.leftMargin: 16
 
-                headerText: qsTr("Аккаунт VPN")
+                headerText: qsTr("Аккаунт %1").arg(Qt.application.displayName)
                 descriptionText: CoordinatorController.username
             }
 
