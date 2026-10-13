@@ -4,6 +4,7 @@
 #include <QEventLoop>
 #include <QFile>
 #include <QHostInfo>
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QObject>
 #include <QSharedPointer>
