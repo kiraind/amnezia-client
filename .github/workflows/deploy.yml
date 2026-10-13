@@ -126,7 +126,6 @@ jobs:
 
     env:
       QT_VERSION: 6.10.1
-      QIF_VERSION: 4.7
 
     steps:
     - name: 'Get sources'
@@ -146,7 +145,7 @@ jobs:
         modules: 'qtremoteobjects qt5compat qtshadertools'
         dir: ${{ runner.temp }}
         setup-python: 'true'
-        tools: 'tools_ifw tools_ninja'
+        tools: 'tools_ninja'
         set-env: 'true'
         aqtversion: '==3.3.0'
         py7zrversion: '==0.22.*'
@@ -189,6 +188,7 @@ jobs:
         max-size: 2G
 
     # Unsigned: code signing would need a certificate (build.bat --sign-cloud/--sign-phys).
+    # MSI only: upstream also builds a Qt Installer Framework .exe, a second unrelated installer.
     - name: 'Build project'
       shell: cmd
       env:
@@ -198,7 +198,7 @@ jobs:
         QT_INSTALL_DIR: ${{ runner.temp }}
       run: |
         set WIX_ROOT_PATH="${{ env.USERPROFILE }}\.dotnet\tools"
-        deploy\build.bat --installer all
+        deploy\build.bat --installer wix
 
     - name: 'Show WiX log'
       if: failure()
@@ -211,7 +211,6 @@ jobs:
         name: release-windows
         path: |
           deploy/build/LeshaVPN_*_windows_x64.msi
-          deploy/build/LeshaVPN_*_windows_x64.exe
         if-no-files-found: error
         retention-days: 14
 
