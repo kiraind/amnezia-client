@@ -1,7 +1,8 @@
 name: 'Build'
 
 # Builds installable Лёша VPN (LeshaVPN) packages for Linux, Windows, macOS and
-# Android, and publishes them to a GitHub Release when a `v*` tag is pushed.
+# Android, and publishes them to a GitHub Release when a `v*` tag is pushed. The tag must be
+# v<AMNEZIAVPN_VERSION>-lesha.<LESHA_VERSION> (root CMakeLists.txt), optionally with -rcN/-betaN.
 #
 # Repository variables (Settings -> Secrets and variables -> Actions -> Variables):
 #   COORDINATOR_API_URL  default coordinator API URL baked into the client (may be empty)
@@ -517,7 +518,9 @@ jobs:
 
         deploy/build.sh -t android --sign --aab
 
-        VERSION=$(grep CMAKE_PROJECT_VERSION:STATIC deploy/build/CMakeCache.txt | cut -d= -f2)
+        # LESHA_FULL_VERSION, e.g. 5.0.3.1-lesha.1 (see the root CMakeLists.txt)
+        VERSION=$(grep '^LESHA_FULL_VERSION:INTERNAL=' deploy/build/CMakeCache.txt | cut -d= -f2)
+        test -n "$VERSION"
 
         APK=$(find deploy/build/client/android-build -maxdepth 1 -name '*.apk' | head -n1)
         test -n "$APK"
@@ -619,6 +622,38 @@ jobs:
       contents: write
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: CMakeLists.txt
+          sparse-checkout-cone-mode: false
+
+      # The tag must be v${LESHA_FULL_VERSION} (AMNEZIAVPN_VERSION-lesha.LESHA_VERSION from the
+      # root CMakeLists.txt), optionally followed by -rcN / -betaN for a prerelease.
+      - name: Check tag against version
+        id: version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          BASE=$(sed -nE 's/^[[:space:]]*set\(AMNEZIAVPN_VERSION[[:space:]]+([0-9.]+)[[:space:]].*/\1/p' CMakeLists.txt | head -n1)
+          LESHA=$(sed -nE 's/^[[:space:]]*set\(LESHA_VERSION[[:space:]]+([0-9]+)[[:space:]].*/\1/p' CMakeLists.txt | head -n1)
+          if [ -z "$BASE" ] || [ -z "$LESHA" ]; then
+            echo "::error::Could not read AMNEZIAVPN_VERSION / LESHA_VERSION from CMakeLists.txt"
+            exit 1
+          fi
+          FULL="${BASE}-lesha.${LESHA}"
+          case "$TAG" in
+            "v${FULL}")
+              PRERELEASE=false ;;
+            "v${FULL}"-rc*|"v${FULL}"-beta*)
+              PRERELEASE=true ;;
+            *)
+              echo "::error::Tag '$TAG' does not match the version in CMakeLists.txt: expected 'v${FULL}' (or 'v${FULL}-rcN' / 'v${FULL}-betaN'). Bump LESHA_VERSION in CMakeLists.txt or fix the tag."
+              exit 1 ;;
+          esac
+          echo "Releasing ${FULL} from tag ${TAG} (prerelease: ${PRERELEASE})"
+          echo "prerelease=${PRERELEASE}" >> "$GITHUB_OUTPUT"
+
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -634,7 +669,7 @@ jobs:
         with:
           name: ${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
-          prerelease: ${{ contains(github.ref_name, '-') }}
+          prerelease: ${{ steps.version.outputs.prerelease == 'true' }}
           generate_release_notes: true
           fail_on_unmatched_files: true
           files: dist/*

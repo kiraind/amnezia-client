@@ -36,7 +36,7 @@ SettingsController::SettingsController(SecureServersRepository* serversRepositor
       m_serversRepository(serversRepository),
       m_appSettingsRepository(appSettingsRepository)
 {
-    m_appVersion = QString("%1 (%2, %3)").arg(QString(APP_VERSION), __DATE__, GIT_COMMIT_HASH);
+    m_appVersion = QString("%1 (%2, %3)").arg(QString(APP_FULL_VERSION), __DATE__, GIT_COMMIT_HASH);
     m_isDevModeEnabled = m_appSettingsRepository->isDevGatewayEnv();
 }
 

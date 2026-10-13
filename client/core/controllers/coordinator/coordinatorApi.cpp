@@ -106,7 +106,7 @@ void CoordinatorApi::send(const QByteArray &verb, const QString &path, const QJs
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     request.setRawHeader("Accept", "application/json");
     request.setRawHeader("X-Client-Request-ID", QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8());
-    request.setRawHeader("X-App-Version", QByteArray(APP_VERSION));
+    request.setRawHeader("X-App-Version", QByteArray(APP_FULL_VERSION));
     if (authorized && !m_token.isEmpty()) {
         request.setRawHeader("Authorization", "Bearer " + m_token.toUtf8());
     }
