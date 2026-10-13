@@ -22,6 +22,7 @@
 #include "core/controllers/coordinator/coordinatorApi.h"
 #include "core/controllers/coordinator/coordinatorController.h"
 #include "core/controllers/selfhosted/importController.h"
+#include "core/models/protocols/awgProtocolConfig.h"
 #include "core/utils/constants/configKeys.h"
 #include "core/utils/constants/protocolConstants.h"
 #include "secureQSettings.h"
@@ -190,6 +191,24 @@ QString awgConf(const QString &endpoint)
             .arg(endpoint);
 }
 
+// AWG 3.1 params as the coordinator's awg3 profile renders them (mirrors upstream AwgInstaller)
+QString awg3Conf(const QString &endpoint)
+{
+    QString conf = awgConf(endpoint);
+    QString params = QStringLiteral("Jc = 4\nJmin = 10\nJmax = 50\n"
+                                    "S1 = 12\nS2 = 12\nS3 = 12\nS4 = 12\n"
+                                    "H1 = 1\nH2 = 2\nH3 = 3\nH4 = 4\n"
+                                    "I1 = <r 2><b 0x858000010001000000000669636c6f756403636f6d0000010001c00c000100010000105a00044d583737>\n"
+                                    "HeaderProtectionKey = q5YQqvq3ZsdHo1ag8Grk1zE1gKXlo6VgSc8uzQ6QY5E=\n"
+                                    "RekeyAfterTime = 110\nRekeyTimeout = 5\nRejectAfterTime = 170\n"
+                                    "KeepaliveTimeout = 10\nMaxHandshakeAttempts = 18\n"
+                                    "RandomTrailers = on\nDisableCookies = on\n");
+    const int start = conf.indexOf("Jc = ");
+    const int end = conf.indexOf("\n[Peer]");
+    conf.replace(start, end - start, params);
+    return conf;
+}
+
 QJsonObject configJson(const QString &id, const QString &name, const QString &revision, const QString &endpoint)
 {
     QJsonObject config;
@@ -241,6 +260,7 @@ private:
     int m_statusHttp = 200;  // non-200 -> error reply
     QString m_statusErrorCode;
     QJsonObject m_currentConfig; // returned by GET /v1/configs/{id}
+    bool m_issueAwg3 = false;    // POST /v1/configs renders an AWG 3.1 config
 
     MockHttpServer::Response handle(const MockHttpServer::Request &request)
     {
@@ -284,6 +304,9 @@ private:
         if (request.method == "POST" && request.path == "/v1/configs") {
             const QString name = request.json().value("name").toString();
             m_currentConfig = configJson("cfg-1", name, "rev1", "203.0.113.10:51820");
+            if (m_issueAwg3) {
+                m_currentConfig["awg"] = awg3Conf("203.0.113.10:51820");
+            }
             return { 201, jsonBytes(m_currentConfig) };
         }
         if (request.method == "GET" && request.path == "/v1/configs/cfg-1/status") {
@@ -360,6 +383,7 @@ private slots:
         m_statusHttp = 200;
         m_statusErrorCode.clear();
         m_currentConfig = {};
+        m_issueAwg3 = false;
     }
 
     void testLogin()
@@ -474,6 +498,36 @@ private slots:
         const QString name = CoordinatorController::deviceConfigName(hostName, QStringLiteral("android"), taken);
         QCOMPARE(name, expected);
         QVERIFY(QRegularExpression(QStringLiteral("^[a-z0-9-]{1,32}$")).match(name).hasMatch());
+    }
+
+    void testAwg3ConfigDetectedAs31()
+    {
+        m_issueAwg3 = true;
+        login();
+        const QString serverId = createPhone();
+        QVERIFY(!serverId.isEmpty());
+
+        const auto server = m_core->m_serversRepository->nativeConfig(serverId);
+        QVERIFY(server.has_value());
+        QJsonObject awgJson;
+        for (const QJsonValue &value : server->toJson().value(configKey::containers).toArray()) {
+            if (value.toObject().contains(configKey::awg)) {
+                awgJson = value.toObject().value(configKey::awg).toObject();
+            }
+        }
+        QVERIFY(!awgJson.isEmpty());
+        const AwgProtocolConfig awg = AwgProtocolConfig::fromJson(awgJson);
+        QCOMPARE(awg.clientProtocolVersion(), QString(protocols::awg::awgV3));
+
+        const QJsonObject lastConfig = awgLastConfig(server->toJson());
+        QCOMPARE(lastConfig.value(configKey::headerProtectionKey).toString(),
+                 QStringLiteral("q5YQqvq3ZsdHo1ag8Grk1zE1gKXlo6VgSc8uzQ6QY5E="));
+        QCOMPARE(lastConfig.value(configKey::rekeyAfterTime).toString(), QStringLiteral("110"));
+        QCOMPARE(lastConfig.value(configKey::maxHandshakeAttempts).toString(), QStringLiteral("18"));
+        QCOMPARE(lastConfig.value(configKey::randomTrailers).toString(), QStringLiteral("on"));
+        QCOMPARE(lastConfig.value(configKey::disableCookies).toString(), QStringLiteral("on"));
+        QVERIFY(lastConfig.value(configKey::specialJunk1).toString().startsWith("<r 2>"));
+        QVERIFY(lastConfig.value(configKey::config).toString().contains("HeaderProtectionKey = "));
     }
 
     void testRefreshOutdatedReplacesInPlace()
