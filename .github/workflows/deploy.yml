@@ -32,7 +32,8 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+  # queue a newer run instead of cancelling: a 30-minute Windows/Android build is worth finishing
+  cancel-in-progress: false
 
 permissions:
   contents: read
