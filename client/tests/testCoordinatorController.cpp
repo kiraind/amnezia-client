@@ -620,7 +620,11 @@ private slots:
 
     void testFallsBackToKnownAddressWhenDnsFails()
     {
+        // login() fires its own GET /v1/me; let it finish first, or it can land after
+        // requests.clear() below and be counted as a second request.
+        QSignalSpy loginFetchSpy(m_controller, &CoordinatorController::remoteConfigsUpdated);
         login();
+        QTRY_COMPARE(loginFetchSpy.count(), 1);
         const int port = QUrl(m_server->baseUrl()).port();
         // The host is unreachable (like DNS/connect through a dead tunnel), so the first
         // attempt gets no HTTP answer. We point it at loopback 127.0.0.2, where nothing
