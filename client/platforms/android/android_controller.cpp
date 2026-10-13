@@ -99,7 +99,6 @@ bool AndroidController::initialize()
         {"onFileOpened", "(Ljava/lang/String;)V", reinterpret_cast<void *>(onFileOpened)},
         {"onConfigImported", "(Ljava/lang/String;)V", reinterpret_cast<void *>(onConfigImported)},
         {"onAuthResult", "(Z)V", reinterpret_cast<void *>(onAuthResult)},
-        {"decodeQrCode", "(Ljava/lang/String;)Z", reinterpret_cast<bool *>(decodeQrCode)},
         {"onImeInsetsChanged", "(I)V", reinterpret_cast<void *>(onImeInsetsChanged)},
         {"onSystemBarsInsetsChanged", "(II)V", reinterpret_cast<void *>(onSystemBarsInsetsChanged)},
         {"onActivityPaused", "()V", reinterpret_cast<void *>(onActivityPaused)},
@@ -196,11 +195,6 @@ QString AndroidController::getFileName(const QString &uri)
     return AndroidUtils::convertJString(env.jniEnv(), fileName.object<jstring>());
 }
 
-bool AndroidController::isCameraPresent()
-{
-    return callActivityMethod<jboolean>("isCameraPresent", "()Z");
-}
-
 bool AndroidController::isOnTv()
 {
     return callActivityMethod<jboolean>("isOnTv", "()Z");
@@ -219,11 +213,6 @@ int AndroidController::getStatusBarHeight()
 int AndroidController::getNavigationBarHeight()
 {
     return callActivityMethod<jint>("getNavigationBarHeight", "()I");
-}
-
-void AndroidController::startQrReaderActivity()
-{
-    callActivityMethod("startQrCodeReader", "()V");
 }
 
 void AndroidController::setSaveLogs(bool enabled)
@@ -579,13 +568,6 @@ void AndroidController::onAuthResult(JNIEnv *env, jobject thiz, jboolean result)
     emit AndroidController::instance()->authenticationResult(result);
 }
 
-// static
-bool AndroidController::decodeQrCode(JNIEnv *env, jobject thiz, jstring data)
-{
-    Q_UNUSED(thiz);
-
-    return ImportUiController::decodeQrCode(AndroidUtils::convertJString(env, data));
-}
 // static
 void AndroidController::onImeInsetsChanged(JNIEnv *env, jobject thiz, jint heightDp)
 {

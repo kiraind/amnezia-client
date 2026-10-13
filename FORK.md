@@ -142,6 +142,24 @@ New upstream workflows: delete them unless they are generic and safe (no Amnezia
 - Files: root `CMakeLists.txt`, `version.h.in`, `cmake/CPack.cmake`, `client/cmake/{android,ios,macos,macos_ne}.cmake`, both `networkextension/CMakeLists.txt`, `client/platforms/windows/amneziavpn.rc.in`, `service/server/amneziavpn-service.rc.in`, `client/main.cpp`, settings controllers (About page), `coordinatorApi.cpp`, `.github/workflows/deploy.yml`.
 How to resolve: for `AMNEZIAVPN_VERSION` and `APP_ANDROID_VERSION_CODE` take **theirs**; keep the fork's `LESHA_*` block and the places that use `LESHA_*`/`APP_FULL_VERSION` instead of upstream's version vars; bump `LESHA_VERSION` by 1. If upstream adds a new place that stamps a version (a new platform plist, installer, manifest), point it at the `LESHA_*` values too.
 
+## 9. Features cut out of the build
+The fork only talks to the coordinator and only uses AmneziaWG, so features it can't reach are removed to make the
+app smaller and the build faster. Files that only served a removed feature are deleted (`git rm`); upstream files
+that referenced them carry small hunks. How to resolve, for every item below: if upstream modified a file the fork
+deleted, keep it deleted (`git rm` it again) and drop upstream's change; in a hunk-carrying file take upstream's
+version and remove the references to the deleted feature again. If upstream adds a new file that only serves a
+removed feature, don't add it to the build.
+
+### 9.1 QR-code import and gamepad navigation (Android)
+- Deleted: `client/android/src/org/amnezia/vpn/CameraActivity.kt`, `client/android/res/layout/camera_preview.xml`,
+  `client/ui/qml/Components/GamepadLoader.qml`, submodule `client/3rd/qtgamepad`.
+- Hunks: `client/android/{AndroidManifest.xml,build.gradle.kts,gradle/libs.versions.toml}` (camera permission and
+  features, CameraX and ML Kit), `AmneziaActivity.kt` / `AmneziaApplication.kt` / `qt/QtAndroidController.kt`
+  (`isCameraPresent`, `startQrCodeReader`, CameraX config, `decodeQrCode`), `client/platforms/android/android_controller.{h,cpp}`
+  (same JNI methods), `ui/controllers/importUiController.cpp`, `ui/controllers/settingsUiController.cpp`
+  (`isCameraPresent()` is false on Android), `client/cmake/3rdparty.cmake` (qtgamepad block), `ui/qml/main2.qml`
+  (gamepad `Loader`), `ui/qml/qml.qrc`.
+
 ## Translations
 Fork UI strings are Russian source text inside `qsTr(...)` (e.g. "Аккаунт VPN"). The fork does not edit `client/translations/*.ts`,
 so on conflict take upstream's `.ts` files. Only if a fork commit ever added entries to them, re-add those entries.

@@ -146,9 +146,6 @@ void ImportUiController::clearConfigFileName()
 void ImportUiController::startDecodingQr()
 {
     m_importController->startDecodingQr();
-#if defined Q_OS_ANDROID
-    AndroidController::instance()->startQrReaderActivity();
-#endif
 }
 
 void ImportUiController::stopDecodingQr()

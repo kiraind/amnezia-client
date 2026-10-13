@@ -198,8 +198,6 @@ dependencies {
     implementation(libs.androidx.fragment)
     implementation(libs.kotlinx.coroutines)
     implementation(libs.kotlinx.serialization.protobuf)
-    implementation(libs.bundles.androidx.camera)
-    implementation(libs.google.mlkit)
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.biometric)
 

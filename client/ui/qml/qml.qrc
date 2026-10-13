@@ -11,7 +11,6 @@
         <file>Components/CountriesEmptyState.qml</file>
         <file>Components/CountryUseCaseChips.qml</file>
         <file>Components/SortCountriesDrawer.qml</file>
-        <file>Components/GamepadLoader.qml</file>
         <file>Components/HomeContainersListView.qml</file>
         <file>Components/HomeSplitTunnelingDrawer.qml</file>
         <file>Components/InstalledAppsDrawer.qml</file>

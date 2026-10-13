@@ -258,9 +258,7 @@ bool SettingsUiController::isCameraPresent()
 {
 #if defined Q_OS_IOS
     return true;
-#elif defined Q_OS_ANDROID
-    return AndroidController::instance()->isCameraPresent();
-#else
+#else // Лёша VPN: no QR import on Android
     return false;
 #endif
 }

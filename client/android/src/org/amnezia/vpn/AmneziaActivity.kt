@@ -1,7 +1,6 @@
 package org.amnezia.vpn
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.NotificationManager
 import android.content.ActivityNotFoundException
@@ -907,10 +906,6 @@ class AmneziaActivity : QtActivity() {
     }
 
     @Suppress("unused")
-    @SuppressLint("UnsupportedChromeOsCameraSystemFeature")
-    fun isCameraPresent(): Boolean = applicationContext.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)
-
-    @Suppress("unused")
     fun isOnTv(): Boolean = applicationContext.packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
 
     @Suppress("unused")
@@ -948,14 +943,6 @@ class AmneziaActivity : QtActivity() {
         val density = resources.displayMetrics.density
         val heightDp = (heightPx / density).toInt()
         return heightDp
-    }
-
-    @Suppress("unused")
-    fun startQrCodeReader() {
-        Log.v(TAG, "Start camera")
-        Intent(this, CameraActivity::class.java).also {
-            startActivity(it)
-        }
     }
 
     @Suppress("unused")
