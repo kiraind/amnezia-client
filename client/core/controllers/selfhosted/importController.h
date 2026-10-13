@@ -69,7 +69,6 @@ public:
 signals:
     void importFinished();
     void importErrorOccurred(ErrorCode errorCode, bool goToPageHome);
-    void restoreAppConfig(const QByteArray &data);
 
 private:
     ConfigTypes checkConfigFormat(const QString &config) const;

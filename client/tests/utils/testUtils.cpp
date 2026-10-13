@@ -56,10 +56,6 @@ std::optional<QString> serverDescription(SecureServersRepository *repo, const QS
         const auto cfg = repo->nativeConfig(serverId);
         return cfg ? std::optional<QString>(cfg->description) : std::nullopt;
     }
-    case serverConfigUtils::ConfigType::AmneziaPremiumV2: {
-        const auto cfg = repo->apiV2Config(serverId);
-        return cfg ? std::optional<QString>(cfg->description) : std::nullopt;
-    }
     default:
         return std::nullopt;
     }

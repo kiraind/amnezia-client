@@ -18,7 +18,6 @@
 #include <QtQuick/QQuickWindow>  
 #include <QWindow>     
 
-#include "core/controllers/updateController.h"
 #include "core/protocols/qmlRegisterProtocols.h"
 #include "logger.h"
 #include "ui/controllers/qml/pageController.h"
@@ -31,9 +30,6 @@
     #include "platforms/ios/ioscontextmenu.h"
 #endif
 
-#ifdef Q_OS_ANDROID
-#include "platforms/android/android_controller.h"
-#endif
          
 
 bool AmneziaApplication::m_forceQuit = false;
@@ -146,16 +142,9 @@ void AmneziaApplication::init()
 #else
     m_engine->rootContext()->setContextProperty("IsMacOsNeBuild", false);
 #endif
-    m_engine->rootContext()->setContextProperty("IsAppUpdatesEnabled", bool(CLIENT_ENABLE_APP_UPDATES));
 
 #ifdef Q_OS_IOS
     m_engine->rootContext()->setContextProperty("IosContextMenu", new IosContextMenu(this));
-#endif
-
-#ifdef Q_OS_ANDROID
-    m_engine->rootContext()->setContextProperty("IsPlayBuild", AndroidController::instance()->isPlay());
-#else
-    m_engine->rootContext()->setContextProperty("IsPlayBuild", false);
 #endif
 
     m_vpnConnection.reset(new VpnConnection(nullptr, nullptr));
@@ -178,10 +167,6 @@ void AmneziaApplication::init()
     m_engine->load(url);
 
     m_coreController->setQmlRoot();
-
-#if CLIENT_ENABLE_APP_UPDATES
-    m_coreController->checkForAppUpdates();
-#endif
 
 #ifdef Q_OS_WIN //TODO
     if (m_parser.isSet(m_optAutostart))
@@ -248,7 +233,6 @@ void AmneziaApplication::registerTypes()
     amnezia::declareQmlProtocolEnum();
     Vpn::declareQmlVpnConnectionStateEnum();
     PageLoader::declareQmlPageEnum();
-    UpdateState::declareQmlUpdateStateEnum();
 }
 
 void AmneziaApplication::loadFonts()

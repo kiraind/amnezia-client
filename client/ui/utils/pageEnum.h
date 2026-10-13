@@ -21,21 +21,11 @@ namespace PageLoader
         PageSettingsConnection,
         PageSettingsDns,
         PageSettingsApplication,
-        PageSettingsNewsNotifications,
-        PageSettingsNewsDetail,
-        PageSettingsBackup,
         PageSettingsAbout,
         PageSettingsLogging,
         PageSettingsSplitTunneling,
         PageSettingsAppSplitTunneling,
         PageSettingsKillSwitch,
-        PageSettingsApiServerInfo,
-        PageSettingsApiAvailableCountries,
-        PageSettingsApiSupport,
-        PageSettingsApiInstructions,
-        PageSettingsApiNativeConfigs,
-        PageSettingsApiDevices,
-        PageSettingsApiSubscriptionKey,
         PageSettingsKillSwitchExceptions,
 
         PageSetupWizardStart,
@@ -43,8 +33,6 @@ namespace PageLoader
         PageSetupWizardTextKey,
         PageSetupWizardViewConfig,
         PageSetupWizardQrReader,
-        PageSetupWizardApiServicesList,
-        PageSetupWizardApiFreeInfo,
 
         PageProtocolOpenVpnSettings,
         PageProtocolXraySettings,
@@ -53,11 +41,6 @@ namespace PageLoader
 
         PageProtocolWireGuardClientSettings,
         PageProtocolAwgClientSettings,
-
-        PageSetupWizardApiPremiumInfo,
-        PageSetupWizardApiTrialEmail,
-
-        PageDevMenu,
 
         PageProtocolXraySnapshots,
         PageProtocolXrayTransportSettings,
@@ -68,8 +51,6 @@ namespace PageLoader
         PageProtocolXrayXPaddingBytesSettings,
 
         PageSettingsLanguage,
-
-        PageUpdate,
 
         PageCoordinatorLogin,
         PageCoordinatorConfigs,

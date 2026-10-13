@@ -17,10 +17,6 @@ private:
     void initErrorMessagesHandler();
     void initSettingsSplitTunnelingHandler();
     void initImportControllerHandler();
-    void initApiCountryModelUpdateHandler();
-    void initCountryListSortModeHandler();
-    void initCountryListStateHandler();
-    void initSubscriptionRefreshHandler();
     void initTranslationsUpdatedHandler();
     void initLanguageHandler();
     void initAutoConnectHandler();
@@ -30,14 +26,12 @@ private:
     void initAllowedDnsModelUpdateHandler();
     void initAppSplitTunnelingModelUpdateHandler();
     void initPrepareConfigHandler();
-    void initUnsupportedConnectDrawerHandler();
     void initStrictKillSwitchHandler();
     void initAndroidSettingsHandler();
     void initAndroidConnectionHandler();
     void initIosImportHandler();
     void initIosSettingsHandler();
     void initNotificationHandler();
-    void initUpdateFoundHandler();
 
     CoreController* m_coreController;
 };

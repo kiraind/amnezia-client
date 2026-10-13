@@ -48,7 +48,6 @@ signals:
     void connectButtonClicked();
     void preparingConfig();
     void prepareConfig();
-    void unsupportedConnectDrawerRequested();
 
 private:
     Vpn::ConnectionState getCurrentConnectionState();

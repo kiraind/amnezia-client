@@ -51,7 +51,6 @@ public:
     QString getServerId(int serverIndex) const;
     int indexOfServerId(const QString &serverId) const;
     QString notificationDisplayName(const QString &serverId) const;
-    std::optional<ApiV2ServerConfig> apiV2Config(const QString &serverId) const;
     std::optional<SelfHostedAdminServerConfig> selfHostedAdminConfig(const QString &serverId) const;
     ServerCredentials getServerCredentials(const QString &serverId) const;
     QMap<DockerContainer, ContainerConfig> getServerContainersMap(const QString &serverId) const;
@@ -59,9 +58,7 @@ public:
     ContainerConfig getContainerConfig(const QString &serverId, DockerContainer container) const;
 
     // Validation
-    bool isServerFromApiAlreadyExists(const QString &userCountryCode, const QString &serviceType, const QString &serviceProtocol) const;
     bool hasInstalledContainers(const QString &serverId) const;
-    bool isLegacyApiV1Server(const QString &serverId) const;
     // Fork: self-hosted/native servers connect only with the client config they already hold; nothing is provisioned
     // over SSH any more (replaces InstallController::validateAndPrepareConfig).
     ErrorCode validateClientConfig(const QString &serverId) const;

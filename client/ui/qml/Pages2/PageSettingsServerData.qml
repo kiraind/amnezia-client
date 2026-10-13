@@ -56,7 +56,6 @@ PageType {
 
     property list<QtObject> serverActions: [
         remove,
-        reset,
     ]
 
     QtObject {
@@ -88,35 +87,4 @@ PageType {
             showQuestionDrawer(headerText, descriptionText, yesButtonText, noButtonText, yesButtonFunction, noButtonFunction)
         }
     }
-
-    QtObject {
-        id: reset
-
-        property bool isVisible: ServersUiController.isServerFromApi(ServersUiController.processedServerId)
-        readonly property string title: qsTr("Reset API config")
-        readonly property string description: ""
-        readonly property var tColor: AmneziaStyle.color.vibrantRed
-        readonly property var clickedHandler: function() {
-            var headerText = qsTr("Do you want to reset API config?")
-            var descriptionText = ""
-            var yesButtonText = qsTr("Continue")
-            var noButtonText = qsTr("Cancel")
-
-            var yesButtonFunction = function() {
-                if (ServersUiController.isDefaultServerCurrentlyProcessed() && ConnectionController.isConnected) {
-                    PageController.showNotificationMessage(qsTr("Cannot reset API config during active connection"))
-                } else {
-                    PageController.showBusyIndicator(true)
-                    SubscriptionUiController.removeApiConfig(ServersUiController.processedServerId)
-                    PageController.showBusyIndicator(false)
-                }
-            }
-            var noButtonFunction = function() {
-
-            }
-
-            showQuestionDrawer(headerText, descriptionText, yesButtonText, noButtonText, yesButtonFunction, noButtonFunction)
-        }
-    }
-
 }

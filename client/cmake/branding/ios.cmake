@@ -23,15 +23,6 @@ if(NOT CLIENT_IOS_MEDIA_ASSETS_PATH)
     set(CLIENT_IOS_MEDIA_ASSETS_PATH "${_CLIENT_SRC_DIR}/ios/app/Media.xcassets" CACHE FILEPATH "iOS app Media.xcassets path")
 endif()
 
-if(NOT CLIENT_IOS_BUNDLE_ID)
-    set(CLIENT_IOS_BUNDLE_ID "${BUILD_IOS_APP_IDENTIFIER}" CACHE STRING "iOS bundle id for App Store version lookup")
-endif()
-# Empty in this fork: the upstream value pointed at the official AmneziaVPN App Store page, and
-# app updates are disabled (CLIENT_ENABLE_APP_UPDATES 0). Set it if the fork is ever published.
-if(NOT CLIENT_IOS_STORE_URL_FALLBACK)
-    set(CLIENT_IOS_STORE_URL_FALLBACK "" CACHE STRING "Fallback App Store URL when lookup omits trackViewUrl")
-endif()
-
 # -- signing
 if(NOT CLIENT_IOS_PROVISIONING_PROFILE_SPECIFIER)
     set(CLIENT_IOS_PROVISIONING_PROFILE_SPECIFIER "distr ios.${BUILD_IOS_APP_IDENTIFIER}" CACHE STRING "iOS app provisioning profile specifier for release")

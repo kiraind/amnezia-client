@@ -12,23 +12,6 @@
     #include "platforms/android/android_controller.h"
 #endif
 
-QString getPlatformName()
-{
-#if defined(Q_OS_WINDOWS)
-    return "Windows";
-#elif defined(Q_OS_ANDROID)
-    return "Android";
-#elif defined(Q_OS_LINUX)
-    return "Linux";
-#elif defined(Q_OS_MACX)
-    return "MacOS";
-#elif defined(Q_OS_IOS)
-    return "iOS";
-#else
-    return "Unknown";
-#endif
-}
-
 SettingsController::SettingsController(SecureServersRepository* serversRepository,
                                      SecureAppSettingsRepository* appSettingsRepository,
                                      QObject* parent)
@@ -37,7 +20,6 @@ SettingsController::SettingsController(SecureServersRepository* serversRepositor
       m_appSettingsRepository(appSettingsRepository)
 {
     m_appVersion = QString("%1 (%2, %3)").arg(QString(APP_FULL_VERSION), __DATE__, GIT_COMMIT_HASH);
-    m_isDevModeEnabled = m_appSettingsRepository->isDevGatewayEnv();
 }
 
 void SettingsController::toggleAmneziaDns(bool enable)
@@ -102,79 +84,6 @@ void SettingsController::clearLogs()
     Logger::clearLogs(false);
     Logger::clearServiceLogs();
 #endif
-}
-
-QByteArray SettingsController::backupAppConfig() const
-{
-    QByteArray data = m_appSettingsRepository->backupAppConfig();
-    QJsonDocument doc = QJsonDocument::fromJson(data);
-    QJsonObject config = doc.object();
-
-    config["AppPlatform"] = getPlatform();
-    config["Conf/autoStart"] = isAutoStartEnabled();
-    config["Conf/killSwitchEnabled"] = isKillSwitchEnabled();
-    config["Conf/strictKillSwitchEnabled"] = isStrictKillSwitchEnabled();
-    config["Conf/useAmneziaDns"] = isAmneziaDnsEnabled();
-
-    return QJsonDocument(config).toJson();
-}
-
-int SettingsController::unsupportedFormatConfigsSkippedCount() const
-{
-    return m_serversRepository->unsupportedFormatConfigsCount();
-}
-
-ErrorCode SettingsController::restoreAppConfigFromData(const QByteArray &data)
-{
-    if (!m_appSettingsRepository->restoreAppConfig(data)) {
-        return ErrorCode::RestoreBackupInvalidError;
-    }
-
-    m_serversRepository->invalidateCache();
-
-    QJsonObject newConfigData = QJsonDocument::fromJson(data).object();
-
-#if defined(Q_OS_WINDOWS) || defined(Q_OS_LINUX) || defined(Q_OS_MACX)
-    bool autoStart = false;
-    if (newConfigData.contains("Conf/autoStart")) {
-        autoStart = newConfigData["Conf/autoStart"].toBool();
-    }
-    toggleAutoStart(autoStart);
-#endif
-
-#if defined(Q_OS_WINDOWS) || defined(Q_OS_ANDROID)
-    int appSplitTunnelingRouteMode = newConfigData.value("Conf/appsRouteMode").toInt();
-    bool appSplittunnelingEnabled =
-            newConfigData.value("Conf/appsSplitTunnelingEnabled").toVariant().toString().toLower() == "true";
-    emit appSplitTunnelingRouteModeChanged(static_cast<AppsRouteMode>(appSplitTunnelingRouteMode));
-
-    #if defined(Q_OS_WINDOWS)
-        emit appSplitTunnelingRouteModeChanged(AppsRouteMode::VpnAllExceptApps);
-    #endif
-
-    if (newConfigData.contains("AppPlatform")) {
-            if (newConfigData.value("AppPlatform").toString() != getPlatform()) {
-                emit appSplitTunnelingClearAppsList();
-            }
-    }
-    
-    emit appSplitTunnelingToggled(appSplittunnelingEnabled);
-#endif
-
-    int siteSplitTunnelingRouteMode = newConfigData.value("Conf/routeMode").toInt();
-    bool siteSplittunnelingEnabled =
-            newConfigData.value("Conf/sitesSplitTunnelingEnabled").toVariant().toString().toLower() == "true";
-    emit siteSplitTunnelingRouteModeChanged(static_cast<RouteMode>(siteSplitTunnelingRouteMode));
-    emit siteSplitTunnelingToggled(siteSplittunnelingEnabled);
-
-#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-    m_appSettingsRepository->setAutoConnect(false);
-    m_appSettingsRepository->setStartMinimized(false);
-    m_appSettingsRepository->setKillSwitchEnabled(false);
-    m_appSettingsRepository->setStrictKillSwitchEnabled(false);
-#endif
-
-    return ErrorCode::NoError;
 }
 
 QString SettingsController::getAppVersion() const
@@ -245,26 +154,6 @@ void SettingsController::toggleScreenshotsEnabled(bool enable)
     m_appSettingsRepository->setScreenshotsEnabled(enable);
 }
 
-bool SettingsController::isNewsNotificationsEnabled() const
-{
-    return m_appSettingsRepository->isNewsNotifications();
-}
-
-void SettingsController::toggleNewsNotificationsEnabled(bool enable)
-{
-    m_appSettingsRepository->setNewsNotifications(enable);
-}
-
-bool SettingsController::isAutoUpdateCheckEnabled() const
-{
-    return m_appSettingsRepository->isAutoUpdateCheckEnabled();
-}
-
-void SettingsController::toggleAutoUpdateCheckEnabled(bool enable)
-{
-    m_appSettingsRepository->setAutoUpdateCheckEnabled(enable);
-}
-
 bool SettingsController::isKillSwitchEnabled() const
 {
     return m_appSettingsRepository->isKillSwitchEnabled();
@@ -290,56 +179,6 @@ QString SettingsController::getInstallationUuid(bool createIfNotExists) const
     return m_appSettingsRepository->getInstallationUuid(createIfNotExists);
 }
 
-void SettingsController::enableDevMode()
-{
-    m_isDevModeEnabled = true;
-}
-
-bool SettingsController::isDevModeEnabled() const
-{
-    return m_isDevModeEnabled;
-}
-
-void SettingsController::resetGatewayEndpoint()
-{
-    m_appSettingsRepository->resetGatewayEndpoint();
-}
-
-void SettingsController::setGatewayEndpoint(const QString &endpoint)
-{
-    m_appSettingsRepository->setGatewayEndpoint(endpoint);
-}
-
-QString SettingsController::getGatewayEndpoint() const
-{
-    return m_appSettingsRepository->isDevGatewayEnv() ? "Dev endpoint" : m_appSettingsRepository->getGatewayEndpoint();
-}
-
-bool SettingsController::isDevGatewayEnv() const
-{
-    return m_appSettingsRepository->isDevGatewayEnv();
-}
-
-void SettingsController::toggleDevGatewayEnv(bool enabled)
-{
-    m_appSettingsRepository->toggleDevGatewayEnv(enabled);
-    if (enabled) {
-        m_appSettingsRepository->setDevGatewayEndpoint();
-    } else {
-        m_appSettingsRepository->resetGatewayEndpoint();
-    }
-}
-
-bool SettingsController::isHomeAdLabelVisible() const
-{
-    return m_appSettingsRepository->isHomeAdLabelVisible();
-}
-
-void SettingsController::disableHomeAdLabel()
-{
-    m_appSettingsRepository->disableHomeAdLabel();
-}
-
 void SettingsController::checkIfNeedDisableLogs()
 {
     if (m_appSettingsRepository->isSaveLogs()) {
@@ -349,11 +188,6 @@ void SettingsController::checkIfNeedDisableLogs()
             clearLogs();
         }
     }
-}
-
-QString SettingsController::getPlatform() const
-{
-    return getPlatformName();
 }
 
 QLocale SettingsController::getAppLanguage() const

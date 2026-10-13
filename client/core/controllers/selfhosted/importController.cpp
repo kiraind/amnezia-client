@@ -1,6 +1,7 @@
 #include "importController.h"
 
 #include <QDataStream>
+#include <QIODevice>
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -17,9 +18,6 @@
 #include "core/utils/containers/containerUtils.h"
 #include "core/utils/protocolEnum.h"
 #include "core/utils/serverConfigUtils.h"
-#include "core/utils/constants/apiKeys.h"
-#include "core/utils/constants/apiConstants.h"
-#include "core/utils/api/apiUtils.h"
 #include "core/utils/serialization/serialization.h"
 #include "core/utils/utilities.h"
 #include "core/utils/protocolEnum.h"
@@ -223,14 +221,9 @@ ImportController::ImportResult ImportController::extractConfigFromData(const QSt
             return result;
         }
 
+        // Fork: Amnezia gateway (premium/free) keys are not supported
         if (serverConfigUtils::isServerFromApi(result.config)) {
-            auto apiConfig = result.config.value(apiDefs::key::apiConfig).toObject();
-            apiConfig[apiDefs::key::vpnKey] = data;
-            result.config[apiDefs::key::apiConfig] = apiConfig;
-        }
-
-        if (serverConfigUtils::isLegacyApiSubscription(serverConfigUtils::configTypeFromJson(result.config))) {
-            result.errorCode = ErrorCode::LegacyApiV1NotSupportedError;
+            result.errorCode = ErrorCode::ImportInvalidConfigError;
             result.config = {};
             return result;
         }
@@ -244,7 +237,8 @@ ImportController::ImportResult ImportController::extractConfigFromData(const QSt
         return result;
     }
     case ConfigTypes::Backup: {
-        result.errorCode = ErrorCode::ImportBackupFileUseRestoreInstead;
+        // Fork: settings backup/restore is removed
+        result.errorCode = ErrorCode::ImportInvalidConfigError;
         return result;
     }
     case ConfigTypes::Invalid: {
@@ -409,32 +403,9 @@ void ImportController::importConfig(const QJsonObject &config)
     credentials.userName = config.value(configKey::userName).toString();
     credentials.secretData = config.value(configKey::password).toString();
 
-    if (credentials.isValid() || config.contains(configKey::containers)) {
+    if ((credentials.isValid() || config.contains(configKey::containers)) && !serverConfigUtils::isServerFromApi(config)) {
         m_serversRepository->addServer(QString(), config, serverConfigUtils::configTypeFromJson(config));
         emit importFinished();
-    } else if (config.contains(configKey::configVersion)) {
-        quint16 crc = qChecksum(QJsonDocument(config).toJson());
-        bool hasServerWithCrc = false;
-        const QVector<QString> ids = m_serversRepository->orderedServerIds();
-        for (const QString &id : ids) {
-            const auto apiV2 = m_serversRepository->apiV2Config(id);
-            if (!apiV2.has_value()) {
-                continue;
-            }
-            if (static_cast<quint16>(apiV2->crc) == crc) {
-                hasServerWithCrc = true;
-                break;
-            }
-        }
-
-        if (hasServerWithCrc) {
-            emit importErrorOccurred(ErrorCode::ApiConfigAlreadyAdded, true);
-        } else {
-            QJsonObject configWithCrc = config;
-            configWithCrc.insert(configKey::crc, crc);
-            m_serversRepository->addServer(QString(), configWithCrc, serverConfigUtils::configTypeFromJson(configWithCrc));
-            emit importFinished();
-        }
     } else {
         qDebug() << "Failed to import profile";
         qDebug().noquote() << QJsonDocument(config).toJson();

@@ -171,15 +171,6 @@ if(NOT ANDROID)
         test_common
     )
 
-    add_executable(test_backup_export_import
-        testBackupExportImport.cpp
-    )
-
-    target_link_libraries(test_backup_export_import PRIVATE
-        Qt6::Test
-        test_common
-    )
-
     add_executable(test_connection
         testConnection.cpp
     )
@@ -373,24 +364,6 @@ print('SONAME patch done.')
         QT_ANDROID_PACKAGE_SOURCE_DIR "${ANDROID_TEST_PACKAGE_DIR}"
         QT_ANDROID_EXTRA_LIBS         "${_openssl_crypto_dst};${_openssl_ssl_dst}"
     )
-
-    qt_add_executable(test_android_restore_backup
-        testAndroidRestoreBackup.cpp
-    )
-
-    target_link_libraries(test_android_restore_backup PRIVATE
-        Qt6::Test
-        test_common
-    )
-
-    set_target_properties(test_android_restore_backup PROPERTIES
-        QT_ANDROID_PACKAGE_SOURCE_DIR "${ANDROID_TEST_PACKAGE_DIR}"
-        QT_ANDROID_EXTRA_LIBS         "${_openssl_crypto_dst};${_openssl_ssl_dst}"
-    )
-endif()
-
-if(NOT ANDROID)
-    add_subdirectory(api)
 endif()
 
 enable_testing()
@@ -411,7 +384,6 @@ if(NOT ANDROID)
     add_test(NAME UiIpModelAndControllerTest       COMMAND test_ui_ip_model_and_controller)
     add_test(NAME UiAppSTModelAndControllerTest    COMMAND test_ui_app_st_model_and_controller)
     add_test(NAME UiAllowedDnsModelAndControllerTest COMMAND test_ui_allowed_dns_model_and_controller)
-    add_test(NAME BackupExportImportTest           COMMAND test_backup_export_import)
     add_test(NAME ConnectionTest                   COMMAND test_connection)
     add_test(NAME OpenSSLLibraryTest               COMMAND test_openssl_library)
     add_test(NAME CoordinatorControllerTest        COMMAND test_coordinator_controller)

@@ -35,9 +35,6 @@ SettingsUiController::SettingsUiController(SettingsController* settingsControlle
 #endif
 
     m_settingsController->checkIfNeedDisableLogs();
-    if (m_settingsController->isDevGatewayEnv()) {
-        m_settingsController->enableDevMode();
-    }
 }
 
 void SettingsUiController::toggleAmneziaDns(bool enable)
@@ -137,47 +134,6 @@ void SettingsUiController::clearLogs()
     qInfo().noquote() << QString("SSL backend: %1").arg(QSslSocket::sslLibraryVersionString());
 }
 
-void SettingsUiController::backupAppConfig(const QString &fileName)
-{
-    QByteArray data = m_settingsController->backupAppConfig();
-    if (!SystemController::saveFile(fileName, data)) {
-        qInfo() << "SettingsUiController::backupAppConfig: save or share was cancelled or failed";
-    }
-}
-
-void SettingsUiController::restoreAppConfig(const QString &fileName)
-{
-    QByteArray data;
-
-    if (!SystemController::readFile(fileName, data)) {
-        emit errorOccurred(ErrorCode::OpenError);
-        return;
-    }
-
-    restoreAppConfigFromData(data);
-}
-
-void SettingsUiController::restoreAppConfigFromData(const QByteArray &data)
-{
-    ErrorCode errorCode = m_settingsController->restoreAppConfigFromData(data);
-    if (errorCode == ErrorCode::NoError) {
-        emit appLanguageChanged();
-
-        bool amneziaDnsEnabled = m_settingsController->isAmneziaDnsEnabled();
-        emit amneziaDnsToggled(amneziaDnsEnabled);
-
-        emit restoreBackupFinished();
-        emit autoStartChanged();
-        emit startMinimizedChanged();
-
-        if (m_settingsController->unsupportedFormatConfigsSkippedCount() > 0) {
-            emit errorOccurred(ErrorCode::RestoreBackupUnsupportedConfigsSkipped);
-        }
-    } else {
-        emit errorOccurred(errorCode);
-    }
-}
-
 QString SettingsUiController::getAppVersion()
 {
     return m_settingsController->getAppVersion();
@@ -240,26 +196,6 @@ void SettingsUiController::toggleScreenshotsEnabled(bool enable)
     m_settingsController->toggleScreenshotsEnabled(enable);
 }
 
-bool SettingsUiController::isNewsNotificationsEnabled()
-{
-    return m_settingsController->isNewsNotificationsEnabled();
-}
-
-void SettingsUiController::toggleNewsNotificationsEnabled(bool enable)
-{
-    m_settingsController->toggleNewsNotificationsEnabled(enable);
-}
-
-bool SettingsUiController::isAutoUpdateCheckEnabled()
-{
-    return m_settingsController->isAutoUpdateCheckEnabled();
-}
-
-void SettingsUiController::toggleAutoUpdateCheckEnabled(bool enable)
-{
-    m_settingsController->toggleAutoUpdateCheckEnabled(enable);
-}
-
 bool SettingsUiController::isCameraPresent()
 {
 #if defined Q_OS_IOS
@@ -317,46 +253,6 @@ QString SettingsUiController::getInstallationUuid()
     return m_settingsController->getInstallationUuid();
 }
 
-void SettingsUiController::enableDevMode()
-{
-    m_settingsController->enableDevMode();
-    emit devModeEnabled();
-}
-
-bool SettingsUiController::isDevModeEnabled()
-{
-    return m_settingsController->isDevModeEnabled();
-}
-
-void SettingsUiController::resetGatewayEndpoint()
-{
-    m_settingsController->resetGatewayEndpoint();
-    emit gatewayEndpointChanged(m_settingsController->getGatewayEndpoint());
-}
-
-void SettingsUiController::setGatewayEndpoint(const QString &endpoint)
-{
-    m_settingsController->setGatewayEndpoint(endpoint);
-    emit gatewayEndpointChanged(endpoint);
-}
-
-QString SettingsUiController::getGatewayEndpoint()
-{
-    return m_settingsController->getGatewayEndpoint();
-}
-
-bool SettingsUiController::isDevGatewayEnv()
-{
-    return m_settingsController->isDevGatewayEnv();
-}
-
-void SettingsUiController::toggleDevGatewayEnv(bool enabled)
-{
-    m_settingsController->toggleDevGatewayEnv(enabled);
-    emit gatewayEndpointChanged(m_settingsController->getGatewayEndpoint());
-    emit devGatewayEnvChanged(enabled);
-}
-
 bool SettingsUiController::isOnTv()
 {
 #ifdef Q_OS_ANDROID
@@ -364,15 +260,4 @@ bool SettingsUiController::isOnTv()
 #else
     return false;
 #endif
-}
-
-bool SettingsUiController::isHomeAdLabelVisible()
-{
-    return m_settingsController->isHomeAdLabelVisible();
-}
-
-void SettingsUiController::disableHomeAdLabel()
-{
-    m_settingsController->disableHomeAdLabel();
-    emit isHomeAdLabelVisibleChanged(false);
 }

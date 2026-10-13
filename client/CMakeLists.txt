@@ -25,17 +25,6 @@ execute_process(
 
 add_definitions(-DGIT_COMMIT_HASH="${GIT_COMMIT_HASH}")
 
-add_definitions(-DPROD_AGW_PUBLIC_KEY="$ENV{PROD_AGW_PUBLIC_KEY}")
-add_definitions(-DPROD_S3_ENDPOINT="$ENV{PROD_S3_ENDPOINT}")
-add_definitions(-DFALLBACK_S3_ENDPOINT="$ENV{FALLBACK_S3_ENDPOINT}")
-
-add_definitions(-DDEV_AGW_PUBLIC_KEY="$ENV{DEV_AGW_PUBLIC_KEY}")
-add_definitions(-DDEV_AGW_ENDPOINT="$ENV{DEV_AGW_ENDPOINT}")
-add_definitions(-DDEV_S3_ENDPOINT="$ENV{DEV_S3_ENDPOINT}")
-
-add_definitions(-DFREE_V2_ENDPOINT="$ENV{FREE_V2_ENDPOINT}")
-add_definitions(-DPREM_V1_ENDPOINT="$ENV{PREM_V1_ENDPOINT}")
-
 # VPN coordinator base URL offered by default on the coordinator login page (empty = user must enter it)
 set(COORDINATOR_API_URL "" CACHE STRING "Default VPN coordinator API base URL")
 if(NOT COORDINATOR_API_URL STREQUAL "")
@@ -76,9 +65,6 @@ endif()
 
 qt6_add_resources(QRC ${QRC}
     ${CMAKE_CURRENT_LIST_DIR}/images/images.qrc
-    ${CMAKE_CURRENT_LIST_DIR}/images/flagKit.qrc
-    ${CMAKE_CURRENT_LIST_DIR}/resources/countries.qrc
-    ${CMAKE_CURRENT_LIST_DIR}/client_scripts/clientScripts.qrc
     ${CLIENT_QML_QRC_FILE}
     ${CLIENT_EXTRA_QRC}
 )

@@ -20,16 +20,13 @@
 #include "ui/controllers/languageUiController.h"
 #include "ui/controllers/importUiController.h"
 #include "ui/controllers/protocolSettingsUiController.h"
-#include "ui/controllers/api/subscriptionUiController.h"
 #include "ui/controllers/coordinator/coordinatorUiController.h"
-#include "ui/controllers/updateUiController.h"
 #include "ui/models/serversModel.h"
 #include "core/controllers/serversController.h"
 #include "core/controllers/ipSplitTunnelingController.h"
 #include "core/controllers/appSplitTunnelingController.h"
 #include "core/controllers/settingsController.h"
 #include "core/controllers/connectionController.h"
-#include "ui/controllers/api/apiNewsUiController.h"
 #include "ui/models/containersModel.h"
 #include "core/utils/containerEnum.h"
 
@@ -58,10 +55,6 @@ void CoreSignalHandlers::initAllHandlers()
     initErrorMessagesHandler();
     initSettingsSplitTunnelingHandler();
     initImportControllerHandler();
-    initApiCountryModelUpdateHandler();
-    initCountryListSortModeHandler();
-    initCountryListStateHandler();
-    initSubscriptionRefreshHandler();
     initTranslationsUpdatedHandler();
     initLanguageHandler();
     initAutoConnectHandler();
@@ -71,14 +64,12 @@ void CoreSignalHandlers::initAllHandlers()
     initAllowedDnsModelUpdateHandler();
     initAppSplitTunnelingModelUpdateHandler();
     initPrepareConfigHandler();
-    initUnsupportedConnectDrawerHandler();
     initStrictKillSwitchHandler();
     initAndroidSettingsHandler();
     initAndroidConnectionHandler();
     initIosImportHandler();
     initIosSettingsHandler();
     initNotificationHandler();
-    initUpdateFoundHandler();
 }
 
 void CoreSignalHandlers::initErrorMessagesHandler()
@@ -87,9 +78,6 @@ void CoreSignalHandlers::initErrorMessagesHandler()
         emit m_coreController->m_pageController->showErrorMessage(errorCode);
         m_coreController->m_connectionController->setConnectionState(Vpn::ConnectionState::Disconnected);
     });
-
-    connect(m_coreController->m_subscriptionUiController, &SubscriptionUiController::errorOccurred, m_coreController->m_pageController,
-            qOverload<ErrorCode>(&PageController::showErrorMessage));
 
     connect(m_coreController->m_settingsUiController, &SettingsUiController::errorOccurred, m_coreController->m_pageController,
             qOverload<ErrorCode>(&PageController::showErrorMessage));
@@ -115,9 +103,6 @@ void CoreSignalHandlers::initSettingsSplitTunnelingHandler()
     connect(m_coreController->m_settingsController, &SettingsController::appSplitTunnelingToggled, this, [this](bool enabled) {
         m_coreController->m_appSplitTunnelingController->toggleSplitTunneling(enabled);
     });
-    connect(m_coreController->m_settingsController, &SettingsController::appSplitTunnelingClearAppsList, this, [this]() {
-        m_coreController->m_appSplitTunnelingController->clearAppsList();
-    });
 }
 
 void CoreSignalHandlers::initImportControllerHandler()
@@ -138,86 +123,11 @@ void CoreSignalHandlers::initImportControllerHandler()
     });
 }
 
-void CoreSignalHandlers::initCountryListSortModeHandler()
-{
-    SecureAppSettingsRepository *repository = m_coreController->m_appSettingsRepository;
-
-    const QVector<ApiCountryListModel *> models { m_coreController->m_apiCountryListModel,
-                                                  m_coreController->m_apiConfigsCountryListModel };
-
-    for (ApiCountryListModel *model : models) {
-        model->setSortMode(repository->countryListSortMode(model->listId()));
-        connect(model, &ApiCountryListModel::sortModeChanged, this, [repository, model]() {
-            repository->setCountryListSortMode(model->listId(), model->sortMode());
-        });
-    }
-}
-
-void CoreSignalHandlers::initCountryListStateHandler()
-{
-    SecureAppSettingsRepository *repository = m_coreController->m_appSettingsRepository;
-
-    const QVector<ApiCountryListModel *> models { m_coreController->m_apiCountryListModel,
-                                                  m_coreController->m_apiConfigsCountryListModel };
-
-    for (ApiCountryListModel *model : models) {
-        model->setFavorites(repository->favoriteLocations());
-        connect(model, &ApiCountryListModel::favoritesChanged, this, [repository, models, model](const QStringList &codes) {
-            repository->setFavoriteLocations(codes);
-            for (ApiCountryListModel *other : models) {
-                if (other != model) {
-                    other->setFavorites(codes);
-                }
-            }
-        });
-    }
-}
-
-void CoreSignalHandlers::initApiCountryModelUpdateHandler()
-{
-    connect(m_coreController->m_serversUiController, &ServersUiController::updateApiCountryModel, this, [this]() {
-        const QString processedServerId = m_coreController->m_serversUiController->getProcessedServerId();
-        if (processedServerId.isEmpty()) {
-            return;
-        }
-
-        const auto apiV2 = m_coreController->m_serversRepository->apiV2Config(processedServerId);
-        if (!apiV2.has_value()) {
-            return;
-        }
-
-        m_coreController->m_apiCountryModel->updateModel(apiV2->apiConfig.availableCountries,
-                                                           apiV2->apiConfig.serverCountryCode,
-                                                           apiV2->apiConfig.userCountryCode);
-    });
-}
-
-void CoreSignalHandlers::initSubscriptionRefreshHandler()
-{
-    connect(m_coreController->m_subscriptionUiController, &SubscriptionUiController::subscriptionRefreshNeeded, this, [this]() {
-        const QString defaultServerId = m_coreController->m_serversController->getDefaultServerId();
-        if (!defaultServerId.isEmpty()) {
-            m_coreController->m_subscriptionUiController->getAccountInfo(defaultServerId, false);
-        }
-    });
-}
-
 void CoreSignalHandlers::initTranslationsUpdatedHandler()
 {
     connect(m_coreController->m_languageUiController, &LanguageUiController::updateTranslations, m_coreController, &CoreController::updateTranslator);
     connect(m_coreController, &CoreController::translationsUpdated, m_coreController->m_languageUiController, &LanguageUiController::translationsUpdated);
     connect(m_coreController, &CoreController::translationsUpdated, m_coreController->m_connectionUiController, &ConnectionUiController::onTranslationsUpdated);
-
-    const QVector<ApiCountryListModel *> countryListModels { m_coreController->m_apiCountryListModel,
-                                                             m_coreController->m_apiConfigsCountryListModel };
-    auto applyUiLanguage = [this, countryListModels]() {
-        const QString languageCode = QLocale::languageToCode(m_coreController->m_settingsController->getAppLanguage().language());
-        for (ApiCountryListModel *model : countryListModels) {
-            model->setUiLanguage(languageCode);
-        }
-    };
-    applyUiLanguage();
-    connect(m_coreController, &CoreController::translationsUpdated, this, applyUiLanguage);
 }
 
 void CoreSignalHandlers::initLanguageHandler()
@@ -225,9 +135,6 @@ void CoreSignalHandlers::initLanguageHandler()
     connect(m_coreController->m_appSettingsRepository, &SecureAppSettingsRepository::appLanguageChanged, m_coreController->m_languageUiController, &LanguageUiController::onAppLanguageChanged);
     connect(m_coreController->m_settingsUiController, &SettingsUiController::resetLanguageToSystem, m_coreController->m_languageUiController, [this]() {
         m_coreController->m_languageUiController->changeLanguage(m_coreController->m_languageUiController->getSystemLanguageEnum());
-    });
-    connect(m_coreController->m_settingsUiController, &SettingsUiController::appLanguageChanged, m_coreController->m_languageUiController, [this]() {
-        m_coreController->m_languageUiController->onAppLanguageChanged(m_coreController->m_settingsController->getAppLanguage());
     });
 }
 
@@ -254,20 +161,6 @@ void CoreSignalHandlers::initServersModelUpdateHandler()
             m_coreController->m_serversUiController, &ServersUiController::updateModel);
     connect(m_coreController->m_serversRepository, &SecureServersRepository::defaultServerChanged,
             m_coreController->m_serversUiController, &ServersUiController::onDefaultServerChanged);
-
-    connect(m_coreController->m_serversRepository, &SecureServersRepository::serverAdded, this,
-            [this](const QString &serverId) {
-                if (m_coreController->m_serversRepository->apiV2Config(serverId).has_value()) {
-                    m_coreController->m_apiNewsUiController->fetchNews(false);
-                }
-            });
-
-    connect(m_coreController->m_settingsUiController, &SettingsUiController::restoreBackupFinished, this, [this]() {
-        m_coreController->m_serversUiController->updateModel();
-        if (m_coreController->m_serversUiController->hasServersFromGatewayApi()) {
-            m_coreController->m_apiNewsUiController->fetchNews(false);
-        }
-    });
 }
 
 void CoreSignalHandlers::initSitesModelUpdateHandler()
@@ -300,39 +193,15 @@ void CoreSignalHandlers::initPrepareConfigHandler()
             return;
         }
 
-        const serverConfigUtils::ConfigType kind = m_coreController->m_serversRepository->serverKind(serverId);
-
-        if (serverConfigUtils::isApiV2Subscription(kind) || serverConfigUtils::isLegacyApiSubscription(kind)) {
-            m_coreController->m_subscriptionUiController->validateConfig();
-        } else {
-            // Fork: no SSH provisioning, the stored client config is used as is
-            const ErrorCode errorCode = m_coreController->m_serversController->validateClientConfig(serverId);
-            if (errorCode != ErrorCode::NoError) {
-                emit m_coreController->m_pageController->showErrorMessage(errorCode);
-                m_coreController->m_connectionController->setConnectionState(Vpn::ConnectionState::Disconnected);
-                return;
-            }
-            m_coreController->m_connectionUiController->openConnection();
-        }
-    });
-
-    connect(m_coreController->m_subscriptionUiController, &SubscriptionUiController::configValidated, this, [this](bool isValid) {
-        if (!isValid) {
+        // Fork: no SSH provisioning, the stored client config is used as is
+        const ErrorCode errorCode = m_coreController->m_serversController->validateClientConfig(serverId);
+        if (errorCode != ErrorCode::NoError) {
+            emit m_coreController->m_pageController->showErrorMessage(errorCode);
             m_coreController->m_connectionController->setConnectionState(Vpn::ConnectionState::Disconnected);
             return;
         }
-
         m_coreController->m_connectionUiController->openConnection();
     });
-}
-
-void CoreSignalHandlers::initUnsupportedConnectDrawerHandler()
-{
-    connect(m_coreController->m_subscriptionUiController, &SubscriptionUiController::unsupportedConnectDrawerRequested,
-            m_coreController->m_pageController, &PageController::unsupportedConnectDrawerRequested);
-
-    connect(m_coreController->m_connectionUiController, &ConnectionUiController::unsupportedConnectDrawerRequested,
-            m_coreController->m_pageController, &PageController::unsupportedConnectDrawerRequested);
 }
 
 void CoreSignalHandlers::initStrictKillSwitchHandler()
@@ -378,11 +247,6 @@ void CoreSignalHandlers::initIosImportHandler()
         m_coreController->m_importController->extractConfigFromData(data);
         emit m_coreController->m_pageController->goToPageViewConfig();
     });
-    connect(IosController::Instance(), &IosController::importBackupFromOutside, this, [this](QString filePath) {
-        emit m_coreController->m_pageController->goToPageHome();
-        m_coreController->m_pageController->goToPageSettingsBackup();
-        emit m_coreController->m_settingsUiController->importBackupFromOutside(filePath);
-    });
 #endif
 }
 
@@ -412,11 +276,3 @@ void CoreSignalHandlers::initNotificationHandler()
     connect(m_coreController, &CoreController::websiteUrlChanged, trayHandler, &SystemTrayNotificationHandler::updateWebsiteUrl);
 #endif    
 }
-
-void CoreSignalHandlers::initUpdateFoundHandler()
-{
-    connect(m_coreController->m_updateUiController, &UpdateUiController::updateFound, this, [this]() {
-        emit m_coreController->m_pageController->goToPage(PageLoader::PageEnum::PageUpdate);
-    });
-}
-

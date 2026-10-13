@@ -4,7 +4,7 @@ This repo (`kiraind/amnezia-client`, default branch `dev`) is a fork of
 [amnezia-vpn/amnezia-client](https://github.com/amnezia-vpn/amnezia-client). It ships as
 **Лёша VPN** (`LeshaVPN`, app id `ru.kiraind.vpn`) and installs side by side with the official
 AmneziaVPN. Its purpose: log in to a self-hosted VPN coordinator (Telegram-backed account) and get
-auto-updated AmneziaWG configs, with Amnezia's own commercial/gateway features hidden or disabled.
+auto-updated AmneziaWG configs, with Amnezia's own commercial/gateway features removed.
 
 Upstream base of the fork: `f1af8ef`. Inventory: `git log --oneline f1af8ef..HEAD`,
 `git diff --stat f1af8ef..HEAD` (after each upstream sync, the base becomes the merged upstream
@@ -27,7 +27,7 @@ Fork-only files (never conflict; upstream doesn't have them, but check that APIs
 - `client/tests/testCoordinatorController.cpp` (mock API test, `CoordinatorControllerTest`)
 
 Fork hunks in upstream files (conflict-prone):
-- `client/core/repositories/secureAppSettingsRepository.{h,cpp}` — `coordinatorBaseUrl/Token/User/Configs/ApiAddress` accessors + `clearCoordinatorAccount()`; not part of app backups.
+- `client/core/repositories/secureAppSettingsRepository.{h,cpp}` — `coordinatorBaseUrl/Token/User/Configs/ApiAddress` accessors + `clearCoordinatorAccount()` (app backups no longer exist, §9.3).
 - `client/vpnConnection.cpp` (`appendSplitTunnelingConfig`, before `splitTunnelType` is stored) — the last known coordinator
   IP (`coordinatorApiAddress`) is excluded from the tunnel ("all sites" becomes "all except" that one address), so a dead
   entry server can't block the update that replaces it. `CoordinatorApi` retries by that IP (SNI/Host keep the name) when DNS fails.
@@ -62,16 +62,18 @@ the "Other connection options" label, and the `fileOpen`/`qrScan` entries (their
 just not listed), because imported configs don't auto-update. The intro text is the fork's Russian line.
 How to resolve: take upstream's file for new/changed code, then delete the removed variants again and
 keep the fork's list. Any NEW upstream option that goes to Amnezia's gateway/shop/site must also be dropped.
-Related: `PageSettingsAbout.qml`, `PageSettingsApplication.qml` (update UI gated by `IsAppUpdatesEnabled`),
+Related: `PageSettingsAbout.qml`, `PageSettingsApplication.qml` (update UI removed, §4),
 `PageSettings.qml` ("О приложении %1" with `Qt.application.displayName`).
 
-## 4. App updates disabled
-- `client/cmake/branding/common.cmake` — `CLIENT_ENABLE_APP_UPDATES` defaults to `0`.
-- `client/amneziaApplication.cpp` — QML context property `IsAppUpdatesEnabled`; update check under `#if CLIENT_ENABLE_APP_UPDATES`.
-- `client/core/controllers/updateController.cpp` — `#if !CLIENT_ENABLE_APP_UPDATES` early-out.
-- QML: update buttons `visible: IsAppUpdatesEnabled`.
-How to resolve: keep the gating. If upstream adds a new update/check path (new controller, new QML button,
-new gateway "latest version" call), wrap it in the same `CLIENT_ENABLE_APP_UPDATES` / `IsAppUpdatesEnabled` gate.
+## 4. App updates removed
+The fork ships through its own GitHub Releases, so upstream's update checker (which asks Amnezia's gateway/S3 for the
+latest version and downloads installers) is deleted rather than gated (§9.3): `updateController.*`, `updateUiController.*`,
+`Pages2/PageUpdate.qml`, `Components/UpdateSupportDrawer.qml`, `client/client_scripts/` (`mac_installer.sh`), `images/update/*`,
+the `CLIENT_ENABLE_APP_UPDATES` cmake option and define, the `IsAppUpdatesEnabled` QML property, the About page's
+"check for updates" button, the "auto update check" switch in `PageSettingsApplication.qml`, and the
+`APP_IOS_BUNDLE_ID` / `APP_IOS_STORE_URL_FALLBACK` defines (`cmake/branding/ios.cmake`, `core/utils/appUiConfig.h.in`).
+How to resolve: never re-add an upstream update path. If upstream changes the deleted files, keep them deleted; if it adds a
+new update/check path (new controller, QML button, gateway "latest version" call), drop it.
 
 ## 5. Rebrand (names, ids, IPC, sockets, installers)
 Commit `7ddc416`. Single source of truth: `client/cmake/branding/*.cmake`:
@@ -132,7 +134,7 @@ Port only useful upstream changes manually (Qt version bump, new conan/toolchain
 New upstream workflows: delete them unless they are generic and safe (no Amnezia secrets/servers).
 
 ## 8. Versioning
-- `AMNEZIAVPN_VERSION` (root `CMakeLists.txt`) = the upstream base version the fork is built on (e.g. `5.0.3.1`); `APP_ANDROID_VERSION_CODE` likewise comes from upstream. `APP_VERSION` (upstream's) is still what goes to Amnezia's gateway code paths.
+- `AMNEZIAVPN_VERSION` (root `CMakeLists.txt`) = the upstream base version the fork is built on (e.g. `5.0.3.1`); `APP_ANDROID_VERSION_CODE` likewise comes from upstream. `APP_VERSION` (upstream's) is now only used by `Constants::versionString()` (Windows tunnel daemon); the gateway code that sent it is deleted (§9.3).
 - `LESHA_VERSION` = fork release counter (positive integer, CACHE, default 1), bumped by 1 for every fork release and **never reset**, not even on an upstream merge. Configure fails if it reaches 100.
 - Derived in one block of root `CMakeLists.txt` (the only place they are computed), e.g. for `5.0.3.1` + `1`:
   - `LESHA_FULL_VERSION` `5.0.3.1-lesha.1`: About page, `X-App-Version` (via the `APP_FULL_VERSION` define in `version.h.in`), Android versionName, package file names.
@@ -182,7 +184,7 @@ client config they already hold, can be renamed and removed; the `SelfHostedAdmi
   `core/controllers/serversController.{h,cpp}` (`updateClientConfig`, `validateClientConfig` moved from `InstallController`),
   `core/controllers/coreController.{h,cpp}`, `core/controllers/coreSignalHandlers.{h,cpp}` (connect of a self-hosted/native server
   validates via `ServersController::validateClientConfig`, no SSH provisioning), `core/controllers/updateController.cpp`
-  (reads `:/client_scripts/mac_installer.sh` directly), `ui/controllers/connectionUiController.{h,cpp}` (`noInstalledContainers`,
+  (read `:/client_scripts/mac_installer.sh` directly; the file is now deleted, §9.3), `ui/controllers/connectionUiController.{h,cpp}` (`noInstalledContainers`,
   `isRevokeBlockedDuringActiveConnection`), `ui/controllers/serversUiController.{h,cpp}` (`removeServerFinished`),
   `ui/controllers/settingsUiController.{h,cpp}` (`ipAddressRegExp`), `ui/controllers/qml/pageController.h` (passphrase, share and
   services signals), `ui/models/protocolsModel.{h,cpp}` (`serverProtocolPage` role), `ui/models/serversModel.{h,cpp}`,
@@ -194,6 +196,61 @@ client config they already hold, can be renamed and removed; the `SelfHostedAdmi
   `client/tests/{CMakeLists.txt,utils/testCoreController.h}`, `.github/workflows/deploy.yml` (ctest `-E` list), `THIRD_PARTY_LICENSES.md`.
 - Left for the protocol cleanup: `Pages2/PageProtocol{OpenVpnSettings,Xray*}.qml` (server-side settings) are no longer reachable
   (the "server settings" entry and `ProtocolsModel`'s `serverProtocolPage` role are gone) and still call the removed `InstallController`.
+
+### 9.3 Amnezia gateway (premium/free VPN, news, purchases), update checker and settings backup
+The app no longer talks to Amnezia's gateway at all: no "VPN by Amnezia" (premium/free/trial) configs, country lists,
+subscriptions, device lists, native config export, purchases (Android Play Billing), news, captcha, support links or
+update checks (§4), and no settings backup/restore (the backup file carried gateway-era settings, and the coordinator
+re-issues configs anyway). Gateway configs (`config_version` 1 = Telegram, 2 = AmneziaGateway) are rejected on import
+(`ImportInvalidConfigError`, as are backup files) and skipped when stored ones load:
+`serverConfigUtils::configTypeFromJson` returns `Invalid` for them. The `ConfigType` enum values are kept so the numbering
+stays stable. The Android `oss` product flavor (dimension `billing`) is kept with no billing code, so the APK output paths and
+`onlyOssRelease` (§5) keep working; the `play` flavor and the `:billing` module are gone.
+- Deleted: `client/core/controllers/gatewayController.*`, `client/core/controllers/api/*` (news, servicesCatalog,
+  storePurchase, subscription), `client/core/utils/api/*` (apiUtils, countryCatalog, gatewayPayloadBuilder),
+  `client/core/utils/payloadSender.*`, `client/core/utils/constants/apiKeys.h`, `client/core/models/api/*` (apiConfig,
+  apiV2ServerConfig, authData, legacyApiServerConfig), `client/core/controllers/updateController.*`,
+  `client/ui/controllers/updateUiController.*`, `client/ui/controllers/api/*`, `client/ui/models/api/*`,
+  `client/ui/models/newsModel.*`, `client/android/billing/`, `client/android/play/`,
+  `client/android/oss/org/amnezia/vpn/BillingPaymentRepository.kt`, `client/android/src/org/amnezia/vpn/BillingRepository.kt`,
+  `client/client_scripts/` (with `clientScripts.qrc`), `client/images/flagKit/` (with `flagKit.qrc`),
+  `client/resources/countries.qrc` + `countries/regions.json`, `client/images/update/*`, now-unused
+  `client/images/controls/{archive-restore,arrow-left-right,bug,chevron-up,download,external-link,eye,gauge,globe-2,headphones,
+  help-circle,history,infinity,monitor,news,news-unread,refresh-cw,search,settings-news,share-2,smartphone,sort-desc,star,
+  star-filled,tag,unread-dot}.svg`, tests `client/tests/api/`, `client/tests/{testBackupExportImport,testAndroidRestoreBackup}.cpp`,
+  QML `Pages2/{PageSettingsApi*,PageSetupWizardApi*,PageSettingsNewsDetail,PageSettingsNewsNotifications,PageSettingsBackup,
+  PageDevMenu,PageUpdate}.qml`, `Components/{AdLabel,BenefitRow,BenefitsPanel,CountriesEmptyState,CountryListStickyHeader,
+  CountrySearchField,CountrySearchRow,CountrySectionHeader,CountryUseCaseChips,SortCountriesDrawer,SubscriptionExpiredDrawer,
+  SubscriptionPlanCard,TermsAndPrivacyText,UpdateSupportDrawer}.qml`, `Config/CountryRegionNames.qml`,
+  `Controls2/{BackdropBlurType,CaptchaDialogType,ChangelogSectionType,CollapsingHeaderType,LabelWithImageType,TagBadgeType,
+  ToastType}.qml`, `Controls2/TextTypes/{AppCaptionTextType,AppDisplayTextType,AppH1TextType,AppH3EmphasizedTextType,
+  AppH3TextType,AppSmallTextType,AppTextType}.qml`.
+- Hunks: `client/CMakeLists.txt` (gateway endpoint/key defines `PROD_AGW_PUBLIC_KEY`, `*_S3_ENDPOINT`, `DEV_AGW_*`,
+  `FREE_V2_ENDPOINT`, `PREM_V1_ENDPOINT`; flagKit/countries/clientScripts qrc), `client/cmake/branding/{common,ios}.cmake`,
+  `client/core/utils/appUiConfig.h.in`, `client/cmake/sources.cmake`, `client/cmake/android.cmake` (`ANDROID_BUILD_PLAY`,
+  `android_play_*` targets), `deploy/build.sh` (`--play`/`--apk`; the AAB step always uses the `aab` target),
+  `client/android/{build.gradle.kts,settings.gradle.kts,gradle/libs.versions.toml}`, `AmneziaActivity.kt` (billing methods,
+  `isPlay`, `getCountryCode`), `client/platforms/android/android_controller.{h,cpp}` (same JNI methods),
+  `client/amneziaApplication.cpp` (`IsAppUpdatesEnabled`, `IsPlayBuild`, update check), `core/controllers/coreController.{h,cpp}`,
+  `core/controllers/coreSignalHandlers.{h,cpp}` (country list, subscription, update, news, backup handlers; connect always
+  validates the client config), `core/controllers/settingsController.{h,cpp}`, `core/repositories/secureAppSettingsRepository.{h,cpp}`
+  (gateway endpoint, country sort/favorites, news, auto update, ad label, backup), `client/secureQSettings.{h,cpp}`
+  (backup/restore; `"Conf/favoriteLocations"` dropped from `encryptedKeys`), `core/repositories/secureServersRepository.{h,cpp}`,
+  `core/models/serverDescription.{h,cpp}`, `core/utils/serverConfigUtils.{h,cpp}`, `core/controllers/serversController.{h,cpp}`,
+  `core/controllers/connectionController.{h,cpp}`, `client/vpnConnection.cpp` (api config cases),
+  `core/controllers/selfhosted/importController.{h,cpp}`, `ui/controllers/{importUiController,connectionUiController,
+  serversUiController,settingsUiController}.{h,cpp}`, `ui/controllers/qml/pageController.h`, `ui/models/serversModel.{h,cpp}`
+  (gateway/subscription roles), `client/images/images.qrc`, `ui/utils/pageEnum.h`, `ui/qml/qml.qrc`, `ui/qml/Config/qmldir`,
+  `ui/qml/main2.qml` (captcha, subscription-expired and unsupported-connect drawers), `Pages2/{PageHome,PageSettings,
+  PageSettingsAbout,PageSettingsApplication,PageSettingsServersList,PageSettingsServerData,PageSettingsServerInfo,PageSettingsDns,
+  PageSettingsSplitTunneling,PageStart,PageSetupWizardConfigSource}.qml`, `Components/ServersListView.qml`,
+  `client/tests/{CMakeLists.txt,run_android_tests.sh,testSettingsSignals.cpp,testConfigFormatVersion.cpp,utils/testUtils.cpp,
+  utils/testCoreController.h}`, `.claude/skills/sync-upstream/SKILL.md`.
+- Kept on purpose: `core/utils/errorCodes.h` (the Billing codes stay, numbering matches Android `ErrorCode.kt`),
+  `core/utils/constants/apiConstants.h` (used by the coordinator API), `ConnectionSettings::isApiConfig` (read by
+  `OpenVpnConfigurator`, always `false` now), `SecureAppSettingsRepository::getInstallationUuid`, the iOS StoreKit/purchase code
+  in `platforms/ios` (iOS is not built by the fork; remove it if iOS is ever enabled), `qrCodeUtils` + `qrcodegen`
+  (`ImportController` uses `qrMagicCode` to parse QR chunks).
 
 ## Translations
 Fork UI strings are Russian source text inside `qsTr(...)` (e.g. "Аккаунт VPN"). The fork does not edit `client/translations/*.ts`,

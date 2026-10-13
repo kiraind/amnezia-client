@@ -62,7 +62,6 @@ signals:
     void goToPageHome();
     void goToPageSettings();
     void goToPageViewConfig();
-    void goToPageSettingsBackup();
 
     void closePage();
 
@@ -78,8 +77,6 @@ signals:
 
     void hideMainWindow();
     void raiseMainWindow();
-
-    void unsupportedConnectDrawerRequested();
 
     void escapePressed();
     void closeTopDrawer();

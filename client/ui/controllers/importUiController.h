@@ -46,7 +46,6 @@ signals:
     void importFinished();
     void importErrorOccurred(ErrorCode errorCode, bool goToPageHome);
     void qrDecodingFinished();
-    void restoreAppConfig(const QByteArray &data);
     void importConfigChanged();
 
 private:

@@ -14,18 +14,6 @@ import "../Components"
 PageType {
     id: root
 
-    Connections {
-        target: UpdateController
-
-        function onUpdateNotFound() {
-            PageController.showNotificationMessage(qsTr("You have the latest version of AmneziaVPN").replace("AmneziaVPN", Qt.application.displayName))
-        }
-
-        function onUpdateCheckFailed() {
-            PageController.showNotificationMessage(qsTr("Failed to check for updates"))
-        }
-    }
-
     BackButtonType {
         id: backButton
 
@@ -130,45 +118,6 @@ PageType {
 
                 text: qsTr("Software version: %1").arg(SettingsController.getAppVersion())
                 color: AmneziaStyle.color.mutedGray
-
-                MouseArea {
-                    property int clickCount: 0
-                    anchors.fill: parent
-                    onClicked: {
-                        if (clickCount > 10) {
-                            SettingsController.enableDevMode()
-                        } else {
-                            clickCount++
-                        }
-                    }
-                }
-            }
-
-            BasicButtonType {
-                id: checkUpdatesButton
-
-                visible: IsAppUpdatesEnabled
-
-                Layout.alignment: Qt.AlignHCenter
-                Layout.topMargin: 8
-                Layout.bottomMargin: 16
-                implicitHeight: 48
-
-                defaultColor: AmneziaStyle.color.surfaceBase
-                hoveredColor: AmneziaStyle.color.surfaceHovered
-                pressedColor: AmneziaStyle.color.surfacePressed
-                disabledColor: AmneziaStyle.color.surfaceBase
-                textColor: AmneziaStyle.color.surfaceInverse
-                borderWidth: 1
-                borderColor: AmneziaStyle.color.borderSoft
-
-                enabled: !UpdateController.isCheckRunning
-
-                text: UpdateController.isCheckRunning ? qsTr("Checking...") : qsTr("Check for updates")
-
-                clickedFunc: function() {
-                    UpdateController.checkForUpdates()
-                }
             }
 
             BasicButtonType {

@@ -8,23 +8,14 @@
 #include "core/utils/errorCodes.h"
 #include "core/utils/routeModes.h"
 #include "core/utils/commonStructs.h"
-#include "core/utils/serverConfigUtils.h"
-#include "core/utils/constants/apiKeys.h"
-#include "core/utils/constants/apiConstants.h"
 #include "core/utils/constants/configKeys.h"
 #include "core/utils/networkUtilities.h"
 
 using namespace amnezia;
 
-namespace {
-    constexpr char gatewayEndpoint[] = "http://gw.amnezia.org:80/";
-}
-
 SecureAppSettingsRepository::SecureAppSettingsRepository(SecureQSettings* settings, QObject *parent)
     : QObject(parent), m_settings(settings)
 {
-    QString storedEndpoint = value("Conf/gatewayEndpoint", gatewayEndpoint).toString();
-    m_gatewayEndpoint = storedEndpoint.isEmpty() ? gatewayEndpoint : storedEndpoint;
 }
 
 QVariant SecureAppSettingsRepository::value(const QString &key, const QVariant &defaultValue) const
@@ -270,60 +261,6 @@ void SecureAppSettingsRepository::setAppsSplitTunnelingEnabled(bool enabled)
     emit appsSplitTunnelingEnabledChanged(enabled);
 }
 
-QString SecureAppSettingsRepository::getGatewayEndpoint(bool isTestPurchase) const
-{
-    if (isTestPurchase) {
-        return QString(DEV_AGW_ENDPOINT);
-    }
-    return m_gatewayEndpoint;
-}
-
-void SecureAppSettingsRepository::setGatewayEndpoint(const QString &endpoint)
-{
-    m_gatewayEndpoint = endpoint;
-    setValue("Conf/gatewayEndpoint", endpoint);
-}
-
-void SecureAppSettingsRepository::resetGatewayEndpoint()
-{
-    m_gatewayEndpoint = gatewayEndpoint;
-    setValue("Conf/gatewayEndpoint", gatewayEndpoint);
-}
-
-void SecureAppSettingsRepository::setDevGatewayEndpoint()
-{
-    m_gatewayEndpoint = QString(DEV_AGW_ENDPOINT);
-    setValue("Conf/gatewayEndpoint", DEV_AGW_ENDPOINT);
-}
-
-bool SecureAppSettingsRepository::isDevGatewayEnv(bool isTestPurchase) const
-{
-    return isTestPurchase ? true : value("Conf/devGatewayEnv", false).toBool();
-}
-
-void SecureAppSettingsRepository::toggleDevGatewayEnv(bool enabled)
-{
-    setValue("Conf/devGatewayEnv", enabled);
-}
-
-QByteArray SecureAppSettingsRepository::readGatewayProxyUrls(const QString &cacheKey) const
-{
-    if (cacheKey.isEmpty()) {
-        return {};
-    }
-
-    return value(QStringLiteral("Conf/proxyUrls/") + cacheKey).toByteArray();
-}
-
-void SecureAppSettingsRepository::writeGatewayProxyUrls(const QString &cacheKey, const QByteArray &proxyUrlsEncrypted)
-{
-    if (cacheKey.isEmpty()) {
-        return;
-    }
-
-    setValue(QStringLiteral("Conf/proxyUrls/") + cacheKey, proxyUrlsEncrypted);
-}
-
 bool SecureAppSettingsRepository::isKillSwitchEnabled() const
 {
     return value("Conf/killSwitchEnabled", true).toBool();
@@ -375,46 +312,6 @@ void SecureAppSettingsRepository::setScreenshotsEnabled(bool enabled)
     emit screenshotsEnabledChanged(enabled);
 }
 
-int SecureAppSettingsRepository::countryListSortMode(const QString &listId) const
-{
-    return value("Conf/countryListSortMode/" + listId, 0).toInt();
-}
-
-void SecureAppSettingsRepository::setCountryListSortMode(const QString &listId, int mode)
-{
-    setValue("Conf/countryListSortMode/" + listId, mode);
-}
-
-QStringList SecureAppSettingsRepository::favoriteLocations() const
-{
-    return value("Conf/favoriteLocations").toStringList();
-}
-
-void SecureAppSettingsRepository::setFavoriteLocations(const QStringList &codes)
-{
-    setValue("Conf/favoriteLocations", codes);
-}
-
-bool SecureAppSettingsRepository::isNewsNotifications() const
-{
-    return value("Conf/newsNotifications", true).toBool();
-}
-
-void SecureAppSettingsRepository::setNewsNotifications(bool enabled)
-{
-    setValue("Conf/newsNotifications", enabled);
-}
-
-bool SecureAppSettingsRepository::isAutoUpdateCheckEnabled() const
-{
-    return value("Conf/autoUpdateCheck", true).toBool();
-}
-
-void SecureAppSettingsRepository::setAutoUpdateCheckEnabled(bool enabled)
-{
-    setValue("Conf/autoUpdateCheck", enabled);
-}
-
 bool SecureAppSettingsRepository::isSaveLogs() const
 {
     return value("Conf/saveLogs", false).toBool();
@@ -450,36 +347,6 @@ QString SecureAppSettingsRepository::getInstallationUuid(bool createIfNotExists)
         const_cast<SecureAppSettingsRepository*>(this)->setValue("Conf/installationUuid", uuid);
     }
     return uuid;
-}
-
-QStringList SecureAppSettingsRepository::getReadNewsIds() const
-{
-    return value("News/readIds").toStringList();
-}
-
-void SecureAppSettingsRepository::setReadNewsIds(const QStringList &ids)
-{
-    setValue("News/readIds", ids);
-}
-
-bool SecureAppSettingsRepository::isHomeAdLabelVisible() const
-{
-    return value("Conf/homeAdLabelVisible", true).toBool();
-}
-
-void SecureAppSettingsRepository::disableHomeAdLabel()
-{
-    setValue("Conf/homeAdLabelVisible", false);
-}
-
-QByteArray SecureAppSettingsRepository::backupAppConfig() const
-{
-    return m_settings->backupAppConfig();
-}
-
-bool SecureAppSettingsRepository::restoreAppConfig(const QByteArray &cfg)
-{
-    return m_settings->restoreAppConfig(cfg);
 }
 
 void SecureAppSettingsRepository::clearSettings()

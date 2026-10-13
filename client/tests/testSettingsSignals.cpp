@@ -176,29 +176,6 @@ private slots:
         }
     }
 
-    void testGatewayEndpointSignals() {
-        QSignalSpy gatewayEndpointChangedSpy(m_coreController->m_settingsUiController, &SettingsUiController::gatewayEndpointChanged);
-        QSignalSpy devGatewayEnvChangedSpy(m_coreController->m_settingsUiController, &SettingsUiController::devGatewayEnvChanged);
-
-        QString initialEndpoint = m_coreController->m_settingsController->getGatewayEndpoint();
-        QString newEndpoint = "https://test-gateway.example.com";
-
-        m_coreController->m_settingsUiController->setGatewayEndpoint(newEndpoint);
-        QVERIFY2(gatewayEndpointChangedSpy.count() == 1, "gatewayEndpointChanged signal should be emitted");
-        QVERIFY2(gatewayEndpointChangedSpy.at(0).at(0).toString() == newEndpoint, "gatewayEndpointChanged should emit correct endpoint");
-        QVERIFY2(m_coreController->m_settingsController->getGatewayEndpoint() == newEndpoint, "Gateway endpoint should be updated in SettingsController");
-        QVERIFY2(m_coreController->m_settingsUiController->getGatewayEndpoint() == newEndpoint, "Gateway endpoint should be available in SettingsUiController");
-        QVERIFY2(m_coreController->m_appSettingsRepository->getGatewayEndpoint() == newEndpoint, "Gateway endpoint should be available in SecureAppSettingsRepository");
-
-        bool initialDevEnv = m_coreController->m_settingsController->isDevGatewayEnv();
-        m_coreController->m_settingsUiController->toggleDevGatewayEnv(!initialDevEnv);
-        QVERIFY2(devGatewayEnvChangedSpy.count() == 1, "devGatewayEnvChanged signal should be emitted");
-        QVERIFY2(devGatewayEnvChangedSpy.at(0).at(0).toBool() == !initialDevEnv, "devGatewayEnvChanged should emit correct value");
-        QVERIFY2(m_coreController->m_settingsController->isDevGatewayEnv() == !initialDevEnv, "Dev gateway env state should be updated in SettingsController");
-        QVERIFY2(m_coreController->m_settingsUiController->isDevGatewayEnv() == !initialDevEnv, "Dev gateway env state should be available in SettingsUiController");
-        QVERIFY2(m_coreController->m_appSettingsRepository->isDevGatewayEnv() == !initialDevEnv, "Dev gateway env state should be available in SecureAppSettingsRepository");
-    }
-
     void testSettingsClearedSignal() {
         QSignalSpy settingsClearedSpy(m_coreController->m_appSettingsRepository, &SecureAppSettingsRepository::settingsCleared);
 

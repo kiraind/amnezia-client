@@ -14,21 +14,6 @@ import "../Config"
 PageType {
     id: root
 
-    Connections {
-        target: ApiNewsController
-        function onFetchNewsFinished() {
-            PageController.showBusyIndicator(false)
-        }
-        
-        function onErrorOccurred(errorCode, showError) {
-            if (showError) {
-                PageController.showErrorMessage(errorCode)
-                PageController.closePage()
-                PageController.showBusyIndicator(false)
-            }
-        }
-    }
-
     ListViewType {
         id: listView
 
@@ -106,10 +91,7 @@ PageType {
         coordinatorAccount,
         connection,
         application,
-        news,
-        backup,
-        about,
-        devConsole
+        about
     ]
 
     QtObject {
@@ -161,33 +143,6 @@ PageType {
     }
 
     QtObject {
-        id: news
-
-        property string title: qsTr("News & Notifications")
-        readonly property string leftImagePath: NewsModel.hasUnread && SettingsController.isNewsNotificationsEnabled() ? "qrc:/images/controls/news-unread.svg" : "qrc:/images/controls/news.svg"
-        property bool isVisible: ServersUiController.hasServersFromGatewayApi
-        readonly property var clickedHandler: function() {
-            if (!ServersUiController.hasServersFromGatewayApi) {
-                return;
-            }
-            PageController.showBusyIndicator(true)
-            ApiNewsController.fetchNews(true)
-            PageController.goToPage(PageEnum.PageSettingsNewsNotifications)
-        }
-    }
-
-    QtObject {
-        id: backup
-
-        property string title: qsTr("Backup")
-        readonly property string leftImagePath: "qrc:/images/controls/save.svg"
-        property bool isVisible: true
-        readonly property var clickedHandler: function() {
-            PageController.goToPage(PageEnum.PageSettingsBackup)
-        }
-    }
-
-    QtObject {
         id: about
 
         property string title: qsTr("О приложении %1").arg(Qt.application.displayName)
@@ -195,17 +150,6 @@ PageType {
         property bool isVisible: true
         readonly property var clickedHandler: function() {
             PageController.goToPage(PageEnum.PageSettingsAbout)
-        }
-    }
-
-    QtObject {
-        id: devConsole
-
-        property string title: qsTr("Dev console")
-        readonly property string leftImagePath: "qrc:/images/controls/bug.svg"
-        property bool isVisible: SettingsController.isDevModeEnabled
-        readonly property var clickedHandler: function() {
-            PageController.goToPage(PageEnum.PageDevMenu)
         }
     }
 }

@@ -14,8 +14,9 @@ conflicts in each. Resolve conflicts **by intent** (keep upstream's new behaviou
 - Never take upstream's branding/ids wholesale: app name, `org.amnezia.*` ids, IPC/socket/pipe names,
   service names, installer GUIDs, Apple team id, logo/wordmark images (see FORK.md §5, §6).
 - Never take upstream's CI workflows wholesale (`deploy.yml` is fork-owned; `tag-deploy.yml`/`tag-upload.yml` stay deleted).
-- Never re-enable app updates (`CLIENT_ENABLE_APP_UPDATES` stays 0) or Amnezia gateway/commercial features
-  (VPN by Amnezia, subscriptions/purchases, Amnezia site links, news/promo from Amnezia servers) in the UI.
+- Never bring back the app update checker, settings backup/restore or Amnezia gateway/commercial features
+  (VPN by Amnezia, subscriptions/purchases, Amnezia site links, news/promo from Amnezia servers): they are
+  deleted from the fork (FORK.md §4, §9.3).
 - Never change `LESHA_VERSION` semantics; never reuse a released tag.
 
 ## 1. Prepare remotes
@@ -47,7 +48,8 @@ git status   # list conflicts
   If upstream refactored APIs the coordinator uses, adapt coordinator code.
 - **MTU (§2):** keep "issuer MTU if smaller than default" in `processAmneziaConfig`.
 - **Connection screen (§3):** take upstream, then keep only `coordinatorLogin`, `fileOpen`, `qrScan`; drop new Amnezia/gateway options.
-- **App updates (§4):** keep `CLIENT_ENABLE_APP_UPDATES` / `IsAppUpdatesEnabled` gates; gate any new update path.
+- **App updates (§4) / gateway, news, purchases, backup (§9.3):** keep the deleted files deleted; drop upstream hunks that
+  call them; any new update/gateway/purchase path is not added to the build.
 - **Rebrand (§5):** upstream logic + branding variables/macros. Upstream edits to files the fork turned into `.in`
   templates → port into the template, delete the literal file.
 - **Icons (§6):** binary conflicts → `git checkout --ours <file>`; new/changed upstream logo images → re-flip (rule in FORK.md §6).
@@ -74,7 +76,7 @@ git grep -nE "gateway|updateController|checkForUpdates|api\.amnezia|amnezia\.org
 git diff <old-base>..<tag> --stat -- client/ui/qml/Pages2/PageSetupWizard* client/images client/android/res client/ios client/macos deploy
 ```
 Fix: user-visible names → `DISPLAY_NAME`/`Qt.application.displayName`; ids/paths/sockets/services → branding vars;
-new connection-screen options → remove; new update checks → gate; new logo images → re-flip.
+new connection-screen options → remove; new update checks or gateway calls → remove; new logo images → re-flip.
 Commit fixes on the sync branch as separate commits (`fix: rebrand ... from upstream <version>`).
 
 ## 7. Verify
