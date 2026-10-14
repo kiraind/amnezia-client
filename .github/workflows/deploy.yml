@@ -1,8 +1,12 @@
 name: 'Build'
 
 # Builds installable Лёша VPN (LeshaVPN) packages for Linux, Windows, macOS and
-# Android, and publishes them to a GitHub Release when a `v*` tag is pushed. The tag must be
-# v<AMNEZIAVPN_VERSION>-lesha.<LESHA_VERSION> (root CMakeLists.txt), optionally with -rcN/-betaN.
+# Android, and publishes them to a GitHub Release:
+#   - on every push to dev (a merged PR) whose version has no release yet: the job creates the tag
+#     v<AMNEZIAVPN_VERSION>-lesha.<LESHA_VERSION> (root CMakeLists.txt) itself. A push that does not
+#     bump LESHA_VERSION finds the tag already there and publishes nothing.
+#   - when a `v*` tag is pushed by hand. The tag must be v<AMNEZIAVPN_VERSION>-lesha.<LESHA_VERSION>,
+#     optionally with -rcN/-betaN (prerelease).
 #
 # Repository variables (Settings -> Secrets and variables -> Actions -> Variables):
 #   COORDINATOR_API_URL  default coordinator API URL baked into the client (may be empty)
@@ -656,7 +660,7 @@ jobs:
 # ------------------------------------------------------
 
   Release:
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/dev'
     needs:
       - Build-Linux-Ubuntu
       - Build-Windows
@@ -675,11 +679,14 @@ jobs:
           sparse-checkout-cone-mode: false
 
       # The tag must be v${LESHA_FULL_VERSION} (AMNEZIAVPN_VERSION-lesha.LESHA_VERSION from the
-      # root CMakeLists.txt), optionally followed by -rcN / -betaN for a prerelease.
+      # root CMakeLists.txt), optionally followed by -rcN / -betaN for a prerelease. On dev the tag
+      # is derived from the version, and the release is skipped when that tag already exists.
       - name: Check tag against version
         id: version
         env:
           TAG: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           BASE=$(sed -nE 's/^[[:space:]]*set\(AMNEZIAVPN_VERSION[[:space:]]+([0-9.]+)[[:space:]].*/\1/p' CMakeLists.txt | head -n1)
           LESHA=$(sed -nE 's/^[[:space:]]*set\(LESHA_VERSION[[:space:]]+([0-9]+)[[:space:]].*/\1/p' CMakeLists.txt | head -n1)
@@ -688,6 +695,14 @@ jobs:
             exit 1
           fi
           FULL="${BASE}-lesha.${LESHA}"
+          if [ "$REF_TYPE" = "branch" ]; then
+            TAG="v${FULL}"
+            if gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${TAG}" --silent 2>/dev/null; then
+              echo "Tag ${TAG} already exists: LESHA_VERSION was not bumped, nothing to release"
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
           case "$TAG" in
             "v${FULL}")
               PRERELEASE=false ;;
@@ -699,8 +714,10 @@ jobs:
           esac
           echo "Releasing ${FULL} from tag ${TAG} (prerelease: ${PRERELEASE})"
           echo "prerelease=${PRERELEASE}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
 
       - name: Download build artifacts
+        if: steps.version.outputs.skip != 'true'
         uses: actions/download-artifact@v4
         with:
           pattern: release-*
@@ -708,13 +725,18 @@ jobs:
           merge-multiple: true
 
       - name: List files
+        if: steps.version.outputs.skip != 'true'
         run: ls -l dist
 
+      # On dev the action creates the tag at this commit. A tag made with GITHUB_TOKEN does not
+      # start another workflow run, so the release is not built twice.
       - name: Create GitHub Release
+        if: steps.version.outputs.skip != 'true'
         uses: softprops/action-gh-release@v2
         with:
-          name: ${{ github.ref_name }}
-          tag_name: ${{ github.ref_name }}
+          name: ${{ steps.version.outputs.tag }}
+          tag_name: ${{ steps.version.outputs.tag }}
+          target_commitish: ${{ github.sha }}
           prerelease: ${{ steps.version.outputs.prerelease == 'true' }}
           generate_release_notes: true
           fail_on_unmatched_files: true
