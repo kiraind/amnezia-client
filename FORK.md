@@ -128,7 +128,7 @@ Never ship the Amnezia logo or the "AmneziaVPN" wordmark.
 
 ## 7. CI workflow
 Commit `affb205`. `.github/workflows/deploy.yml` is fully rewritten: builds LeshaVPN for Linux, Windows, macOS, Android
-(iOS optional via `vars.ENABLE_IOS`), runs tests on Linux, ships only the `.msi` on Windows (no Qt Installer Framework `.exe`), publishes a GitHub Release on `v*` tags, uses repo var `COORDINATOR_API_URL`
+(iOS optional via `vars.ENABLE_IOS`), runs tests on Linux, ships only the `.msi` on Windows (no Qt Installer Framework `.exe`), publishes a GitHub Release on `v*` tags and on every push to `dev` that bumps `LESHA_VERSION` (§8), uses repo var `COORDINATOR_API_URL`
 and optional signing secrets, never uploads to Amnezia's infra. Upstream's `tag-deploy.yml` and `tag-upload.yml` are deleted.
 Build-time trims: runs on `push` only (no `pull_request`, which built every PR commit twice); Android builds only
 `arm64-v8a` + `armeabi-v7a` (no x86 Qt installs) and a universal APK without AAB; all four builds use ccache (Windows builds with Ninja for that: `CMAKE_GENERATOR=Ninja`, and `deploy/build.bat` drops the MSBuild-only `/m` for Ninja); Qt installs are cached (`cache: true`, needs install-qt-action v4: v3 talks to the retired cache API), Android also caches conan packages and Gradle.
@@ -143,7 +143,8 @@ New upstream workflows: delete them unless they are generic and safe (no Amnezia
   - `LESHA_FULL_VERSION` `5.0.3.1-lesha.1`: About page, `X-App-Version` (via the `APP_FULL_VERSION` define in `version.h.in`), Android versionName, package file names.
   - `LESHA_NUMERIC_VERSION` `5.0.3001` (MAJOR.MINOR.PATCH*1000+N): MSI/CPack version. `LESHA_RC_VERSION` `5,0,3001,1`: Windows `.rc` files.
   - `LESHA_ANDROID_VERSION_CODE` = upstream code (with offset) * 100 + N, e.g. `217101`. `LESHA_APPLE_BUILD` = TWEAK*1000 + N, e.g. `1001`.
-- Release tag must be exactly `v<LESHA_FULL_VERSION>` (optionally `-rcN`/`-betaN` for a prerelease); the release job in `deploy.yml` checks it against `CMakeLists.txt` and fails otherwise.
+- Releasing: bump `LESHA_VERSION` in the PR. When it is merged, the push to `dev` builds everything and the release job creates tag `v<LESHA_FULL_VERSION>` and the GitHub Release itself; a `dev` push whose tag already exists publishes nothing.
+- A hand-pushed tag still works and must be exactly `v<LESHA_FULL_VERSION>` (optionally `-rcN`/`-betaN` for a prerelease); the release job checks it against `CMakeLists.txt` and fails otherwise.
 - Files: root `CMakeLists.txt`, `version.h.in`, `cmake/CPack.cmake`, `client/cmake/{android,ios,macos,macos_ne}.cmake`, both `networkextension/CMakeLists.txt`, `client/platforms/windows/amneziavpn.rc.in`, `service/server/amneziavpn-service.rc.in`, `client/main.cpp`, settings controllers (About page), `coordinatorApi.cpp`, `.github/workflows/deploy.yml`.
 How to resolve: for `AMNEZIAVPN_VERSION` and `APP_ANDROID_VERSION_CODE` take **theirs**; keep the fork's `LESHA_*` block and the places that use `LESHA_*`/`APP_FULL_VERSION` instead of upstream's version vars; bump `LESHA_VERSION` by 1. If upstream adds a new place that stamps a version (a new platform plist, installer, manifest), point it at the `LESHA_*` values too.
 
