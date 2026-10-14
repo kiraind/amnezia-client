@@ -160,7 +160,8 @@ removed feature, don't add it to the build.
   `client/ui/qml/Components/GamepadLoader.qml`, submodule `client/3rd/qtgamepad`.
 - Hunks: `client/android/{AndroidManifest.xml,build.gradle.kts,gradle/libs.versions.toml}` (camera permission and
   features, CameraX and ML Kit), `AmneziaActivity.kt` / `AmneziaApplication.kt` / `qt/QtAndroidController.kt`
-  (`isCameraPresent`, `startQrCodeReader`, CameraX config, `decodeQrCode`), `client/platforms/android/android_controller.{h,cpp}`
+  (`isCameraPresent`, `startQrCodeReader`, CameraX config, `decodeQrCode`; the gamepad A/B/X/Y/Start/Select branch of
+  `AmneziaActivity.dispatchKeyEvent` and its unimplemented `nativeGamepadKeyEvent`), `client/platforms/android/android_controller.{h,cpp}`
   (same JNI methods), `ui/controllers/importUiController.cpp`, `ui/controllers/settingsUiController.cpp`
   (`isCameraPresent()` is false on Android), `client/cmake/3rdparty.cmake` (qtgamepad block), `ui/qml/main2.qml`
   (gamepad `Loader`), `ui/qml/qml.qrc`.
@@ -292,7 +293,8 @@ Android: a stored `VpnState` with a removed `VpnProto` fails to decode and reset
   `ui/models/{containersModel,protocolsModel}.{h,cpp}` (`isIpsec`, `isOpenVpn`, `isXray` roles), `ui/utils/pageEnum.h`,
   `ui/qml/qml.qrc`, `Components/SettingsContainersListView.qml`, `Pages2/{PageSetupWizardViewConfig,PageSetupWizardConfigSource}.qml`,
   `client/macos/app/Info.plist.in` (`.ovpn` document type), `client/android/{AndroidManifest.xml,build.gradle.kts,
-  settings.gradle.kts}`, `VpnProto.kt`, `client/tests/{CMakeLists.txt,testConnection.cpp}`, `THIRD_PARTY_LICENSES.md`,
+  settings.gradle.kts}`, `VpnProto.kt`, `AmneziaActivity.kt` (`loadLibs()` loaded `librsapss.so` from `openvpn-pt-android`;
+  without that lib the app crashed on launch), `client/tests/{CMakeLists.txt,testConnection.cpp}`, `THIRD_PARTY_LICENSES.md`,
   `.claude/skills/sync-upstream/SKILL.md`.
 - Kept on purpose: `errorCodes.h`/`errorStrings.cpp` (numbering, matches Android), the env-gated tests that import
   `THIRD_PARTY_XRAY_VPN_KEY`/`OPEN_VPN`/`CLOAK`/`SS` keys as plain servers (they only exercise the server list), the

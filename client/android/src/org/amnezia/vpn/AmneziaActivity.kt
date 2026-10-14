@@ -58,7 +58,6 @@ import kotlinx.coroutines.runBlocking
 import org.amnezia.vpn.protocol.getStatistics
 import org.amnezia.vpn.protocol.getStatus
 import org.amnezia.vpn.qt.QtAndroidController
-import org.amnezia.vpn.util.LibraryLoader.loadSharedLibrary
 import org.amnezia.vpn.util.Log
 import org.amnezia.vpn.util.Prefs
 import org.json.JSONException
@@ -184,7 +183,6 @@ class AmneziaActivity : QtActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "Create Amnezia activity")
-        loadLibs()
 
         // Configure window for edge-to-edge display
         configureWindowForEdgeToEdge()
@@ -210,14 +208,6 @@ class AmneziaActivity : QtActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         pendingOpenFileUri?.let { outState.putString(KEY_PENDING_OPEN_FILE_URI, it) }
-    }
-
-    private fun loadLibs() {
-        listOf(
-            "rsapss"
-        ).forEach {
-            loadSharedLibrary(this.applicationContext, it)
-        }
     }
 
     private fun registerBroadcastReceivers() {
@@ -317,18 +307,8 @@ class AmneziaActivity : QtActivity() {
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         val keyCode = event.keyCode
-        val pressed = event.action == KeyEvent.ACTION_DOWN
 
         when (keyCode) {
-            KeyEvent.KEYCODE_BUTTON_A,
-            KeyEvent.KEYCODE_BUTTON_B,
-            KeyEvent.KEYCODE_BUTTON_X,
-            KeyEvent.KEYCODE_BUTTON_Y,
-            KeyEvent.KEYCODE_BUTTON_START,
-            KeyEvent.KEYCODE_BUTTON_SELECT -> {
-                    nativeGamepadKeyEvent(0, keyCode, pressed)
-                    return true
-            }
             KeyEvent.KEYCODE_DPAD_CENTER,
             KeyEvent.KEYCODE_DPAD_UP,
             KeyEvent.KEYCODE_DPAD_DOWN,
@@ -346,8 +326,6 @@ class AmneziaActivity : QtActivity() {
 
         return super.dispatchKeyEvent(event)
     }
-
-    private external fun nativeGamepadKeyEvent(deviceId: Int, keyCode: Int, pressed: Boolean)
 
     override fun onPause() {
         // Notify Qt to stop rendering BEFORE super.onPause() destroys the EGL surface.
