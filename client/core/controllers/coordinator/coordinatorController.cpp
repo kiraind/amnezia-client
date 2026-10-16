@@ -1,6 +1,7 @@
 #include "coordinatorController.h"
 
 #include <QDateTime>
+#include <QHash>
 #include <QHostAddress>
 #include <QHostInfo>
 #include <QRegularExpression>
@@ -468,8 +469,11 @@ void CoordinatorController::deleteConfig(const QString &configId)
         if (reply.ok() || reply.notFound()) {
             const QString serverId = serverIdForConfig(configId);
             if (!serverId.isEmpty()) {
-                if (m_connectionState != Vpn::ConnectionState::Disconnected
-                    && m_serversRepository->defaultServerId() == serverId) {
+                const bool active = m_connectionState == Vpn::ConnectionState::Connected
+                        || m_connectionState == Vpn::ConnectionState::Connecting
+                        || m_connectionState == Vpn::ConnectionState::Reconnecting
+                        || m_connectionState == Vpn::ConnectionState::Preparing;
+                if (active && m_serversRepository->defaultServerId() == serverId) {
                     // Also while connecting or reconnecting: the revoked key must not stay up
                     m_pendingReconnectServerId.clear();
                     m_connectionController->closeConnection();
