@@ -114,20 +114,42 @@ PageType {
         delegate: ColumnLayout {
             width: listView.width
 
-            LabelWithButtonType {
+            RowLayout {
                 Layout.fillWidth: true
                 Layout.topMargin: 6
 
-                text: modelData.name
-                descriptionText: root.stateText(modelData)
-                rightImageSource: "qrc:/images/controls/edit-3.svg"
+                spacing: 0
 
-                enabled: !CoordinatorController.busy
+                LabelWithButtonType {
+                    Layout.fillWidth: true
 
-                // Another device's config is never added here: two devices with one key knock each other off
-                clickedFunction: function() {
-                    configDrawer.config = modelData
-                    configDrawer.openTriggered()
+                    text: modelData.name
+                    descriptionText: root.stateText(modelData)
+                    rightImageSource: "qrc:/images/controls/edit-3.svg"
+
+                    enabled: !CoordinatorController.busy
+
+                    // Another device's config is never added here: two devices with one key knock each other off
+                    clickedFunction: function() {
+                        configDrawer.config = modelData
+                        configDrawer.openTriggered()
+                    }
+                }
+
+                ImageButtonType {
+                    Layout.rightMargin: 16
+
+                    implicitWidth: 40
+                    implicitHeight: 40
+
+                    image: "qrc:/images/controls/trash.svg"
+                    imageColor: AmneziaStyle.color.paleGray
+
+                    enabled: !CoordinatorController.busy
+
+                    onClicked: function() {
+                        root.askDelete(modelData)
+                    }
                 }
             }
 
@@ -195,14 +217,13 @@ PageType {
         }
     }
 
-    // Rename or delete a config; the name is what the bot and the coordinator call the device
+    // Rename a config; the name is what the bot and the coordinator call the device
     DrawerType2 {
         id: configDrawer
 
         property var config: ({})
 
         anchors.fill: parent
-        expandedHeight: root.height * 0.5
 
         expandedStateContent: ColumnLayout {
             id: drawerContent
@@ -212,11 +233,15 @@ PageType {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.topMargin: 32
             anchors.leftMargin: 16
             anchors.rightMargin: 16
 
             spacing: 0
+
+            // Same sizing as QuestionDrawer: as tall as the content
+            onImplicitHeightChanged: {
+                configDrawer.expandedHeight = drawerContent.implicitHeight + 32 + PageController.safeAreaBottomMargin
+            }
 
             Connections {
                 target: configDrawer
@@ -226,10 +251,18 @@ PageType {
                 }
             }
 
+            Header2TextType {
+                Layout.fillWidth: true
+                Layout.topMargin: 16
+
+                text: qsTr("Переименовать устройство")
+            }
+
             TextFieldWithHeaderType {
                 id: nameField
 
                 Layout.fillWidth: true
+                Layout.topMargin: 16
 
                 headerText: qsTr("Название устройства")
                 textField.maximumLength: 64
@@ -261,28 +294,6 @@ PageType {
                         CoordinatorController.renameConfig(configDrawer.config.id, drawerContent.normalizedName)
                     }
                     configDrawer.closeTriggered()
-                }
-            }
-
-            BasicButtonType {
-                Layout.alignment: Qt.AlignHCenter
-                Layout.topMargin: 16
-                implicitHeight: 32
-
-                defaultColor: AmneziaStyle.color.transparent
-                hoveredColor: AmneziaStyle.color.translucentWhite
-                pressedColor: AmneziaStyle.color.sheerWhite
-                disabledColor: AmneziaStyle.color.mutedGray
-                textColor: AmneziaStyle.color.vibrantRed
-
-                enabled: !CoordinatorController.busy
-
-                text: qsTr("Удалить конфиг")
-
-                clickedFunc: function() {
-                    var config = configDrawer.config
-                    configDrawer.closeTriggered()
-                    root.askDelete(config)
                 }
             }
         }
