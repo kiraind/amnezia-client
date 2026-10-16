@@ -14,6 +14,8 @@ import "../Components"
 PageType {
     id: root
 
+    property bool signingOut: false // the sign-out button navigates by itself
+
     // One config per device: once this app has one, nothing new can be created here
     readonly property bool hasConfigInApp: {
         var configs = CoordinatorController.remoteConfigs
@@ -27,19 +29,22 @@ PageType {
 
     function stateText(config) {
         if (config.state === "revoked") {
-            return qsTr("Отозван")
+            return qsTr("Deleted")
         }
         if (config.state === "suspended") {
-            return qsTr("Приостановлен")
+            return qsTr("Suspended")
         }
-        return config.inApp ? qsTr("Это устройство") : qsTr("Другое устройство")
+        return config.inApp ? qsTr("This device") : qsTr("Another device")
     }
 
     function askDelete(config) {
-        var headerText = qsTr("Удалить конфиг %1?").arg(config.name)
-        var descriptionText = qsTr("Конфиг будет удалён на сервере и из приложения.")
-        var yesButtonText = qsTr("Удалить")
-        var noButtonText = qsTr("Отмена")
+        var headerText = config.inApp ? qsTr("Delete the config of this device?")
+                                       : qsTr("Delete device %1?").arg(config.name)
+        var descriptionText = config.inApp
+                ? qsTr("VPN on this device will stop working. To connect it again, tap \"Connect this device\".")
+                : qsTr("VPN on %1 will stop working.").arg(config.name)
+        var yesButtonText = qsTr("Delete")
+        var noButtonText = qsTr("Cancel")
 
         var yesButtonFunction = function() {
             CoordinatorController.deleteConfig(config.id)
@@ -58,11 +63,30 @@ PageType {
         target: CoordinatorController
 
         function onConfigAdded(serverId) {
-            PageController.showNotificationMessage(qsTr("Конфиг добавлен"))
+            PageController.showNotificationMessage(qsTr("This device is connected"))
         }
 
         function onConfigRenamed(configId, name) {
-            PageController.showNotificationMessage(qsTr("Устройство переименовано"))
+            PageController.showNotificationMessage(qsTr("Device renamed"))
+        }
+
+        function onDeviceSetupFinished(success) {
+            // Reached from the start screen, "back" would lead there again: the device has a server now
+            if (success && root.visible) {
+                PageController.goToPageHome()
+            }
+        }
+
+        function onLoggedInChanged() {
+            // Signed out by the server (token revoked): the list is gone, show the sign-in page instead
+            if (!CoordinatorController.loggedIn && root.visible && !root.signingOut) {
+                if (root.StackView.index > 0) {
+                    PageController.closePage()
+                    PageController.goToPage(PageEnum.PageCoordinatorLogin)
+                } else {
+                    PageController.goToPageHome()
+                }
+            }
         }
     }
 
@@ -92,7 +116,7 @@ PageType {
                 Layout.rightMargin: 16
                 Layout.leftMargin: 16
 
-                headerText: qsTr("Аккаунт %1").arg(Qt.application.displayName)
+                headerText: qsTr("%1 account").arg(Qt.application.displayName)
                 descriptionText: CoordinatorController.username
             }
 
@@ -104,8 +128,8 @@ PageType {
 
                 visible: CoordinatorController.networkState === "degraded" || CoordinatorController.networkState === "down"
 
-                textString: CoordinatorController.networkState === "down" ? qsTr("Сеть недоступна")
-                                                                         : qsTr("Сеть работает с перебоями")
+                textString: CoordinatorController.networkState === "down" ? qsTr("The VPN network is down")
+                                                                         : qsTr("The VPN network is unstable")
 
                 iconPath: "qrc:/images/controls/alert-circle.svg"
             }
@@ -172,7 +196,7 @@ PageType {
                 visible: !root.hasConfigInApp
                 enabled: !CoordinatorController.busy
 
-                text: qsTr("Подключить это устройство")
+                text: qsTr("Connect this device")
 
                 clickedFunc: function() {
                     CoordinatorController.setupThisDevice()
@@ -192,15 +216,16 @@ PageType {
                 disabledColor: AmneziaStyle.color.mutedGray
                 textColor: AmneziaStyle.color.vibrantRed
 
-                text: qsTr("Выйти")
+                text: qsTr("Sign out")
 
                 clickedFunc: function() {
-                    var headerText = qsTr("Выйти из аккаунта?")
-                    var descriptionText = qsTr("Добавленные конфиги останутся в приложении, но перестанут обновляться.")
-                    var yesButtonText = qsTr("Выйти")
-                    var noButtonText = qsTr("Отмена")
+                    var headerText = qsTr("Sign out?")
+                    var descriptionText = qsTr("VPN on this device keeps working, but its settings will no longer be updated.")
+                    var yesButtonText = qsTr("Sign out")
+                    var noButtonText = qsTr("Cancel")
 
                     var yesButtonFunction = function() {
+                        root.signingOut = true
                         CoordinatorController.logout()
                         if (root.StackView.index > 0) {
                             PageController.closePage()
@@ -255,7 +280,7 @@ PageType {
                 Layout.fillWidth: true
                 Layout.topMargin: 16
 
-                text: qsTr("Переименовать устройство")
+                text: qsTr("Rename device")
             }
 
             TextFieldWithHeaderType {
@@ -264,7 +289,7 @@ PageType {
                 Layout.fillWidth: true
                 Layout.topMargin: 16
 
-                headerText: qsTr("Название устройства")
+                headerText: qsTr("Device name")
                 textField.maximumLength: 64
                 checkEmptyText: true
             }
@@ -278,8 +303,8 @@ PageType {
 
                 color: AmneziaStyle.color.mutedGray
                 text: drawerContent.normalizedName === ""
-                      ? qsTr("Латинские буквы, цифры и дефисы, до 32 символов")
-                      : qsTr("Сохранится как %1").arg(drawerContent.normalizedName)
+                      ? qsTr("Latin letters, digits and hyphens, up to 32 characters")
+                      : qsTr("Will be saved as %1").arg(drawerContent.normalizedName)
             }
 
             BasicButtonType {
@@ -288,7 +313,7 @@ PageType {
 
                 enabled: !CoordinatorController.busy && drawerContent.normalizedName !== ""
 
-                text: qsTr("Сохранить")
+                text: qsTr("Save")
 
                 clickedFunc: function() {
                     if (drawerContent.normalizedName !== configDrawer.config.name) {

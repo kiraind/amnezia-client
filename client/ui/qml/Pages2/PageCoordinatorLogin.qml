@@ -16,6 +16,13 @@ PageType {
 
     property bool showServerField: CoordinatorController.defaultBaseUrl === ""
 
+    function submit() {
+        if (!loginButton.enabled) {
+            return
+        }
+        loginButton.clickedFunc()
+    }
+
     function serverUrl() {
         var url = serverField.textField.text.trim()
         return url !== "" ? url : CoordinatorController.defaultBaseUrl
@@ -84,8 +91,8 @@ PageType {
                 Layout.rightMargin: 16
                 Layout.bottomMargin: 24
 
-                headerText: qsTr("Вход по коду")
-                descriptionText: qsTr("Напишите боту /login и введите полученный код. Код действует 5 минут.")
+                headerText: qsTr("Sign in with a code")
+                descriptionText: qsTr("Send /login to the bot and enter the code you get. The code is valid for 5 minutes.")
             }
 
             TextFieldWithHeaderType {
@@ -96,22 +103,28 @@ PageType {
                 Layout.rightMargin: 16
                 Layout.bottomMargin: 16
 
-                headerText: qsTr("Код")
+                headerText: qsTr("Code")
                 textField.placeholderText: qsTr("ABC123")
-                textField.maximumLength: 6
+                // Longer than a code so a paste like " abc123" or "Код: ABC123" isn't cut before it is cleaned up
+                textField.maximumLength: 64
                 textField.inputMethodHints: Qt.ImhUppercaseOnly | Qt.ImhNoPredictiveText | Qt.ImhSensitiveData
 
                 Connections {
                     target: codeField.textField
 
                     function onTextChanged() {
-                        var upper = codeField.textField.text.toUpperCase()
-                        if (upper !== codeField.textField.text) {
-                            codeField.textField.text = upper
+                        // Codes are [A-Z0-9]; drop spaces, line breaks and any text pasted around the code
+                        var cleaned = codeField.textField.text.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6)
+                        if (cleaned !== codeField.textField.text) {
+                            codeField.textField.text = cleaned
                         }
                         if (codeField.errorText !== "") {
                             codeField.errorText = ""
                         }
+                    }
+
+                    function onAccepted() {
+                        root.submit()
                     }
                 }
             }
@@ -132,7 +145,7 @@ PageType {
                 disabledColor: AmneziaStyle.color.mutedGray
                 textColor: AmneziaStyle.color.goldenApricot
 
-                text: qsTr("Адрес сервера")
+                text: qsTr("Server address")
 
                 clickedFunc: function() {
                     root.showServerField = !root.showServerField
@@ -149,10 +162,18 @@ PageType {
 
                 visible: root.showServerField
 
-                headerText: qsTr("Адрес сервера")
+                headerText: qsTr("Server address")
                 textField.placeholderText: qsTr("https://vpn.example.com")
                 textField.text: CoordinatorController.baseUrl || CoordinatorController.defaultBaseUrl
                 textField.inputMethodHints: Qt.ImhUrlCharactersOnly | Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
+
+                Connections {
+                    target: serverField.textField
+
+                    function onAccepted() {
+                        root.submit()
+                    }
+                }
             }
         }
     }
@@ -168,20 +189,20 @@ PageType {
         anchors.rightMargin: 16
         anchors.bottomMargin: 16 + PageController.safeAreaBottomMargin
 
-        enabled: !CoordinatorController.busy && codeField.textField.text.trim().length === 6
+        enabled: !CoordinatorController.busy && codeField.textField.text.length === 6
 
-        text: qsTr("Войти")
+        text: qsTr("Sign in")
 
         clickedFunc: function() {
             codeField.errorText = ""
             var url = root.serverUrl()
             if (url === "") {
-                serverField.errorText = qsTr("Укажите адрес сервера")
+                serverField.errorText = qsTr("Enter the server address")
                 root.showServerField = true
                 return
             }
             serverField.errorText = ""
-            CoordinatorController.login(url, codeField.textField.text.trim().toUpperCase())
+            CoordinatorController.login(url, codeField.textField.text)
         }
     }
 }

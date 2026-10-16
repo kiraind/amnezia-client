@@ -485,7 +485,9 @@ void VpnConnection::appendSplitTunnelingConfig()
     // Fork: the coordinator API always bypasses the tunnel, so a dead entry server can't block the config update
     // that replaces it. "Only listed sites" mode already leaves it outside the tunnel.
     const QString coordinatorAddress = m_appSettingsRepository->coordinatorApiAddress();
-    if (allowSiteBasedSplitTunneling && NetworkUtilities::checkIpSubnetFormat(coordinatorAddress)) {
+    // Only while signed in: nothing talks to the coordinator otherwise, and the address may be shared with other sites
+    const bool coordinatorInUse = !m_appSettingsRepository->coordinatorToken().isEmpty();
+    if (allowSiteBasedSplitTunneling && coordinatorInUse && NetworkUtilities::checkIpSubnetFormat(coordinatorAddress)) {
         if (routeMode == amnezia::RouteMode::VpnAllSites) {
             routeMode = amnezia::RouteMode::VpnAllExceptSites;
             sitesJsonArray = QJsonArray { coordinatorAddress };

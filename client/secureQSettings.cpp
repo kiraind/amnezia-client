@@ -4,6 +4,9 @@
 #include "core/utils/utilities.h"
 #include "cryptoUtils.h"
 #include <QDataStream>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
 #include <QDebug>
 #include <QEventLoop>
 #include <QIODevice>
@@ -28,6 +31,21 @@ namespace {
 SecureQSettings::SecureQSettings(const QString &organization, const QString &application, QObject *parent, bool enableEncryption)
     : QObject { parent }, m_settings(organization, application, parent), encryptedKeys({ "Servers/serversList", "Coordinator/token" }), m_encryptionEnabled(enableEncryption)
 {
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
+    // Fork: no keychain encryption here (see encryptionRequired()), so at least keep the device token and keys
+    // readable by this user only. QSettings saves via QSaveFile, which keeps the file's permissions.
+    {
+        const QFileInfo settingsFile(m_settings.fileName());
+        QDir().mkpath(settingsFile.absolutePath());
+        QFile::setPermissions(settingsFile.absolutePath(), QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner);
+        if (!settingsFile.exists()) {
+            QFile file(settingsFile.absoluteFilePath());
+            file.open(QIODevice::WriteOnly);
+        }
+        QFile::setPermissions(settingsFile.absoluteFilePath(), QFileDevice::ReadOwner | QFileDevice::WriteOwner);
+    }
+#endif
+
     bool encrypted = m_settings.value("Conf/encrypted").toBool();
 
     // convert settings to encrypted for if updated to >= 2.1.0

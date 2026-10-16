@@ -39,6 +39,9 @@ public:
     // Account
     void login(const QString &baseUrl, const QString &code);
     void logout(); // revokes the token on the server (best effort) and forgets it locally; managed servers stay as static configs
+    // Before "reset all data": revoke this app's configs and the token on the server (best effort) so the reset leaves
+    // no orphaned configs behind. Local state is cleared by the settings reset itself (settingsCleared).
+    void forgetDevice();
 
     // Remote configs of this account (GET /v1/me); result in remoteConfigsUpdated().
     void fetchRemoteConfigs();
@@ -62,6 +65,8 @@ public:
 
     // storageServerId of the managed server for configId, or empty.
     QString serverIdForConfig(const QString &configId) const;
+    // configId of a managed server, or empty.
+    QString configIdForServer(const QString &serverId) const;
     bool isManagedServer(const QString &serverId) const;
     QJsonObject managedConfigs() const;
 
@@ -69,6 +74,10 @@ public:
     void start();
 
     static constexpr int refreshIntervalMsecs = 15 * 60 * 1000;
+    // While connected to a managed server: a replaced entry node looks like a silent tunnel, not an error
+    static constexpr int connectedRefreshIntervalMsecs = 2 * 60 * 1000;
+    // A reconnect requested after a config update only applies to the disconnect it caused
+    static constexpr qint64 pendingReconnectTimeoutMsecs = 30 * 1000;
 
 signals:
     void loggedInChanged();
@@ -77,6 +86,7 @@ signals:
     void configAdded(const QString &serverId);
     void configReplaced(const QString &serverId);
     void configRenamed(const QString &configId, const QString &name);
+    void configDeleted(const QString &configId); // deleted on the coordinator and its server removed from the app
     void deviceSetupFinished(bool success);
     void managedConfigsChanged();
     // Human-readable problem for the user (not member, suspended, revoked, re-login needed, request failed).
@@ -89,6 +99,14 @@ private:
     void onServerRemoved(const QString &serverId);
 
     void checkConfig(const QString &serverId);
+    // Sync managed entries with GET /v1/me: entries missing there are revoked, suspended ones are marked.
+    // Returns the summaries for remoteConfigsUpdated().
+    QJsonArray reconcile(const QJsonArray &remoteConfigs, bool notify);
+    // A managed server whose config is gone (revoked), preferring the default one; the new device config replaces it.
+    QString revokedServerToReplace() const;
+    void beginBusy();
+    void endBusy();
+    void updateRefreshInterval();
     // Import Config JSON (from GET/POST) as a new server or replace serverId's config if non-empty.
     bool applyConfig(const QJsonObject &config, const QString &existingServerId);
     void handleAuthError(const CoordinatorApi::Reply &reply); // 401 -> forget token; 403 not_member -> message
@@ -108,6 +126,9 @@ private:
     QTimer m_refreshTimer;
     QString m_lastNetworkState;
     QString m_pendingReconnectServerId;
+    qint64 m_pendingReconnectMsecs = 0;
+    Vpn::ConnectionState m_connectionState = Vpn::ConnectionState::Disconnected;
+    int m_busyCount = 0;
     qint64 m_lastErrorRefreshMsecs = 0;
     bool m_notMemberReported = false;
 };

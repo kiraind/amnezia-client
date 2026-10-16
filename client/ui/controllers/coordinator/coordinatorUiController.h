@@ -42,6 +42,8 @@ public:
     Q_INVOKABLE bool isValidConfigName(const QString &name) const; // [a-z0-9-]{1,32}
     Q_INVOKABLE QString toConfigName(const QString &text) const; // free text -> [a-z0-9-]{0,32}, Cyrillic transliterated
     Q_INVOKABLE bool isManagedServer(const QString &serverId) const;
+    Q_INVOKABLE QString configIdForServer(const QString &serverId) const; // empty when not managed
+    Q_INVOKABLE void forgetDevice(); // before "reset all data": revoke this app's configs and token on the server
 
 signals:
     void loggedInChanged();
@@ -51,6 +53,7 @@ signals:
     void loginFinished(bool success, const QString &errorText);
     void configAdded(const QString &serverId);
     void configRenamed(const QString &configId, const QString &name);
+    void configDeleted(const QString &configId);
     void deviceSetupFinished(bool success);
     void errorOccurred(const QString &text); // also routed to PageController.showErrorMessage by CoreSignalHandlers
 

@@ -128,6 +128,8 @@ void CoreSignalHandlers::initTranslationsUpdatedHandler()
     connect(m_coreController->m_languageUiController, &LanguageUiController::updateTranslations, m_coreController, &CoreController::updateTranslator);
     connect(m_coreController, &CoreController::translationsUpdated, m_coreController->m_languageUiController, &LanguageUiController::translationsUpdated);
     connect(m_coreController, &CoreController::translationsUpdated, m_coreController->m_connectionUiController, &ConnectionUiController::onTranslationsUpdated);
+    // Fork: server descriptions ("AmneziaWG (version 3.1)") are built before the first translator is installed
+    connect(m_coreController, &CoreController::translationsUpdated, m_coreController->m_serversUiController, &ServersUiController::updateModel);
 }
 
 void CoreSignalHandlers::initLanguageHandler()

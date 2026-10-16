@@ -23,6 +23,7 @@ public:
         QString errorCode;      // error.code from the body, e.g. "invalid_code", "not_member", "name_taken"
         QString errorMessage;   // error.message from the body, or the Qt network error text
         QJsonObject body;       // parsed JSON body (empty for 204 or non-JSON replies)
+        QString token;          // device token the request was sent with (empty if none)
 
         bool ok() const { return !networkError && httpStatus >= 200 && httpStatus < 300; }
         bool unauthorized() const { return httpStatus == 401; }
