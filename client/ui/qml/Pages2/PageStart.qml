@@ -274,7 +274,8 @@ PageType {
             objectName: "plusTabButton"
 
             isSelected: tabBar.currentIndex === 2
-            image: "qrc:/images/controls/plus.svg"
+            // Fork: the tab leads to the VPN account, so it shows a person instead of "+"
+            image: "qrc:/images/controls/user.svg"
             clickedFunc: function () {
                 // Fork: once logged in, "+" opens the VPN account instead of the connection screen
                 tabBarStackView.goToTabBarPage(CoordinatorController.loggedIn ? PageEnum.PageCoordinatorConfigs
