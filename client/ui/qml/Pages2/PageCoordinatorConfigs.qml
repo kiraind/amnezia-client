@@ -240,7 +240,7 @@ PageType {
 
             // Same sizing as QuestionDrawer: as tall as the content
             onImplicitHeightChanged: {
-                configDrawer.expandedHeight = drawerContent.implicitHeight + 32 + PageController.safeAreaBottomMargin
+                configDrawer.expandedHeight = drawerContent.implicitHeight + 16 + PageController.safeAreaBottomMargin
             }
 
             Connections {
@@ -269,16 +269,17 @@ PageType {
                 checkEmptyText: true
             }
 
+            // Only when the typed text is not saved as is
             CaptionTextType {
                 Layout.fillWidth: true
                 Layout.topMargin: 8
 
+                visible: drawerContent.normalizedName !== nameField.textField.text
+
                 color: AmneziaStyle.color.mutedGray
                 text: drawerContent.normalizedName === ""
                       ? qsTr("Латинские буквы, цифры и дефисы, до 32 символов")
-                      : (drawerContent.normalizedName !== nameField.textField.text
-                         ? qsTr("Сохранится как %1").arg(drawerContent.normalizedName)
-                         : qsTr("Так устройство будет называться в боте и в списке конфигов"))
+                      : qsTr("Сохранится как %1").arg(drawerContent.normalizedName)
             }
 
             BasicButtonType {
