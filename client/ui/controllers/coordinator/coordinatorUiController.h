@@ -36,9 +36,11 @@ public:
     Q_INVOKABLE void createConfig(const QString &name);
     Q_INVOKABLE void addConfigToApp(const QString &configId);
     Q_INVOKABLE void deleteConfig(const QString &configId);
+    Q_INVOKABLE void renameConfig(const QString &configId, const QString &name);
     Q_INVOKABLE void setupThisDevice();
     Q_INVOKABLE void refreshAll();
     Q_INVOKABLE bool isValidConfigName(const QString &name) const; // [a-z0-9-]{1,32}
+    Q_INVOKABLE QString toConfigName(const QString &text) const; // free text -> [a-z0-9-]{0,32}, Cyrillic transliterated
     Q_INVOKABLE bool isManagedServer(const QString &serverId) const;
 
 signals:
@@ -48,6 +50,7 @@ signals:
     void networkStateChanged();
     void loginFinished(bool success, const QString &errorText);
     void configAdded(const QString &serverId);
+    void configRenamed(const QString &configId, const QString &name);
     void deviceSetupFinished(bool success);
     void errorOccurred(const QString &text); // also routed to PageController.showErrorMessage by CoreSignalHandlers
 

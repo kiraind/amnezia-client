@@ -21,6 +21,7 @@
 #include "core/controllers/connectionController.h"
 #include "core/controllers/coordinator/coordinatorApi.h"
 #include "core/controllers/coordinator/coordinatorController.h"
+#include "core/controllers/coordinator/deviceName.h"
 #include "core/controllers/selfhosted/importController.h"
 #include "core/models/protocols/awgProtocolConfig.h"
 #include "core/utils/constants/configKeys.h"
@@ -320,6 +321,20 @@ private:
             body["checkedAt"] = "2026-10-12T10:05:00Z";
             return { 200, jsonBytes(body) };
         }
+        if (request.method == "PATCH" && request.path == "/v1/configs/cfg-1") {
+            const QString name = request.json().value("name").toString();
+            if (name == "taken") {
+                return { 409, errorBody("name_taken") };
+            }
+            m_currentConfig["name"] = name;
+            QJsonObject summary;
+            summary["id"] = "cfg-1";
+            summary["name"] = name;
+            summary["revision"] = m_currentConfig.value("revision");
+            summary["state"] = "active";
+            summary["createdAt"] = m_currentConfig.value("createdAt");
+            return { 200, jsonBytes(summary) };
+        }
         if (request.method == "GET" && request.path == "/v1/configs/cfg-1") {
             return { 200, jsonBytes(m_currentConfig) };
         }
@@ -466,7 +481,7 @@ private slots:
         const auto creates = m_server->requestsTo("POST", "/v1/configs");
         QCOMPARE(creates.size(), 1);
         const QString name = creates.first().json().value("name").toString();
-        QCOMPARE(name, CoordinatorController::deviceConfigName(QSysInfo::machineHostName(), QSysInfo::productType(), {}));
+        QCOMPARE(name, CoordinatorController::deviceConfigName(deviceName::platformName(), QSysInfo::productType(), {}));
         QCOMPARE(m_controller->serverIdForConfig("cfg-1"), addedSpy.at(0).at(0).toString());
 
         // A config is already in the app: nothing new is created
@@ -482,8 +497,11 @@ private slots:
         QTest::addColumn<QStringList>("taken");
         QTest::addColumn<QString>("expected");
 
-        QTest::newRow("mac") << "Noahs-MacBook-Pro.local" << QStringList() << "noahs-macbook-pro";
-        QTest::newRow("spaces and unicode") << "Ноа PC_1" << QStringList() << "pc-1";
+        QTest::newRow("mac hostname") << "Noahs-MacBook-Pro" << QStringList() << "noahs-macbook-pro";
+        QTest::newRow("mac computer name") << "Noah’s MacBook Pro" << QStringList() << "noahs-macbook-pro";
+        QTest::newRow("android settings") << "Galaxy S23 Ultra" << QStringList() << "galaxy-s23-ultra";
+        QTest::newRow("cyrillic") << "Ноутбук Лёши PC_1" << QStringList() << "noutbuk-leshi-pc-1";
+        QTest::newRow("symbols only") << "★ ✓" << QStringList() << "android";
         QTest::newRow("localhost") << "localhost" << QStringList() << "android";
         QTest::newRow("empty") << "" << QStringList() << "android";
         QTest::newRow("taken") << "laptop" << QStringList { "laptop", "laptop-2" } << "laptop-3";
@@ -498,6 +516,49 @@ private slots:
         const QString name = CoordinatorController::deviceConfigName(hostName, QStringLiteral("android"), taken);
         QCOMPARE(name, expected);
         QVERIFY(QRegularExpression(QStringLiteral("^[a-z0-9-]{1,32}$")).match(name).hasMatch());
+    }
+
+    void testToConfigName_data()
+    {
+        QTest::addColumn<QString>("text");
+        QTest::addColumn<QString>("expected");
+
+        QTest::newRow("already valid") << "pixel-8" << "pixel-8";
+        QTest::newRow("upper and spaces") << "  My Phone  " << "my-phone";
+        QTest::newRow("cyrillic") << "Телефон мамы" << "telefon-mamy";
+        QTest::newRow("empty") << "" << "";
+        QTest::newRow("long") << QString(40, 'b') << QString(32, 'b');
+        QTest::newRow("cut at dash") << QString(31, 'c') + " d" << QString(31, 'c');
+    }
+
+    void testToConfigName()
+    {
+        QFETCH(QString, text);
+        QFETCH(QString, expected);
+        QCOMPARE(deviceName::toConfigName(text), expected);
+    }
+
+    void testRenameConfig()
+    {
+        login();
+        const QString serverId = createPhone();
+        QSignalSpy renamedSpy(m_controller, &CoordinatorController::configRenamed);
+        QSignalSpy errorSpy(m_controller, &CoordinatorController::errorOccurred);
+
+        m_controller->renameConfig("cfg-1", "pixel-8");
+        QTRY_COMPARE(renamedSpy.count(), 1);
+        QCOMPARE(renamedSpy.at(0).at(1).toString(), QStringLiteral("pixel-8"));
+        const auto patches = m_server->requestsTo("PATCH", "/v1/configs/cfg-1");
+        QCOMPARE(patches.size(), 1);
+        QCOMPARE(patches.first().json().value("name").toString(), QStringLiteral("pixel-8"));
+        QCOMPARE(m_controller->managedConfigs().value(serverId).toObject().value("name").toString(), QStringLiteral("pixel-8"));
+        // The server keeps its name in the app
+        QCOMPARE(m_core->m_serversRepository->nativeConfig(serverId)->description, QStringLiteral("phone"));
+
+        m_controller->renameConfig("cfg-1", "taken");
+        QTRY_COMPARE(errorSpy.count(), 1);
+        QCOMPARE(renamedSpy.count(), 1);
+        QCOMPARE(m_controller->managedConfigs().value(serverId).toObject().value("name").toString(), QStringLiteral("pixel-8"));
     }
 
     void testAwg3ConfigDetectedAs31()

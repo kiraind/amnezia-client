@@ -60,6 +60,10 @@ PageType {
         function onConfigAdded(serverId) {
             PageController.showNotificationMessage(qsTr("Конфиг добавлен"))
         }
+
+        function onConfigRenamed(configId, name) {
+            PageController.showNotificationMessage(qsTr("Устройство переименовано"))
+        }
     }
 
     ListViewType {
@@ -116,13 +120,14 @@ PageType {
 
                 text: modelData.name
                 descriptionText: root.stateText(modelData)
-                rightImageSource: "qrc:/images/controls/trash.svg"
+                rightImageSource: "qrc:/images/controls/edit-3.svg"
 
                 enabled: !CoordinatorController.busy
 
                 // Another device's config is never added here: two devices with one key knock each other off
                 clickedFunction: function() {
-                    root.askDelete(modelData)
+                    configDrawer.config = modelData
+                    configDrawer.openTriggered()
                 }
             }
 
@@ -185,6 +190,99 @@ PageType {
                     }
 
                     showQuestionDrawer(headerText, descriptionText, yesButtonText, noButtonText, yesButtonFunction, noButtonFunction)
+                }
+            }
+        }
+    }
+
+    // Rename or delete a config; the name is what the bot and the coordinator call the device
+    DrawerType2 {
+        id: configDrawer
+
+        property var config: ({})
+
+        anchors.fill: parent
+        expandedHeight: root.height * 0.5
+
+        expandedStateContent: ColumnLayout {
+            id: drawerContent
+
+            readonly property string normalizedName: CoordinatorController.toConfigName(nameField.textField.text)
+
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.topMargin: 32
+            anchors.leftMargin: 16
+            anchors.rightMargin: 16
+
+            spacing: 0
+
+            Connections {
+                target: configDrawer
+
+                function onAboutToShow() {
+                    nameField.textField.text = configDrawer.config.name || ""
+                }
+            }
+
+            TextFieldWithHeaderType {
+                id: nameField
+
+                Layout.fillWidth: true
+
+                headerText: qsTr("Название устройства")
+                textField.maximumLength: 64
+                checkEmptyText: true
+            }
+
+            CaptionTextType {
+                Layout.fillWidth: true
+                Layout.topMargin: 8
+
+                color: AmneziaStyle.color.mutedGray
+                text: drawerContent.normalizedName === ""
+                      ? qsTr("Латинские буквы, цифры и дефисы, до 32 символов")
+                      : (drawerContent.normalizedName !== nameField.textField.text
+                         ? qsTr("Сохранится как %1").arg(drawerContent.normalizedName)
+                         : qsTr("Так устройство будет называться в боте и в списке конфигов"))
+            }
+
+            BasicButtonType {
+                Layout.fillWidth: true
+                Layout.topMargin: 16
+
+                enabled: !CoordinatorController.busy && drawerContent.normalizedName !== ""
+
+                text: qsTr("Сохранить")
+
+                clickedFunc: function() {
+                    if (drawerContent.normalizedName !== configDrawer.config.name) {
+                        CoordinatorController.renameConfig(configDrawer.config.id, drawerContent.normalizedName)
+                    }
+                    configDrawer.closeTriggered()
+                }
+            }
+
+            BasicButtonType {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.topMargin: 16
+                implicitHeight: 32
+
+                defaultColor: AmneziaStyle.color.transparent
+                hoveredColor: AmneziaStyle.color.translucentWhite
+                pressedColor: AmneziaStyle.color.sheerWhite
+                disabledColor: AmneziaStyle.color.mutedGray
+                textColor: AmneziaStyle.color.vibrantRed
+
+                enabled: !CoordinatorController.busy
+
+                text: qsTr("Удалить конфиг")
+
+                clickedFunc: function() {
+                    var config = configDrawer.config
+                    configDrawer.closeTriggered()
+                    root.askDelete(config)
                 }
             }
         }

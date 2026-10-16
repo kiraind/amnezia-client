@@ -2,11 +2,11 @@
 
 #include <QDateTime>
 #include <QDebug>
-#include <QRegularExpression>
 #include <QSysInfo>
 #include <QUrl>
 
 #include "core/controllers/connectionController.h"
+#include "core/controllers/coordinator/deviceName.h"
 #include "core/controllers/selfhosted/importController.h"
 #include "core/repositories/secureAppSettingsRepository.h"
 #include "core/repositories/secureServersRepository.h"
@@ -266,7 +266,7 @@ void CoordinatorController::setupThisDevice()
         for (const QJsonValue &value : reply.body.value("configs").toArray()) {
             takenNames.append(value.toObject().value("name").toString());
         }
-        const QString name = deviceConfigName(QSysInfo::machineHostName(), QSysInfo::productType(), takenNames);
+        const QString name = deviceConfigName(deviceName::platformName(), QSysInfo::productType(), takenNames);
 
         m_api->createConfig(name, [this](const CoordinatorApi::Reply &reply) {
             emit busyChanged(false);
@@ -286,24 +286,14 @@ void CoordinatorController::setupThisDevice()
     });
 }
 
-QString CoordinatorController::deviceConfigName(const QString &hostName, const QString &fallback, const QStringList &takenNames)
+QString CoordinatorController::deviceConfigName(const QString &deviceName, const QString &fallback, const QStringList &takenNames)
 {
-    static const QRegularExpression invalidChars(QStringLiteral("[^a-z0-9]+"));
-
-    QString base = hostName.toLower();
-    if (base.endsWith(QStringLiteral(".local"))) {
-        base.chop(6);
-    }
-    base.replace(invalidChars, QStringLiteral("-"));
-    base = base.left(28);
-    while (base.startsWith('-')) {
-        base.remove(0, 1);
-    }
-    while (base.endsWith('-')) {
-        base.chop(1);
-    }
-    if (base.isEmpty() || base == QStringLiteral("localhost")) {
-        base = fallback.toLower().replace(invalidChars, QStringLiteral("-")).left(28);
+    // 28 leaves room for a "-NN" suffix
+    QString base = deviceName.trimmed().compare(QLatin1String("localhost"), Qt::CaseInsensitive) == 0
+            ? QString()
+            : deviceName::toConfigName(deviceName, 28);
+    if (base.isEmpty()) {
+        base = deviceName::toConfigName(fallback, 28);
     }
     if (base.isEmpty()) {
         base = QStringLiteral("device");
@@ -314,6 +304,34 @@ QString CoordinatorController::deviceConfigName(const QString &hostName, const Q
         name = QStringLiteral("%1-%2").arg(base).arg(i);
     }
     return name;
+}
+
+void CoordinatorController::renameConfig(const QString &configId, const QString &name)
+{
+    if (!isLoggedIn()) {
+        return;
+    }
+    allowThroughKillSwitch();
+    emit busyChanged(true);
+    m_api->renameConfig(configId, name, [this, configId](const CoordinatorApi::Reply &reply) {
+        emit busyChanged(false);
+        if (reply.ok()) {
+            const QString newName = reply.body.value("name").toString();
+            const QString serverId = serverIdForConfig(configId);
+            if (!serverId.isEmpty()) {
+                QJsonObject entry = managedConfigs().value(serverId).toObject();
+                entry[entryKey::name] = newName;
+                setManagedEntry(serverId, entry);
+            }
+            emit configRenamed(configId, newName);
+        } else if (reply.unauthorized() || reply.notMember()) {
+            handleAuthError(reply);
+            return;
+        } else {
+            emit errorOccurred(describeError(reply));
+        }
+        fetchRemoteConfigs();
+    });
 }
 
 void CoordinatorController::deleteConfig(const QString &configId)
@@ -597,6 +615,9 @@ QString CoordinatorController::describeError(const CoordinatorApi::Reply &reply)
     if (reply.errorCode == QLatin1String("name_taken")) {
         return tr("Имя уже занято");
     }
+    if (reply.errorCode == QLatin1String("invalid_name")) {
+        return tr("Имя может состоять только из латинских букв, цифр и дефисов, до 32 символов");
+    }
     if (reply.notMember()) {
         return tr("Вы больше не участник чата — доступ к VPN приостановлен");
     }
@@ -676,5 +697,8 @@ void CoordinatorController::allowThroughKillSwitch()
 
 QString CoordinatorController::deviceLabel() const
 {
-    return QStringLiteral("%1 (%2)").arg(QSysInfo::machineHostName(), QSysInfo::prettyProductName());
+    const QString name = deviceName::platformName();
+    const QString label = name.isEmpty() ? QSysInfo::prettyProductName()
+                                         : QStringLiteral("%1 (%2)").arg(name, QSysInfo::prettyProductName());
+    return label.left(64); // the coordinator rejects longer labels
 }
