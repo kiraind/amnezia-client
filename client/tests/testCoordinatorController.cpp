@@ -262,6 +262,7 @@ private:
     QString m_statusErrorCode;
     QJsonObject m_currentConfig; // returned by GET /v1/configs/{id}
     bool m_issueAwg3 = false;    // POST /v1/configs renders an AWG 3.1 config
+    QString m_nextConfigId = QStringLiteral("cfg-1"); // id of the next config POST /v1/configs creates
 
     MockHttpServer::Response handle(const MockHttpServer::Request &request)
     {
@@ -304,13 +305,18 @@ private:
         }
         if (request.method == "POST" && request.path == "/v1/configs") {
             const QString name = request.json().value("name").toString();
-            m_currentConfig = configJson("cfg-1", name, "rev1", "203.0.113.10:51820");
+            m_currentConfig = configJson(m_nextConfigId, name, "rev1", "203.0.113.10:51820");
             if (m_issueAwg3) {
                 m_currentConfig["awg"] = awg3Conf("203.0.113.10:51820");
             }
             return { 201, jsonBytes(m_currentConfig) };
         }
-        if (request.method == "GET" && request.path == "/v1/configs/cfg-1/status") {
+        const QString configPath = "/v1/configs/" + m_currentConfig.value("id").toString();
+        if (request.method == "DELETE" && !m_currentConfig.isEmpty() && request.path == configPath) {
+            m_currentConfig = {};
+            return { 204, {} };
+        }
+        if (request.method == "GET" && !m_currentConfig.isEmpty() && request.path == configPath + "/status") {
             if (m_statusHttp != 200) {
                 return { m_statusHttp, errorBody(m_statusErrorCode) };
             }
@@ -335,7 +341,7 @@ private:
             summary["createdAt"] = m_currentConfig.value("createdAt");
             return { 200, jsonBytes(summary) };
         }
-        if (request.method == "GET" && request.path == "/v1/configs/cfg-1") {
+        if (request.method == "GET" && !m_currentConfig.isEmpty() && request.path == configPath) {
             return { 200, jsonBytes(m_currentConfig) };
         }
         return { 404, errorBody("not_found") };
@@ -399,6 +405,7 @@ private slots:
         m_statusErrorCode.clear();
         m_currentConfig = {};
         m_issueAwg3 = false;
+        m_nextConfigId = QStringLiteral("cfg-1");
     }
 
     void testLogin()
@@ -418,11 +425,34 @@ private slots:
         QCOMPARE(m_controller->username(), QStringLiteral("@alice"));
         QCOMPARE(loggedInSpy.count(), 1);
 
+        // The login page follows up with setupThisDevice(), which fetches /me itself: no second request here
+        QTest::qWait(200);
+        QCOMPARE(m_server->requestsTo("GET", "/v1/me").size(), 0);
+        m_controller->fetchRemoteConfigs();
         QTRY_COMPARE(remoteSpy.count(), 1);
         const auto meRequests = m_server->requestsTo("GET", "/v1/me");
         QCOMPARE(meRequests.size(), 1);
         QCOMPARE(meRequests.first().headers.value("authorization"), "Bearer " + m_token.toUtf8());
         QVERIFY(!meRequests.first().headers.value("x-app-version").isEmpty());
+    }
+
+    void testLoginCleansUpCode()
+    {
+        QSignalSpy loginSpy(m_controller, &CoordinatorController::loginFinished);
+        m_controller->login(m_server->baseUrl(), " ab 12\ncd ");
+        QTRY_COMPARE(loginSpy.count(), 1);
+        QVERIFY(loginSpy.at(0).at(0).toBool());
+        QCOMPARE(m_server->requestsTo("POST", "/v1/auth/login").first().json().value("code").toString(), QStringLiteral("AB12CD"));
+    }
+
+    void testLoginRejectsPlainHttp()
+    {
+        QSignalSpy loginSpy(m_controller, &CoordinatorController::loginFinished);
+        m_controller->login("http://vpn.example.com", "AB12CD");
+        QCOMPARE(loginSpy.count(), 1);
+        QVERIFY(!loginSpy.at(0).at(0).toBool());
+        QVERIFY(m_server->requestsTo("POST", "/v1/auth/login").isEmpty());
+        QVERIFY(!m_controller->isLoggedIn());
     }
 
     void testLoginInvalidCode()
@@ -489,6 +519,71 @@ private slots:
         QTRY_COMPARE(setupSpy.count(), 2);
         QVERIFY(setupSpy.at(1).at(0).toBool());
         QCOMPARE(m_server->requestsTo("POST", "/v1/configs").size(), 1);
+    }
+
+    void testSetupReplacesRevokedConfig()
+    {
+        login();
+        const QString serverId = createPhone();
+        QVERIFY(!serverId.isEmpty());
+        const int serversBefore = m_core->m_serversRepository->serversCount();
+
+        // Revoked in the bot (or another account signed in): /me no longer lists it
+        m_currentConfig = {};
+        m_nextConfigId = QStringLiteral("cfg-2");
+        QSignalSpy setupSpy(m_controller, &CoordinatorController::deviceSetupFinished);
+        QSignalSpy replacedSpy(m_controller, &CoordinatorController::configReplaced);
+        m_controller->setupThisDevice();
+        QTRY_COMPARE(setupSpy.count(), 1);
+        QVERIFY(setupSpy.at(0).at(0).toBool());
+
+        // A new config takes the dead one's place instead of piling up next to it
+        QCOMPARE(m_server->requestsTo("POST", "/v1/configs").size(), 2);
+        QCOMPARE(replacedSpy.count(), 1);
+        QCOMPARE(m_core->m_serversRepository->serversCount(), serversBefore);
+        QCOMPARE(m_controller->serverIdForConfig("cfg-2"), serverId);
+        QVERIFY(m_controller->serverIdForConfig("cfg-1").isEmpty());
+        QCOMPARE(m_controller->managedConfigs().value(serverId).toObject().value("state").toString(), QStringLiteral("ok"));
+    }
+
+    void testFetchMarksMissingConfigRevoked()
+    {
+        login();
+        const QString serverId = createPhone();
+        QVERIFY(!serverId.isEmpty());
+
+        m_currentConfig = {};
+        QSignalSpy remoteSpy(m_controller, &CoordinatorController::remoteConfigsUpdated);
+        QSignalSpy errorSpy(m_controller, &CoordinatorController::errorOccurred);
+        m_controller->fetchRemoteConfigs();
+        QTRY_COMPARE(remoteSpy.count(), 1);
+        QCOMPARE(m_controller->managedConfigs().value(serverId).toObject().value("state").toString(), QStringLiteral("revoked"));
+        QCOMPARE(errorSpy.count(), 1);
+    }
+
+    void testDeleteConfigRemovesServer()
+    {
+        login();
+        const QString serverId = createPhone();
+        QVERIFY(!serverId.isEmpty());
+
+        QSignalSpy deletedSpy(m_controller, &CoordinatorController::configDeleted);
+        m_controller->deleteConfig("cfg-1");
+        QTRY_COMPARE(deletedSpy.count(), 1);
+        QCOMPARE(deletedSpy.at(0).at(0).toString(), QStringLiteral("cfg-1"));
+        QCOMPARE(m_server->requestsTo("DELETE", "/v1/configs/cfg-1").size(), 1);
+        QVERIFY(m_core->m_serversRepository->indexOfServerId(serverId) < 0);
+        QVERIFY(!m_controller->isManagedServer(serverId));
+    }
+
+    void testForgetDeviceRevokesConfigsAndToken()
+    {
+        login();
+        QVERIFY(!createPhone().isEmpty());
+
+        m_controller->forgetDevice();
+        QTRY_COMPARE(m_server->requestsTo("POST", "/v1/auth/logout").size(), 1);
+        QCOMPARE(m_server->requestsTo("DELETE", "/v1/configs/cfg-1").size(), 1);
     }
 
     void testDeviceConfigName_data()
@@ -681,11 +776,7 @@ private slots:
 
     void testFallsBackToKnownAddressWhenDnsFails()
     {
-        // login() fires its own GET /v1/me; let it finish first, or it can land after
-        // requests.clear() below and be counted as a second request.
-        QSignalSpy loginFetchSpy(m_controller, &CoordinatorController::remoteConfigsUpdated);
         login();
-        QTRY_COMPARE(loginFetchSpy.count(), 1);
         const int port = QUrl(m_server->baseUrl()).port();
         // The host is unreachable (like DNS/connect through a dead tunnel), so the first
         // attempt gets no HTTP answer. We point it at loopback 127.0.0.2, where nothing

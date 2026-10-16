@@ -151,6 +151,8 @@ void CoordinatorApi::send(const QByteArray &verb, const QString &path, const QJs
         const int port = url.port();
         request.setRawHeader("Host", (port > 0 ? QStringLiteral("%1:%2").arg(hostName).arg(port) : hostName).toUtf8());
         url.setHost(m_fallbackAddress);
+        // HTTP/2 takes :authority from the URL (the IP), not from the Host header; a reverse proxy routing by name needs HTTP/1.1
+        request.setAttribute(QNetworkRequest::Http2AllowedAttribute, false);
     }
     request.setUrl(url);
     request.setTransferTimeout(apiDefs::requestTimeoutMsecs);
@@ -158,8 +160,9 @@ void CoordinatorApi::send(const QByteArray &verb, const QString &path, const QJs
     request.setRawHeader("Accept", "application/json");
     request.setRawHeader("X-Client-Request-ID", QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8());
     request.setRawHeader("X-App-Version", QByteArray(APP_FULL_VERSION));
-    if (authorized && !m_token.isEmpty()) {
-        request.setRawHeader("Authorization", "Bearer " + m_token.toUtf8());
+    const QString token = authorized ? m_token : QString();
+    if (!token.isEmpty()) {
+        request.setRawHeader("Authorization", "Bearer " + token.toUtf8());
     }
 
     const QByteArray data = body ? QJsonDocument(*body).toJson(QJsonDocument::Compact) : QByteArray();
@@ -184,8 +187,9 @@ void CoordinatorApi::send(const QByteArray &verb, const QString &path, const QJs
 
     const std::shared_ptr<QJsonObject> bodyCopy = body ? std::make_shared<QJsonObject>(*body) : nullptr;
     connect(reply, &QNetworkReply::finished, this, [this, reply, sslErrors, callback, verb, path, bodyCopy, authorized,
-                                                    viaFallback, hostName]() {
+                                                    viaFallback, hostName, token]() {
         Reply result;
+        result.token = token;
         result.httpStatus = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
         result.networkError = result.httpStatus == 0 || !sslErrors->isEmpty()
                 || reply->error() == QNetworkReply::OperationCanceledError || reply->error() == QNetworkReply::TimeoutError;
@@ -210,9 +214,15 @@ void CoordinatorApi::send(const QByteArray &verb, const QString &path, const QJs
 
         reply->deleteLater();
 
-        // Unreachable by name (no HTTP answer, not a TLS problem): retry once via the known address
+        // Unreachable by name (no HTTP answer, not a TLS problem): retry once via the known address.
+        // A POST may already have reached the server before a timeout or reset (a created config, a used login code),
+        // so it is only retried when the connection itself failed.
+        const QNetworkReply::NetworkError networkError = reply->error();
+        const bool notSent = networkError == QNetworkReply::HostNotFoundError || networkError == QNetworkReply::ConnectionRefusedError
+                || networkError == QNetworkReply::TemporaryNetworkFailureError || networkError == QNetworkReply::NetworkSessionFailedError
+                || networkError == QNetworkReply::UnknownNetworkError;
         const bool canRetry = !viaFallback && result.httpStatus == 0 && sslErrors->isEmpty() && !m_fallbackAddress.isEmpty()
-                && m_fallbackAddress != hostName && hostName == host();
+                && m_fallbackAddress != hostName && hostName == host() && (verb != "POST" || notSent);
         if (canRetry) {
             send(verb, path, bodyCopy.get(), authorized, callback, true);
             return;

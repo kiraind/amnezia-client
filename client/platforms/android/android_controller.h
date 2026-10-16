@@ -31,6 +31,7 @@ public:
 
     ErrorCode start(const QJsonObject &vpnConfig);
     void stop();
+    void saveConfig(const QJsonObject &vpnConfig);
     void resetLastServer(int serverIndex);
     void saveFile(const QString &fileName, const QString &data);
     QString openFile(const QString &filter);
@@ -67,8 +68,6 @@ signals:
     void vpnStateChanged(ConnectionState state);
     void statisticsUpdated(quint64 rxBytes, quint64 txBytes);
     void fileOpened(QString uri);
-    void configImported(QString config);
-    void importConfigFromOutside(QString config);
     void initConnectionState(Vpn::ConnectionState state);
     void authenticationResult(bool result);
     void imeInsetsChanged(int heightDp);
@@ -99,7 +98,6 @@ private:
     static void onNotificationStateChanged(JNIEnv *env, jobject thiz);
     static void onVpnStateChanged(JNIEnv *env, jobject thiz, jint stateCode);
     static void onStatisticsUpdate(JNIEnv *env, jobject thiz, jlong rxBytes, jlong txBytes);
-    static void onConfigImported(JNIEnv *env, jobject thiz, jstring data);
     static void onFileOpened(JNIEnv *env, jobject thiz, jstring uri);
     static void onAuthResult(JNIEnv *env, jobject thiz, jboolean result);
     static void onImeInsetsChanged(JNIEnv *env, jobject thiz, jint heightDp);

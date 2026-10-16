@@ -96,7 +96,7 @@ PageType {
     QtObject {
         id: coordinatorAccount
 
-        property string title: qsTr("Аккаунт %1").arg(Qt.application.displayName)
+        property string title: qsTr("%1 account").arg(Qt.application.displayName)
         readonly property string leftImagePath: "qrc:/images/controls/telegram.svg"
         property bool isVisible: true
         readonly property var clickedHandler: function() {
@@ -133,7 +133,7 @@ PageType {
     QtObject {
         id: about
 
-        property string title: qsTr("О приложении")
+        property string title: qsTr("About")
         readonly property string leftImagePath: "qrc:/images/controls/amnezia.svg"
         property bool isVisible: true
         readonly property var clickedHandler: function() {

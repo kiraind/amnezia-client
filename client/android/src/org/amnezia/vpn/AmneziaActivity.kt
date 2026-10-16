@@ -8,7 +8,6 @@ import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Intent
 import android.content.Intent.EXTRA_MIME_TYPES
-import android.content.Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -22,6 +21,7 @@ import android.os.Looper
 import android.os.Message
 import android.os.Messenger
 import android.os.ParcelFileDescriptor
+import android.os.RemoteException
 import android.os.SystemClock
 import android.provider.OpenableColumns
 import android.provider.Settings
@@ -201,7 +201,6 @@ class AmneziaActivity : QtActivity() {
         pendingOpenFileUri = savedInstanceState?.getString(KEY_PENDING_OPEN_FILE_URI)
         openFileDeliveryScheduled = false
         registerBroadcastReceivers()
-        intent?.let(::processIntent)
         runBlocking { vpnProto = proto.await() }
     }
 
@@ -233,21 +232,6 @@ class AmneziaActivity : QtActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         Log.v(TAG, "onNewIntent: $intent")
-        intent?.let(::processIntent)
-    }
-
-    private fun processIntent(intent: Intent) {
-        // disable config import when starting activity from history
-        if (intent.flags and FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY == 0) {
-            if (intent.action == ACTION_IMPORT_CONFIG) {
-                intent.getStringExtra(EXTRA_CONFIG)?.let {
-                    mainScope.launch {
-                        qtInitialized.await()
-                        QtAndroidController.onConfigImported(it)
-                    }
-                }
-            }
-        }
     }
 
     override fun onStart() {
@@ -686,6 +670,64 @@ class AmneziaActivity : QtActivity() {
         Log.v(TAG, "Stop VPN")
         mainScope.launch {
             disconnectFromVpn()
+        }
+    }
+
+    // Fork: store the config always-on and the QS tile connect with, without connecting.
+    // The service keeps it in its own process (SharedPreferences are cached per process), so it is sent
+    // over the existing binding, or over a short-lived one when the activity isn't bound to the service.
+    @Suppress("unused")
+    fun saveVpnConfig(vpnConfig: String) {
+        Log.v(TAG, "Save VPN config")
+        mainScope.launch {
+            val proto = getVpnProto(vpnConfig) ?: return@launch
+            val message = {
+                Action.SAVE_CONFIG.packToMessage {
+                    putString(MSG_VPN_CONFIG, vpnConfig)
+                }
+            }
+            if (isServiceConnected && proto.serviceClass == vpnProto?.serviceClass) {
+                vpnServiceMessenger.send(message)
+                return@launch
+            }
+            val connection = object : ServiceConnection {
+                override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+                    try {
+                        Messenger(service).send(message())
+                    } catch (e: RemoteException) {
+                        Log.w(TAG, "Failed to send the VPN config to the service: $e")
+                    }
+                    unbindServiceSafely(this)
+                }
+
+                override fun onServiceDisconnected(name: ComponentName?) {}
+
+                override fun onBindingDied(name: ComponentName?) {
+                    unbindServiceSafely(this)
+                }
+
+                override fun onNullBinding(name: ComponentName?) {
+                    unbindServiceSafely(this)
+                }
+            }
+            val bound = try {
+                bindService(Intent(this@AmneziaActivity, proto.serviceClass), connection, BIND_AUTO_CREATE)
+            } catch (e: SecurityException) {
+                Log.e(TAG, "Failed to bind ${proto.serviceClass.simpleName}: $e")
+                false
+            }
+            if (!bound) {
+                Log.w(TAG, "Failed to bind the service to save the VPN config")
+                unbindServiceSafely(connection)
+            }
+        }
+    }
+
+    private fun unbindServiceSafely(connection: ServiceConnection) {
+        try {
+            unbindService(connection)
+        } catch (_: IllegalArgumentException) {
+            // already unbound
         }
     }
 

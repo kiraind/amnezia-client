@@ -213,6 +213,83 @@
     </message>
 </context>
 <context>
+    <name>CoordinatorController</name>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="130"/>
+        <source>Enter a server address starting with https://</source>
+        <translation>Введіть адресу сервера, що починається з https://</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="247"/>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="619"/>
+        <source>Config &quot;%1&quot; was deleted</source>
+        <translation>Конфігурацію «%1» видалено</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="661"/>
+        <source>VPN access is suspended: you are not a member of the chat</source>
+        <translation>Доступ до VPN призупинено: ви не є учасником чату</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="680"/>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="695"/>
+        <source>Could not import config &quot;%1&quot;</source>
+        <translation>Не вдалося імпортувати конфігурацію «%1»</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="719"/>
+        <source>Could not add config &quot;%1&quot;</source>
+        <translation>Не вдалося додати конфігурацію «%1»</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="753"/>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="785"/>
+        <source>You have been signed out. Sign in again with a code from the bot</source>
+        <translation>Ви вийшли з акаунта. Увійдіть знову за кодом від бота</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="757"/>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="782"/>
+        <source>You are no longer a member of the chat, VPN access is suspended</source>
+        <translation>Ви більше не учасник чату — доступ до VPN призупинено</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="767"/>
+        <source>No connection to the Лёша VPN server. Check your internet connection and try again</source>
+        <translation>Немає зв&apos;язку з сервером Лёша VPN. Перевірте підключення до інтернету та спробуйте ще раз</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="770"/>
+        <source>Wrong or expired code</source>
+        <translation>Невірний або прострочений код</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="773"/>
+        <source>Too many attempts. Try again in a minute</source>
+        <translation>Забагато спроб. Спробуйте ще раз за хвилину</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="776"/>
+        <source>This name is already taken</source>
+        <translation>Це ім&apos;я вже зайняте</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="779"/>
+        <source>The name may only contain Latin letters, digits and hyphens, up to 32 characters</source>
+        <translation>Ім&apos;я може містити лише латинські літери, цифри та дефіси, до 32 символів</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="788"/>
+        <source>Config not found</source>
+        <translation>Конфігурацію не знайдено</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="791"/>
+        <source>Лёша VPN server error (HTTP %1). Try again later</source>
+        <translation>Помилка сервера Лёша VPN (HTTP %1). Спробуйте пізніше</translation>
+    </message>
+</context>
+<context>
     <name>HomeContainersListView</name>
     <message>
         <location filename="../ui/qml/Components/HomeContainersListView.qml" line="55"/>
@@ -451,6 +528,165 @@ Already installed containers were found on the server. All installed containers 
         <location filename="../ui/utils/notificationHandler.cpp" line="89"/>
         <source>Unsecured network detected: </source>
         <translation>Знайдена не захищена мережа: </translation>
+    </message>
+</context>
+<context>
+    <name>PageCoordinatorConfigs</name>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="119"/>
+        <source>%1 account</source>
+        <translation>Акаунт %1</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="37"/>
+        <source>Another device</source>
+        <translation>Інший пристрій</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="47"/>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="225"/>
+        <source>Cancel</source>
+        <translation>Відмінити</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="199"/>
+        <source>Connect this device</source>
+        <translation>Підключити цей пристрій</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="46"/>
+        <source>Delete</source>
+        <translation>Видалити</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="42"/>
+        <source>Delete device %1?</source>
+        <translation>Видалити пристрій %1?</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="41"/>
+        <source>Delete the config of this device?</source>
+        <translation>Видалити конфігурацію цього пристрою?</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="32"/>
+        <source>Deleted</source>
+        <translation>Видалено</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="292"/>
+        <source>Device name</source>
+        <translation>Назва пристрою</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="70"/>
+        <source>Device renamed</source>
+        <translation>Пристрій перейменовано</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="306"/>
+        <source>Latin letters, digits and hyphens, up to 32 characters</source>
+        <translation>Латинські літери, цифри та дефіси, до 32 символів</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="283"/>
+        <source>Rename device</source>
+        <translation>Перейменувати пристрій</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="316"/>
+        <source>Save</source>
+        <translation>Зберегти</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="219"/>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="224"/>
+        <source>Sign out</source>
+        <translation>Вийти</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="222"/>
+        <source>Sign out?</source>
+        <translation>Вийти з акаунта?</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="35"/>
+        <source>Suspended</source>
+        <translation>Призупинено</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="131"/>
+        <source>The VPN network is down</source>
+        <translation>Мережа VPN недоступна</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="132"/>
+        <source>The VPN network is unstable</source>
+        <translation>Мережа VPN працює з перебоями</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="37"/>
+        <source>This device</source>
+        <translation>Цей пристрій</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="66"/>
+        <source>This device is connected</source>
+        <translation>Цей пристрій підключено</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="45"/>
+        <source>VPN on %1 will stop working.</source>
+        <translation>VPN на пристрої %1 перестане працювати.</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="223"/>
+        <source>VPN on this device keeps working, but its settings will no longer be updated.</source>
+        <translation>VPN на цьому пристрої продовжить працювати, але його налаштування більше не оновлюватимуться.</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="44"/>
+        <source>VPN on this device will stop working. To connect it again, tap &quot;Connect this device&quot;.</source>
+        <translation>VPN на цьому пристрої перестане працювати. Щоб підключити його знову, натисніть «Підключити цей пристрій».</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="307"/>
+        <source>Will be saved as %1</source>
+        <translation>Буде збережено як %1</translation>
+    </message>
+</context>
+<context>
+    <name>PageCoordinatorLogin</name>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="106"/>
+        <source>Code</source>
+        <translation>Код</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="200"/>
+        <source>Enter the server address</source>
+        <translation>Вкажіть адресу сервера</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="95"/>
+        <source>Send /login to the bot and enter the code you get. The code is valid for 5 minutes.</source>
+        <translation>Надішліть боту /login і введіть отриманий код. Код дійсний 5 хвилин.</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="148"/>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="165"/>
+        <source>Server address</source>
+        <translation>Адреса сервера</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="194"/>
+        <source>Sign in</source>
+        <translation>Увійти</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="94"/>
+        <source>Sign in with a code</source>
+        <translation>Вхід за кодом</translation>
     </message>
 </context>
 <context>
@@ -3375,6 +3611,16 @@ Create one from the current settings.</source>
         <source>Dev console</source>
         <translation>Консоль розробника</translation>
     </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettings.qml" line="99"/>
+        <source>%1 account</source>
+        <translation>Акаунт %1</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettings.qml" line="136"/>
+        <source>About</source>
+        <translation>Про застосунок</translation>
+    </message>
 </context>
 <context>
     <name>PageSettingsAbout</name>
@@ -3477,6 +3723,11 @@ Create one from the current settings.</source>
         <location filename="../ui/qml/Pages2/PageSettingsAbout.qml" line="239"/>
         <source>Visit official website</source>
         <translation>Перейти на офіційний сайт</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsAbout.qml" line="109"/>
+        <source>Telegram</source>
+        <translation>Telegram</translation>
     </message>
 </context>
 <context>
@@ -4145,6 +4396,11 @@ Create one from the current settings.</source>
         <source>Cannot reset settings during active connection</source>
         <translation>Неможливо скинути налаштування під час активного підключення</translation>
     </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsApplication.qml" line="220"/>
+        <source>All settings will be reset to default. The config of this device will be deleted from your account.</source>
+        <translation>Усі налаштування буде скинуто до типових. Конфігурацію цього пристрою буде видалено з вашого акаунта.</translation>
+    </message>
 </context>
 <context>
     <name>PageSettingsBackup</name>
@@ -4590,6 +4846,16 @@ Create one from the current settings.</source>
         <source>AmneziaVPN-service logs</source>
         <translation>Логи служби AmneziaVPN</translation>
     </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsLogging.qml" line="182"/>
+        <source>%1 logs</source>
+        <translation>Логи %1</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsLogging.qml" line="211"/>
+        <source>%1 service logs</source>
+        <translation>Логи служби %1</translation>
+    </message>
 </context>
 <context>
     <name>PageSettingsNewsNotifications</name>
@@ -4711,6 +4977,26 @@ Create one from the current settings.</source>
         <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="212"/>
         <source>Cannot reset API config during active connection</source>
         <translation>Неможливо скинути конфігурацію API під час активного підключення</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="69"/>
+        <source>Delete the config of this device</source>
+        <translation>Видалити конфігурацію цього пристрою</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="74"/>
+        <source>Delete the config of this device?</source>
+        <translation>Видалити конфігурацію цього пристрою?</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="78"/>
+        <source>The server will be removed from this app only.</source>
+        <translation>Сервер буде видалено лише з цього застосунку.</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="77"/>
+        <source>VPN on this device will stop working. To connect it again, tap &quot;Connect this device&quot; in your account.</source>
+        <translation>VPN на цьому пристрої перестане працювати. Щоб підключити його знову, натисніть «Підключити цей пристрій» в акаунті.</translation>
     </message>
 </context>
 <context>
@@ -5249,6 +5535,21 @@ Create one from the current settings.</source>
         <location filename="../ui/qml/Pages2/PageSetupWizardConfigSource.qml" line="392"/>
         <source>I have nothing</source>
         <translation>У мене нічого нема</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSetupWizardConfigSource.qml" line="57"/>
+        <source>Sign in with a code from the Telegram bot: the app will get your connection settings and keep them up to date</source>
+        <translation>Увійдіть за кодом від Telegram-бота: застосунок сам отримає налаштування підключення й оновлюватиме їх</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSetupWizardConfigSource.qml" line="101"/>
+        <source>Sign in with a Telegram code</source>
+        <translation>Увійти за кодом із Telegram</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSetupWizardConfigSource.qml" line="102"/>
+        <source>Get a code with the /login command in the bot</source>
+        <translation>Отримайте код командою /login у боті</translation>
     </message>
 </context>
 <context>
@@ -5938,6 +6239,14 @@ Create one from the current settings.</source>
         <location filename="../ui/qml/Controls2/PopupType.qml" line="101"/>
         <source>Close</source>
         <translation>Закрити</translation>
+    </message>
+</context>
+<context>
+    <name>ProtocolSettingsUiController</name>
+    <message>
+        <location filename="../ui/controllers/protocolSettingsUiController.cpp" line="53"/>
+        <source>Settings updated successfully</source>
+        <translation>Налаштування оновлено</translation>
     </message>
 </context>
 <context>
@@ -6870,6 +7179,11 @@ For more detailed information, you can
         <location filename="../ui/controllers/serversUiController.cpp" line="100"/>
         <source>Use the remove action to delete this legacy config.</source>
         <translation>Скористайтеся дією «Видалити», щоб видалити цю застарілу конфігурацію.</translation>
+    </message>
+    <message>
+        <location filename="../ui/controllers/serversUiController.cpp" line="56"/>
+        <source>Server &apos;%1&apos; was removed</source>
+        <translation>Сервер &apos;%1&apos; був видалений</translation>
     </message>
 </context>
 <context>

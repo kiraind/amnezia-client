@@ -37,12 +37,22 @@ Fork hunks in upstream files (conflict-prone):
 - `client/core/controllers/coreSignalHandlers.cpp` — `CoordinatorUiController::errorOccurred` -> `PageController::showErrorMessage(QString)`.
 - `client/cmake/sources.cmake` — coordinator `.h/.cpp` in HEADERS/SOURCES; `ui/controllers/coordinator/*` in the UI_CONTROLLERS globs.
 - `client/ui/utils/pageEnum.h` — `PageCoordinatorLogin`, `PageCoordinatorConfigs`; `client/ui/qml/qml.qrc` — the two pages.
-- `client/ui/qml/Pages2/PageSettings.qml` — `coordinatorAccount` entry ("Аккаунт VPN").
+- `client/ui/qml/Pages2/PageSettings.qml` — `coordinatorAccount` entry ("%1 account" with the display name).
 - `client/ui/qml/Pages2/PageStart.qml` (third tab, `onEscapePressed`) and `PageSetupWizardStart.qml` ("Let's get started") —
   when logged in, open `PageCoordinatorConfigs` instead of the connection screen. The third tab shows the fork-only
   `client/images/controls/user.svg` (Feather "user", same style as the other tab icons) instead of upstream's `plus.svg`.
 - `client/CMakeLists.txt` — `COORDINATOR_API_URL` cache var -> `-DCOORDINATOR_API_URL`; `deploy/build.sh` / `deploy/build.bat` pass it through.
 - `client/tests/CMakeLists.txt` — `test_coordinator_controller` target + `add_test`.
+- `client/vpnConnection.cpp` — the coordinator IP is excluded only while signed in (`coordinatorToken` not empty).
+- `client/secureQSettings.cpp` (Linux only) — the settings file is `0600` and its directory `0700`, since there is no keychain encryption there.
+- `client/core/controllers/coreSignalHandlers.cpp` — `translationsUpdated` -> `ServersUiController::updateModel`, so server descriptions
+  ("AmneziaWG (version 3.1)") are rebuilt in the UI language after the first translator is installed.
+- `client/ui/qml/Pages2/PageSettingsServerData.qml` — for a managed server, "remove" deletes its config on the coordinator
+  (`CoordinatorController.deleteConfig`), so it doesn't stay behind as a dead device.
+- `client/ui/qml/Pages2/PageSettingsApplication.qml` — "reset all data" calls `CoordinatorController.forgetDevice()` first
+  (revokes this app's configs and the token on the server).
+- `client/ui/qml/Pages2/PageStart.qml` — `onRemoveServerFinished` always goes to the main screen (the servers list page is
+  unreachable in the fork); `onConfigDeleted` goes to the start screen when the last server is gone.
 
 How to resolve: take upstream's version of the file, then re-add the fork hunk(s) above. If upstream
 renamed/refactored something the coordinator uses (servers repository, import controller,
@@ -61,7 +71,7 @@ Fork state: `variants` = `coordinatorLogin` only. Removed: "VPN by Amnezia"
 (`amneziaVpn`), self-hosted setup (`selfHostVpn`), `backupRestore`, `restorePurchases`, `siteLink`,
 the "Site Amnezia" footer link, and (Noah, 2026-10-13) the "Insert key" field with its Continue button,
 the "Other connection options" label, and the `fileOpen`/`qrScan` entries (their QtObjects stay defined,
-just not listed), because imported configs don't auto-update. The intro text is the fork's Russian line.
+just not listed), because imported configs don't auto-update. The intro text and the `coordinatorLogin` title/description are fork strings (see Translations).
 The header's "more" (⋮) button and its drawer (logs toggle/export, support tag) are removed too (Noah, 2026-10-13):
 the header is a plain `BaseHeaderType` "Connection".
 How to resolve: take upstream's file for new/changed code, then delete the removed variants again and
@@ -168,6 +178,17 @@ removed feature, don't add it to the build.
   (same JNI methods), `ui/controllers/importUiController.cpp`, `ui/controllers/settingsUiController.cpp`
   (`isCameraPresent()` is false on Android), `client/cmake/3rdparty.cmake` (qtgamepad block), `ui/qml/main2.qml`
   (gamepad `Loader`), `ui/qml/qml.qrc`.
+
+### 9.1a Android "open with" config import
+The app no longer registers as a handler for `vpn://` links, `.vpn`/`.cfg`/`.conf` files or shared text (configs only come
+from the coordinator, and `vpn://` collided with the official AmneziaVPN app).
+- Deleted: `client/android/src/org/amnezia/vpn/ImportConfigActivity.kt`.
+- Hunks: `client/android/AndroidManifest.xml` (the `ImportConfigActivity` with its SEND/VIEW filters, and the
+  `org.amnezia.vpn.IMPORT_CONFIG` filter of `AmneziaActivity`), `AmneziaActivity.kt` (`processIntent`),
+  `qt/QtAndroidController.kt` (`onConfigImported`), `client/platforms/android/android_controller.{h,cpp}`
+  (`onConfigImported`, `configImported`, `importConfigFromOutside`), `core/controllers/coreSignalHandlers.cpp`
+  (`initAndroidConnectionHandler`: the import-from-outside handler). The launcher, QS-tile preferences filter, VPN service
+  and tile are unchanged. iOS's `importConfigFromOutside` is left as is (iOS is not built).
 
 ### 9.2 Self-hosted server installation, server services and sharing
 The app can no longer install or manage a server over SSH, add services (Tor website, SFTP, SOCKS5, MTProxy, Telemt,
@@ -324,13 +345,43 @@ How to resolve: keep ours. If upstream adds a new place that hardcodes `amn0` fo
 ## 11. Settings, About and tray trimmed
 Noah, 2026-10-13.
 - `client/ui/qml/Pages2/PageSettings.qml` — the "Servers" entry is removed from the list (the servers pages stay in the
-  build, just unreachable from Settings). Titles: "Аккаунт %1" (`Qt.application.displayName`) and plain "О приложении".
-- `client/ui/qml/Pages2/PageCoordinatorConfigs.qml` — header "Аккаунт %1" with the display name.
+  build, just unreachable from Settings). Titles: "%1 account" (`Qt.application.displayName`) and plain "About" (context `PageSettings`).
+- `client/ui/qml/Pages2/PageCoordinatorConfigs.qml` — header "%1 account" with the display name.
 - `client/ui/qml/Pages2/PageSettingsAbout.qml` — no donation header/paragraph, no Privacy Policy button; contacts are only
-  Telegram (https://t.me/kiraind) and GitHub (https://github.com/lesha-vpn). The version line stays.
+  Telegram (https://t.me/kiraind, the `@kiraind` handle is not translatable) and GitHub (https://github.com/lesha-vpn). The version line stays.
+- `client/ui/qml/Pages2/PageSettingsLogging.qml` — log descriptions are "%1 logs" / "%1 service logs" with the display name instead of "AmneziaVPN(-service) logs".
 - `client/ui/utils/systemTrayNotificationHandler.{h,cpp}` — the tray "Visit Website" action is removed.
 How to resolve: take upstream's changes, then drop these entries again. New upstream contacts/links in About are dropped.
 
+## 12. Android: always-on and QS tile follow config updates
+Upstream's VPN service saves the config (`LAST_CONF` in `Prefs`) only when the app connects, and always-on / the QS tile
+connect with that saved copy. After the coordinator replaced a config (e.g. the entry node moved) they kept using the dead
+one until the user connected once from the app. Now every change of the default server or its config (`serverEdited`,
+`serverAdded` as default, `defaultServerChanged`) pushes the freshly built connection config (same JSON as on connect,
+split tunneling included) to the service without connecting.
+- `core/controllers/coreSignalHandlers.cpp` (`initAndroidSettingsHandler`) → `ConnectionController::saveAndroidConfig`
+  (`core/controllers/connectionController.{h,cpp}`, signal `saveAndroidConfigRequested`) → `VpnConnection::saveAndroidConfig`
+  (`client/vpnConnection.{h,cpp}`) → `AndroidController::saveConfig` (`platforms/android/android_controller.{h,cpp}`) →
+  `AmneziaActivity.saveVpnConfig` → service action `Action.SAVE_CONFIG` (`IpcMessage.kt`, `AmneziaVpnService.kt`).
+- The service process writes the prefs itself (SharedPreferences are cached per process): the activity sends the message
+  over its binding, or binds briefly (`BIND_AUTO_CREATE`) when it isn't bound; an unstarted service then stops again on unbind.
+How to resolve: keep the hunks; if upstream changes how `connect()` / `LAST_CONF` work in the service, keep a way to
+update the saved config without connecting.
+
 ## Translations
-Fork UI strings are Russian source text inside `qsTr(...)` (e.g. "Аккаунт VPN"). The fork does not edit `client/translations/*.ts`,
-so on conflict take upstream's `.ts` files. Only if a fork commit ever added entries to them, re-add those entries.
+Fork UI strings are **English source text** in `qsTr()`/`tr()`, like upstream's, and every fork string has a finished
+translation in all 12 shipped `client/translations/amneziavpn_*.ts` (ru_RU, uk_UA, es_ES, fr_FR, ar_EG, fa_IR, hi_IN, ko_KR,
+my_MM, th_TH, ur_PK, zh_CN). The brand stays «Лёша VPN» in every language; prefer `%1` + `Qt.application.displayName` /
+`DISPLAY_NAME` over a literal. Russian uses the fork's wording («конфиг», «» quotes, «вы»).
+Fork entries in the `.ts` files: contexts `CoordinatorController`, `PageCoordinatorConfigs`, `PageCoordinatorLogin` (fork-only),
+`ProtocolSettingsUiController`, `ServersUiController` (strings moved out of upstream's deleted `InstallUiController`, §9.2), and
+fork strings added to the upstream contexts `PageSettings`, `PageSettingsAbout`, `PageSettingsApplication`, `PageSettingsLogging`,
+`PageSettingsServerData`, `PageSetupWizardConfigSource`.
+- A new or changed fork string must be added to **every** `.ts` in the same change (a QML string's context is the file's basename).
+  The fork's `.ts` files are edited by hand / script: don't run a full `lupdate` over them, it would mark hundreds of strings
+  of the features removed in §9 as vanished. To find untranslated fork strings, run `lupdate` over the current tree and over
+  the upstream base into scratch `.ts` files and compare (strings in the current tree but not in the base, plus anything in
+  fork-only files, must have a finished translation with the same `%N` placeholders in each language).
+- How to resolve: on conflict take upstream's `.ts` files, then re-add the fork entries listed above (copy the fork's
+  `<message>` blocks from the pre-merge `dev` version of each file). If upstream changed the source text of a string the fork
+  also changed, keep the fork's source text and its entries.

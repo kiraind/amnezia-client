@@ -180,6 +180,16 @@ open class AmneziaVpnService : VpnService() {
                     Action.SET_SAVE_LOGS -> {
                         Log.saveLogs = msg.data.getBoolean(MSG_SAVE_LOGS)
                     }
+
+                    Action.SAVE_CONFIG -> {
+                        // Fork: the app pushes the current default server's config here whenever it changes, so
+                        // always-on and the QS tile (connect() without a config) don't start with a stale one.
+                        // Saved in this process: SharedPreferences are cached per process.
+                        msg.data.getString(MSG_VPN_CONFIG)?.takeIf { it.isNotBlank() }?.let {
+                            Log.d(TAG, "Save VPN config")
+                            Prefs.save(PREFS_CONFIG_KEY, it)
+                        }
+                    }
                 }
             }
         }

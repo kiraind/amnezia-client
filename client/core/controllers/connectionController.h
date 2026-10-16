@@ -42,6 +42,7 @@ public:
 
 #ifdef Q_OS_ANDROID
     void restoreConnection();
+    void saveAndroidConfig(const QString &serverId);
 #endif
 
     void onKillSwitchModeChanged(bool enabled);
@@ -69,6 +70,7 @@ signals:
 
 #ifdef Q_OS_ANDROID
     void restoreConnectionRequested();
+    void saveAndroidConfigRequested(const QJsonObject &vpnConfiguration);
 #endif
 
 private:

@@ -13,6 +13,7 @@ CoordinatorUiController::CoordinatorUiController(CoordinatorController *coordina
     connect(m_coordinatorController, &CoordinatorController::loginFinished, this, &CoordinatorUiController::loginFinished);
     connect(m_coordinatorController, &CoordinatorController::configAdded, this, &CoordinatorUiController::configAdded);
     connect(m_coordinatorController, &CoordinatorController::configRenamed, this, &CoordinatorUiController::configRenamed);
+    connect(m_coordinatorController, &CoordinatorController::configDeleted, this, &CoordinatorUiController::configDeleted);
     connect(m_coordinatorController, &CoordinatorController::deviceSetupFinished, this, &CoordinatorUiController::deviceSetupFinished);
     connect(m_coordinatorController, &CoordinatorController::errorOccurred, this, &CoordinatorUiController::errorOccurred);
 
@@ -144,4 +145,14 @@ QString CoordinatorUiController::toConfigName(const QString &text) const
 bool CoordinatorUiController::isManagedServer(const QString &serverId) const
 {
     return m_coordinatorController->isManagedServer(serverId);
+}
+
+QString CoordinatorUiController::configIdForServer(const QString &serverId) const
+{
+    return m_coordinatorController->configIdForServer(serverId);
+}
+
+void CoordinatorUiController::forgetDevice()
+{
+    m_coordinatorController->forgetDevice();
 }

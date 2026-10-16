@@ -112,13 +112,22 @@ PageType {
         target: ServersUiController
 
         function onRemoveServerFinished(finishedMessage) {
+            // Fork: the servers list is not part of the app any more, so always back to the main screen
+            PageController.goToPageHome()
+            PageController.showNotificationMessage(finishedMessage)
+        }
+    }
+
+    Connections {
+        objectName: "coordinatorControllerConnections"
+
+        target: CoordinatorController
+
+        function onConfigDeleted(configId) {
+            // The device's only server is gone: the main screen becomes the start screen
             if (!ServersUiController.getServersCount()) {
                 PageController.goToPageHome()
-            } else {
-                PageController.goToStartPage()
-                PageController.goToPage(PageEnum.PageSettingsServersList)
             }
-            PageController.showNotificationMessage(finishedMessage)
         }
     }
 

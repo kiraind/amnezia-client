@@ -213,6 +213,83 @@
     </message>
 </context>
 <context>
+    <name>CoordinatorController</name>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="130"/>
+        <source>Enter a server address starting with https://</source>
+        <translation>أدخل عنوان خادم يبدأ بـ https://</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="247"/>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="619"/>
+        <source>Config &quot;%1&quot; was deleted</source>
+        <translation>تم حذف التكوين &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="661"/>
+        <source>VPN access is suspended: you are not a member of the chat</source>
+        <translation>تم تعليق الوصول إلى VPN: أنت لست عضوًا في الدردشة</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="680"/>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="695"/>
+        <source>Could not import config &quot;%1&quot;</source>
+        <translation>تعذّر استيراد التكوين &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="719"/>
+        <source>Could not add config &quot;%1&quot;</source>
+        <translation>تعذّر إضافة التكوين &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="753"/>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="785"/>
+        <source>You have been signed out. Sign in again with a code from the bot</source>
+        <translation>تم تسجيل خروجك. سجّل الدخول مجددًا باستخدام رمز من البوت</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="757"/>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="782"/>
+        <source>You are no longer a member of the chat, VPN access is suspended</source>
+        <translation>لم تعد عضوًا في الدردشة، تم تعليق الوصول إلى VPN</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="767"/>
+        <source>No connection to the Лёша VPN server. Check your internet connection and try again</source>
+        <translation>لا يوجد اتصال بخادم Лёша VPN. تحقق من اتصالك بالإنترنت وحاول مرة أخرى</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="770"/>
+        <source>Wrong or expired code</source>
+        <translation>الرمز غير صحيح أو منتهي الصلاحية</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="773"/>
+        <source>Too many attempts. Try again in a minute</source>
+        <translation>محاولات كثيرة جدًا. حاول مرة أخرى بعد دقيقة</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="776"/>
+        <source>This name is already taken</source>
+        <translation>هذا الاسم مستخدم بالفعل</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="779"/>
+        <source>The name may only contain Latin letters, digits and hyphens, up to 32 characters</source>
+        <translation>يمكن أن يحتوي الاسم على أحرف لاتينية وأرقام وشرطات فقط، بحد أقصى 32 حرفًا</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="788"/>
+        <source>Config not found</source>
+        <translation>لم يتم العثور على التكوين</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="791"/>
+        <source>Лёша VPN server error (HTTP %1). Try again later</source>
+        <translation>خطأ في خادم Лёша VPN (HTTP %1). حاول مرة أخرى لاحقًا</translation>
+    </message>
+</context>
+<context>
     <name>HomeContainersListView</name>
     <message>
         <location filename="../ui/qml/Components/HomeContainersListView.qml" line="55"/>
@@ -452,6 +529,165 @@ Already installed containers were found on the server. All installed containers 
         <location filename="../ui/utils/notificationHandler.cpp" line="89"/>
         <source>Unsecured network detected: </source>
         <translation>تم العثور علي شبكة غير مؤمنة: </translation>
+    </message>
+</context>
+<context>
+    <name>PageCoordinatorConfigs</name>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="119"/>
+        <source>%1 account</source>
+        <translation>حساب %1</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="37"/>
+        <source>Another device</source>
+        <translation>جهاز آخر</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="47"/>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="225"/>
+        <source>Cancel</source>
+        <translation>إلغاء</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="199"/>
+        <source>Connect this device</source>
+        <translation>توصيل هذا الجهاز</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="46"/>
+        <source>Delete</source>
+        <translation>احذف</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="42"/>
+        <source>Delete device %1?</source>
+        <translation>هل تريد حذف الجهاز %1؟</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="41"/>
+        <source>Delete the config of this device?</source>
+        <translation>هل تريد حذف تكوين هذا الجهاز؟</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="32"/>
+        <source>Deleted</source>
+        <translation>محذوف</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="292"/>
+        <source>Device name</source>
+        <translation>اسم الجهاز</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="70"/>
+        <source>Device renamed</source>
+        <translation>تمت إعادة تسمية الجهاز</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="306"/>
+        <source>Latin letters, digits and hyphens, up to 32 characters</source>
+        <translation>أحرف لاتينية وأرقام وشرطات، حتى 32 حرفًا</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="283"/>
+        <source>Rename device</source>
+        <translation>إعادة تسمية الجهاز</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="316"/>
+        <source>Save</source>
+        <translation>احفظ</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="219"/>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="224"/>
+        <source>Sign out</source>
+        <translation>تسجيل الخروج</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="222"/>
+        <source>Sign out?</source>
+        <translation>هل تريد تسجيل الخروج؟</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="35"/>
+        <source>Suspended</source>
+        <translation>معلّق</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="131"/>
+        <source>The VPN network is down</source>
+        <translation>شبكة VPN معطّلة</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="132"/>
+        <source>The VPN network is unstable</source>
+        <translation>شبكة VPN غير مستقرة</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="37"/>
+        <source>This device</source>
+        <translation>هذا الجهاز</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="66"/>
+        <source>This device is connected</source>
+        <translation>تم توصيل هذا الجهاز</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="45"/>
+        <source>VPN on %1 will stop working.</source>
+        <translation>سيتوقف VPN عن العمل على %1.</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="223"/>
+        <source>VPN on this device keeps working, but its settings will no longer be updated.</source>
+        <translation>سيستمر VPN في العمل على هذا الجهاز، لكن لن يتم تحديث إعداداته بعد الآن.</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="44"/>
+        <source>VPN on this device will stop working. To connect it again, tap &quot;Connect this device&quot;.</source>
+        <translation>سيتوقف VPN عن العمل على هذا الجهاز. لتوصيله مرة أخرى، اضغط على &quot;توصيل هذا الجهاز&quot;.</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="307"/>
+        <source>Will be saved as %1</source>
+        <translation>سيتم الحفظ باسم %1</translation>
+    </message>
+</context>
+<context>
+    <name>PageCoordinatorLogin</name>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="106"/>
+        <source>Code</source>
+        <translation>الرمز</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="200"/>
+        <source>Enter the server address</source>
+        <translation>أدخل عنوان الخادم</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="95"/>
+        <source>Send /login to the bot and enter the code you get. The code is valid for 5 minutes.</source>
+        <translation>أرسل /login إلى البوت وأدخل الرمز الذي تحصل عليه. الرمز صالح لمدة 5 دقائق.</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="148"/>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="165"/>
+        <source>Server address</source>
+        <translation>عنوان الخادم</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="194"/>
+        <source>Sign in</source>
+        <translation>تسجيل الدخول</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="94"/>
+        <source>Sign in with a code</source>
+        <translation>تسجيل الدخول برمز</translation>
     </message>
 </context>
 <context>
@@ -3376,6 +3612,16 @@ Create one from the current settings.</source>
         <source>Dev console</source>
         <translation>وحدة تحكم التطوير</translation>
     </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettings.qml" line="99"/>
+        <source>%1 account</source>
+        <translation>حساب %1</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettings.qml" line="136"/>
+        <source>About</source>
+        <translation>حول التطبيق</translation>
+    </message>
 </context>
 <context>
     <name>PageSettingsAbout</name>
@@ -3478,6 +3724,11 @@ Create one from the current settings.</source>
         <location filename="../ui/qml/Pages2/PageSettingsAbout.qml" line="239"/>
         <source>Visit official website</source>
         <translation>زيارة الموقع الرسمي</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsAbout.qml" line="109"/>
+        <source>Telegram</source>
+        <translation>Telegram</translation>
     </message>
 </context>
 <context>
@@ -4146,6 +4397,11 @@ Create one from the current settings.</source>
         <source>Cannot reset settings during active connection</source>
         <translation>لا يمكن إعادة ضبط الإعدادات اثناء تواجد اتصال فعال</translation>
     </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsApplication.qml" line="220"/>
+        <source>All settings will be reset to default. The config of this device will be deleted from your account.</source>
+        <translation>ستتم إعادة تعيين جميع الإعدادات إلى الوضع الافتراضي. سيتم حذف تكوين هذا الجهاز من حسابك.</translation>
+    </message>
 </context>
 <context>
     <name>PageSettingsBackup</name>
@@ -4591,6 +4847,16 @@ Create one from the current settings.</source>
         <source>AmneziaVPN-service logs</source>
         <translation>سجلات خدمة AmneziaVPN</translation>
     </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsLogging.qml" line="182"/>
+        <source>%1 logs</source>
+        <translation>سجلات %1</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsLogging.qml" line="211"/>
+        <source>%1 service logs</source>
+        <translation>سجلات خدمة %1</translation>
+    </message>
 </context>
 <context>
     <name>PageSettingsNewsNotifications</name>
@@ -4712,6 +4978,26 @@ Create one from the current settings.</source>
         <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="212"/>
         <source>Cannot reset API config during active connection</source>
         <translation>لا يمكن إعادة تعيين تكوين API أثناء الاتصال النشط</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="69"/>
+        <source>Delete the config of this device</source>
+        <translation>حذف تكوين هذا الجهاز</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="74"/>
+        <source>Delete the config of this device?</source>
+        <translation>هل تريد حذف تكوين هذا الجهاز؟</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="78"/>
+        <source>The server will be removed from this app only.</source>
+        <translation>ستتم إزالة الخادم من هذا التطبيق فقط.</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="77"/>
+        <source>VPN on this device will stop working. To connect it again, tap &quot;Connect this device&quot; in your account.</source>
+        <translation>سيتوقف VPN عن العمل على هذا الجهاز. لتوصيله مرة أخرى، اضغط على &quot;توصيل هذا الجهاز&quot; في حسابك.</translation>
     </message>
 </context>
 <context>
@@ -5259,6 +5545,21 @@ Create one from the current settings.</source>
         <location filename="../ui/qml/Pages2/PageSetupWizardConfigSource.qml" line="392"/>
         <source>I have nothing</source>
         <translation>ليس لدي اي شئ</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSetupWizardConfigSource.qml" line="57"/>
+        <source>Sign in with a code from the Telegram bot: the app will get your connection settings and keep them up to date</source>
+        <translation>سجّل الدخول باستخدام رمز من بوت Telegram: سيحصل التطبيق على إعدادات الاتصال ويحافظ على تحديثها</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSetupWizardConfigSource.qml" line="101"/>
+        <source>Sign in with a Telegram code</source>
+        <translation>تسجيل الدخول برمز من Telegram</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSetupWizardConfigSource.qml" line="102"/>
+        <source>Get a code with the /login command in the bot</source>
+        <translation>احصل على رمز باستخدام الأمر /login في البوت</translation>
     </message>
 </context>
 <context>
@@ -5948,6 +6249,14 @@ Create one from the current settings.</source>
         <location filename="../ui/qml/Controls2/PopupType.qml" line="101"/>
         <source>Close</source>
         <translation>اغلاق</translation>
+    </message>
+</context>
+<context>
+    <name>ProtocolSettingsUiController</name>
+    <message>
+        <location filename="../ui/controllers/protocolSettingsUiController.cpp" line="53"/>
+        <source>Settings updated successfully</source>
+        <translation>تم تحديث الاعدادات بنجاح</translation>
     </message>
 </context>
 <context>
@@ -6880,6 +7189,11 @@ For more detailed information, you can
         <location filename="../ui/controllers/serversUiController.cpp" line="100"/>
         <source>Use the remove action to delete this legacy config.</source>
         <translation>استخدم إجراء الإزالة لحذف هذا التكوين القديم.</translation>
+    </message>
+    <message>
+        <location filename="../ui/controllers/serversUiController.cpp" line="56"/>
+        <source>Server &apos;%1&apos; was removed</source>
+        <translation>تمت إزالة الخادم &apos;%1&apos;</translation>
     </message>
 </context>
 <context>

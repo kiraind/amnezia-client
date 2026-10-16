@@ -485,7 +485,9 @@ void VpnConnection::appendSplitTunnelingConfig()
     // Fork: the coordinator API always bypasses the tunnel, so a dead entry server can't block the config update
     // that replaces it. "Only listed sites" mode already leaves it outside the tunnel.
     const QString coordinatorAddress = m_appSettingsRepository->coordinatorApiAddress();
-    if (allowSiteBasedSplitTunneling && NetworkUtilities::checkIpSubnetFormat(coordinatorAddress)) {
+    // Only while signed in: nothing talks to the coordinator otherwise, and the address may be shared with other sites
+    const bool coordinatorInUse = !m_appSettingsRepository->coordinatorToken().isEmpty();
+    if (allowSiteBasedSplitTunneling && coordinatorInUse && NetworkUtilities::checkIpSubnetFormat(coordinatorAddress)) {
         if (routeMode == amnezia::RouteMode::VpnAllSites) {
             routeMode = amnezia::RouteMode::VpnAllExceptSites;
             sitesJsonArray = QJsonArray { coordinatorAddress };
@@ -531,6 +533,19 @@ void VpnConnection::restoreConnection()
     m_vpnProtocol.reset(androidVpnProtocol);
 
     createProtocolConnections();
+}
+
+// Fork: hand the service the same config connectToVpn() would send, so always-on / QS tile connections
+// (which reuse the service's last saved config) follow config changes made without connecting from the app.
+void VpnConnection::saveAndroidConfig(const QJsonObject &vpnConfiguration)
+{
+    const QJsonObject currentConfiguration = m_vpnConfiguration;
+    m_vpnConfiguration = vpnConfiguration;
+    appendSplitTunnelingConfig();
+    const QJsonObject preparedConfiguration = m_vpnConfiguration;
+    m_vpnConfiguration = currentConfiguration;
+
+    AndroidController::instance()->saveConfig(preparedConfiguration);
 }
 
 void VpnConnection::createAndroidConnections()
