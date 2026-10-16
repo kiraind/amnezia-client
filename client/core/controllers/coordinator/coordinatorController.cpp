@@ -760,7 +760,7 @@ QString CoordinatorController::describeError(const CoordinatorApi::Reply &reply)
     // Server messages are English and meant for logs; the user only sees these
     if (reply.networkError) {
         qWarning() << "CoordinatorController: request failed:" << reply.errorMessage;
-        return tr("No connection to the Lesha VPN server. Check your internet connection and try again");
+        return tr("No connection to the Лёша VPN server. Check your internet connection and try again");
     }
     if (reply.errorCode == QLatin1String("invalid_code")) {
         return tr("Wrong or expired code");
@@ -784,7 +784,7 @@ QString CoordinatorController::describeError(const CoordinatorApi::Reply &reply)
         return tr("Config not found");
     }
     qWarning() << "CoordinatorController: request failed:" << reply.httpStatus << reply.errorCode << reply.errorMessage;
-    return tr("Lesha VPN server error (HTTP %1). Try again later").arg(reply.httpStatus);
+    return tr("Лёша VPN server error (HTTP %1). Try again later").arg(reply.httpStatus);
 }
 
 void CoordinatorController::setManagedEntry(const QString &serverId, const QJsonObject &entry)
