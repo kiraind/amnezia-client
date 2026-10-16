@@ -121,7 +121,7 @@ PageType {
         readonly property string description: qsTr("Discover the source code")
         readonly property string imageSource: "qrc:/images/controls/github.svg"
         readonly property var handler: function() {
-            Qt.openUrlExternally("https://github.com/kiraind/amnezia-client")
+            Qt.openUrlExternally("https://github.com/lesha-vpn")
         }
     }
 }
