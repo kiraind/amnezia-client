@@ -43,6 +43,16 @@ Fork hunks in upstream files (conflict-prone):
   `client/images/controls/user.svg` (Feather "user", same style as the other tab icons) instead of upstream's `plus.svg`.
 - `client/CMakeLists.txt` — `COORDINATOR_API_URL` cache var -> `-DCOORDINATOR_API_URL`; `deploy/build.sh` / `deploy/build.bat` pass it through.
 - `client/tests/CMakeLists.txt` — `test_coordinator_controller` target + `add_test`.
+- `client/vpnConnection.cpp` — the coordinator IP is excluded only while signed in (`coordinatorToken` not empty).
+- `client/secureQSettings.cpp` (Linux only) — the settings file is `0600` and its directory `0700`, since there is no keychain encryption there.
+- `client/core/controllers/coreSignalHandlers.cpp` — `translationsUpdated` -> `ServersUiController::updateModel`, so server descriptions
+  ("AmneziaWG (version 3.1)") are rebuilt in the UI language after the first translator is installed.
+- `client/ui/qml/Pages2/PageSettingsServerData.qml` — for a managed server, "remove" deletes its config on the coordinator
+  (`CoordinatorController.deleteConfig`), so it doesn't stay behind as a dead device.
+- `client/ui/qml/Pages2/PageSettingsApplication.qml` — "reset all data" calls `CoordinatorController.forgetDevice()` first
+  (revokes this app's configs and the token on the server).
+- `client/ui/qml/Pages2/PageStart.qml` — `onRemoveServerFinished` always goes to the main screen (the servers list page is
+  unreachable in the fork); `onConfigDeleted` goes to the start screen when the last server is gone.
 
 How to resolve: take upstream's version of the file, then re-add the fork hunk(s) above. If upstream
 renamed/refactored something the coordinator uses (servers repository, import controller,
