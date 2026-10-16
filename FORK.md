@@ -1,6 +1,6 @@
 # Лёша VPN fork of AmneziaVPN
 
-This repo (`kiraind/amnezia-client`, default branch `dev`) is a fork of
+This repo (`lesha-vpn/client`, default branch `dev`) is a fork of
 [amnezia-vpn/amnezia-client](https://github.com/amnezia-vpn/amnezia-client). It ships as
 **Лёша VPN** (`LeshaVPN`, app id `ru.kiraind.vpn`) and installs side by side with the official
 AmneziaVPN. Its purpose: log in to a self-hosted VPN coordinator (Telegram-backed account) and get
@@ -327,7 +327,7 @@ Noah, 2026-10-13.
   build, just unreachable from Settings). Titles: "Аккаунт %1" (`Qt.application.displayName`) and plain "О приложении".
 - `client/ui/qml/Pages2/PageCoordinatorConfigs.qml` — header "Аккаунт %1" with the display name.
 - `client/ui/qml/Pages2/PageSettingsAbout.qml` — no donation header/paragraph, no Privacy Policy button; contacts are only
-  Telegram (https://t.me/kiraind) and GitHub (https://github.com/kiraind/amnezia-client). The version line stays.
+  Telegram (https://t.me/kiraind) and GitHub (https://github.com/lesha-vpn). The version line stays.
 - `client/ui/utils/systemTrayNotificationHandler.{h,cpp}` — the tray "Visit Website" action is removed.
 How to resolve: take upstream's changes, then drop these entries again. New upstream contacts/links in About are dropped.
 
