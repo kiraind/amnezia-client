@@ -232,12 +232,6 @@ void CoreSignalHandlers::initAndroidConnectionHandler()
         m_coreController->m_connectionUiController->onConnectionStateChanged(state);
         m_coreController->m_connectionController->restoreConnection();
     });
-    connect(AndroidController::instance(), &AndroidController::importConfigFromOutside, this, [this](QString data) {
-        emit m_coreController->m_pageController->goToPageHome();
-        m_coreController->m_importController->extractConfigFromData(data);
-        data.clear();
-        emit m_coreController->m_pageController->goToPageViewConfig();
-    });
 #endif
 }
 

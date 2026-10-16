@@ -23,8 +23,6 @@ object QtAndroidController {
 
     external fun onFileOpened(uri: String)
 
-    external fun onConfigImported(data: String)
-
     external fun onAuthResult(result: Boolean)
 
 

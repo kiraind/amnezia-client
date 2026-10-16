@@ -169,6 +169,17 @@ removed feature, don't add it to the build.
   (`isCameraPresent()` is false on Android), `client/cmake/3rdparty.cmake` (qtgamepad block), `ui/qml/main2.qml`
   (gamepad `Loader`), `ui/qml/qml.qrc`.
 
+### 9.1a Android "open with" config import
+The app no longer registers as a handler for `vpn://` links, `.vpn`/`.cfg`/`.conf` files or shared text (configs only come
+from the coordinator, and `vpn://` collided with the official AmneziaVPN app).
+- Deleted: `client/android/src/org/amnezia/vpn/ImportConfigActivity.kt`.
+- Hunks: `client/android/AndroidManifest.xml` (the `ImportConfigActivity` with its SEND/VIEW filters, and the
+  `org.amnezia.vpn.IMPORT_CONFIG` filter of `AmneziaActivity`), `AmneziaActivity.kt` (`processIntent`),
+  `qt/QtAndroidController.kt` (`onConfigImported`), `client/platforms/android/android_controller.{h,cpp}`
+  (`onConfigImported`, `configImported`, `importConfigFromOutside`), `core/controllers/coreSignalHandlers.cpp`
+  (`initAndroidConnectionHandler`: the import-from-outside handler). The launcher, QS-tile preferences filter, VPN service
+  and tile are unchanged. iOS's `importConfigFromOutside` is left as is (iOS is not built).
+
 ### 9.2 Self-hosted server installation, server services and sharing
 The app can no longer install or manage a server over SSH, add services (Tor website, SFTP, SOCKS5, MTProxy, Telemt,
 TProxy, AmneziaDNS) or share access/configs with other users. Stored self-hosted (admin) servers still load, connect with the

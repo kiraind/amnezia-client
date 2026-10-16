@@ -8,7 +8,6 @@ import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Intent
 import android.content.Intent.EXTRA_MIME_TYPES
-import android.content.Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -201,7 +200,6 @@ class AmneziaActivity : QtActivity() {
         pendingOpenFileUri = savedInstanceState?.getString(KEY_PENDING_OPEN_FILE_URI)
         openFileDeliveryScheduled = false
         registerBroadcastReceivers()
-        intent?.let(::processIntent)
         runBlocking { vpnProto = proto.await() }
     }
 
@@ -233,21 +231,6 @@ class AmneziaActivity : QtActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         Log.v(TAG, "onNewIntent: $intent")
-        intent?.let(::processIntent)
-    }
-
-    private fun processIntent(intent: Intent) {
-        // disable config import when starting activity from history
-        if (intent.flags and FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY == 0) {
-            if (intent.action == ACTION_IMPORT_CONFIG) {
-                intent.getStringExtra(EXTRA_CONFIG)?.let {
-                    mainScope.launch {
-                        qtInitialized.await()
-                        QtAndroidController.onConfigImported(it)
-                    }
-                }
-            }
-        }
     }
 
     override fun onStart() {

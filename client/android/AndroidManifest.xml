@@ -52,11 +52,6 @@
             </intent-filter>
 
             <intent-filter>
-                <action android:name="org.amnezia.vpn.IMPORT_CONFIG" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-
-            <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
             </intent-filter>
 
@@ -87,59 +82,6 @@
             android:taskAffinity=""
             android:exported="false"
             android:theme="@style/Translucent" />
-
-        <activity
-            android:name=".ImportConfigActivity"
-            android:excludeFromRecents="true"
-            android:launchMode="singleTask"
-            android:taskAffinity=""
-            android:exported="true"
-            android:theme="@style/Translucent">
-
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="application/octet-stream" />
-                <data android:mimeType="text/plain" />
-            </intent-filter>
-
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="vpn" android:host="*" />
-            </intent-filter>
-
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="file" />
-                <data android:scheme="content" />
-                <data android:mimeType="*/*" />
-                <data android:host="*" />
-
-                <data android:pathPattern=".*\\.vpn" />
-                <data android:pathPattern=".*\\..*\\.vpn" />
-                <data android:pathPattern=".*\\..*\\..*\\.vpn" />
-                <data android:pathPattern=".*\\..*\\..*\\..*\\.vpn" />
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.vpn" />
-
-                <data android:pathPattern=".*\\.cfg" />
-                <data android:pathPattern=".*\\..*\\.cfg" />
-                <data android:pathPattern=".*\\..*\\..*\\.cfg" />
-                <data android:pathPattern=".*\\..*\\..*\\..*\\.cfg" />
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.cfg" />
-
-                <data android:pathPattern=".*\\.conf" />
-                <data android:pathPattern=".*\\..*\\.conf" />
-                <data android:pathPattern=".*\\..*\\..*\\.conf" />
-                <data android:pathPattern=".*\\..*\\..*\\..*\\.conf" />
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.conf" />
-            </intent-filter>
-        </activity>
 
         <service
             android:name=".AwgService"

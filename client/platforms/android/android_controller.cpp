@@ -65,14 +65,6 @@ AndroidController::AndroidController() : QObject()
             emit connectionStateChanged(convertState(state));
         },
         Qt::QueuedConnection);
-
-    connect(
-        this, &AndroidController::configImported, this,
-        [this](const QString& config) {
-            qDebug() << "Android event: config import";
-            emit importConfigFromOutside(config);
-        },
-        Qt::QueuedConnection);
 }
 
 AndroidController *AndroidController::instance()
@@ -97,7 +89,6 @@ bool AndroidController::initialize()
         {"onVpnStateChanged", "(I)V", reinterpret_cast<void *>(onVpnStateChanged)},
         {"onStatisticsUpdate", "(JJ)V", reinterpret_cast<void *>(onStatisticsUpdate)},
         {"onFileOpened", "(Ljava/lang/String;)V", reinterpret_cast<void *>(onFileOpened)},
-        {"onConfigImported", "(Ljava/lang/String;)V", reinterpret_cast<void *>(onConfigImported)},
         {"onAuthResult", "(Z)V", reinterpret_cast<void *>(onAuthResult)},
         {"onImeInsetsChanged", "(I)V", reinterpret_cast<void *>(onImeInsetsChanged)},
         {"onSystemBarsInsetsChanged", "(II)V", reinterpret_cast<void *>(onSystemBarsInsetsChanged)},
@@ -504,14 +495,6 @@ void AndroidController::onFileOpened(JNIEnv *env, jobject thiz, jstring uri)
     Q_UNUSED(thiz);
 
     emit AndroidController::instance()->fileOpened(AndroidUtils::convertJString(env, uri));
-}
-
-// static
-void AndroidController::onConfigImported(JNIEnv *env, jobject thiz, jstring data)
-{
-    Q_UNUSED(thiz);
-
-    emit AndroidController::instance()->configImported(AndroidUtils::convertJString(env, data));
 }
 
 // static
