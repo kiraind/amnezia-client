@@ -33,6 +33,7 @@ ConnectionController::ConnectionController(SecureServersRepository* serversRepos
     connect(this, &ConnectionController::killSwitchModeChangedRequested, m_vpnConnection, &VpnConnection::onKillSwitchModeChanged, Qt::QueuedConnection);
 #ifdef Q_OS_ANDROID
     connect(this, &ConnectionController::restoreConnectionRequested, m_vpnConnection, &VpnConnection::restoreConnection, Qt::QueuedConnection);
+    connect(this, &ConnectionController::saveAndroidConfigRequested, m_vpnConnection, &VpnConnection::saveAndroidConfig, Qt::QueuedConnection);
 #endif
 }
 
@@ -191,6 +192,23 @@ void ConnectionController::restoreConnection()
     if (m_vpnConnection) {
         emit restoreConnectionRequested();
     }
+}
+
+// Fork: push the server's current config to the Android service without connecting (always-on / QS tile)
+void ConnectionController::saveAndroidConfig(const QString &serverId)
+{
+    if (!m_vpnConnection || isConnectionSupported(serverId) != ErrorCode::NoError) {
+        return;
+    }
+
+    QJsonObject vpnConfiguration;
+    DockerContainer container;
+    if (prepareConnection(serverId, vpnConfiguration, container) != ErrorCode::NoError
+        || vpnConfiguration.value(configKey::vpnProto).toString().isEmpty()) {
+        return;
+    }
+
+    emit saveAndroidConfigRequested(vpnConfiguration);
 }
 #endif
 

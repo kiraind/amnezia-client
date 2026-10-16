@@ -21,6 +21,7 @@ import android.os.Looper
 import android.os.Message
 import android.os.Messenger
 import android.os.ParcelFileDescriptor
+import android.os.RemoteException
 import android.os.SystemClock
 import android.provider.OpenableColumns
 import android.provider.Settings
@@ -669,6 +670,64 @@ class AmneziaActivity : QtActivity() {
         Log.v(TAG, "Stop VPN")
         mainScope.launch {
             disconnectFromVpn()
+        }
+    }
+
+    // Fork: store the config always-on and the QS tile connect with, without connecting.
+    // The service keeps it in its own process (SharedPreferences are cached per process), so it is sent
+    // over the existing binding, or over a short-lived one when the activity isn't bound to the service.
+    @Suppress("unused")
+    fun saveVpnConfig(vpnConfig: String) {
+        Log.v(TAG, "Save VPN config")
+        mainScope.launch {
+            val proto = getVpnProto(vpnConfig) ?: return@launch
+            val message = {
+                Action.SAVE_CONFIG.packToMessage {
+                    putString(MSG_VPN_CONFIG, vpnConfig)
+                }
+            }
+            if (isServiceConnected && proto.serviceClass == vpnProto?.serviceClass) {
+                vpnServiceMessenger.send(message)
+                return@launch
+            }
+            val connection = object : ServiceConnection {
+                override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+                    try {
+                        Messenger(service).send(message())
+                    } catch (e: RemoteException) {
+                        Log.w(TAG, "Failed to send the VPN config to the service: $e")
+                    }
+                    unbindServiceSafely(this)
+                }
+
+                override fun onServiceDisconnected(name: ComponentName?) {}
+
+                override fun onBindingDied(name: ComponentName?) {
+                    unbindServiceSafely(this)
+                }
+
+                override fun onNullBinding(name: ComponentName?) {
+                    unbindServiceSafely(this)
+                }
+            }
+            val bound = try {
+                bindService(Intent(this@AmneziaActivity, proto.serviceClass), connection, BIND_AUTO_CREATE)
+            } catch (e: SecurityException) {
+                Log.e(TAG, "Failed to bind ${proto.serviceClass.simpleName}: $e")
+                false
+            }
+            if (!bound) {
+                Log.w(TAG, "Failed to bind the service to save the VPN config")
+                unbindServiceSafely(connection)
+            }
+        }
+    }
+
+    private fun unbindServiceSafely(connection: ServiceConnection) {
+        try {
+            unbindService(connection)
+        } catch (_: IllegalArgumentException) {
+            // already unbound
         }
     }
 

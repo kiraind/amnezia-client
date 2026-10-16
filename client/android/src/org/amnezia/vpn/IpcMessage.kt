@@ -33,7 +33,9 @@ enum class Action : IpcMessage {
     DISCONNECT,
     REQUEST_STATUS,
     NOTIFICATION_PERMISSION_GRANTED,
-    SET_SAVE_LOGS
+    SET_SAVE_LOGS,
+    // Fork: store the config used by always-on / the QS tile without connecting
+    SAVE_CONFIG
 }
 
 fun <T> T.packToMessage(): Message

@@ -45,6 +45,7 @@ public:
 
 #ifdef Q_OS_ANDROID
     void restoreConnection();
+    void saveAndroidConfig(const QJsonObject &vpnConfiguration);
 #endif
 
 public slots:

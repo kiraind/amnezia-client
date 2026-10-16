@@ -535,6 +535,19 @@ void VpnConnection::restoreConnection()
     createProtocolConnections();
 }
 
+// Fork: hand the service the same config connectToVpn() would send, so always-on / QS tile connections
+// (which reuse the service's last saved config) follow config changes made without connecting from the app.
+void VpnConnection::saveAndroidConfig(const QJsonObject &vpnConfiguration)
+{
+    const QJsonObject currentConfiguration = m_vpnConfiguration;
+    m_vpnConfiguration = vpnConfiguration;
+    appendSplitTunnelingConfig();
+    const QJsonObject preparedConfiguration = m_vpnConfiguration;
+    m_vpnConfiguration = currentConfiguration;
+
+    AndroidController::instance()->saveConfig(preparedConfiguration);
+}
+
 void VpnConnection::createAndroidConnections()
 {
     androidVpnProtocol = createDefaultAndroidVpnProtocol();

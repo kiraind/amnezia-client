@@ -342,6 +342,21 @@ Noah, 2026-10-13.
 - `client/ui/utils/systemTrayNotificationHandler.{h,cpp}` — the tray "Visit Website" action is removed.
 How to resolve: take upstream's changes, then drop these entries again. New upstream contacts/links in About are dropped.
 
+## 12. Android: always-on and QS tile follow config updates
+Upstream's VPN service saves the config (`LAST_CONF` in `Prefs`) only when the app connects, and always-on / the QS tile
+connect with that saved copy. After the coordinator replaced a config (e.g. the entry node moved) they kept using the dead
+one until the user connected once from the app. Now every change of the default server or its config (`serverEdited`,
+`serverAdded` as default, `defaultServerChanged`) pushes the freshly built connection config (same JSON as on connect,
+split tunneling included) to the service without connecting.
+- `core/controllers/coreSignalHandlers.cpp` (`initAndroidSettingsHandler`) → `ConnectionController::saveAndroidConfig`
+  (`core/controllers/connectionController.{h,cpp}`, signal `saveAndroidConfigRequested`) → `VpnConnection::saveAndroidConfig`
+  (`client/vpnConnection.{h,cpp}`) → `AndroidController::saveConfig` (`platforms/android/android_controller.{h,cpp}`) →
+  `AmneziaActivity.saveVpnConfig` → service action `Action.SAVE_CONFIG` (`IpcMessage.kt`, `AmneziaVpnService.kt`).
+- The service process writes the prefs itself (SharedPreferences are cached per process): the activity sends the message
+  over its binding, or binds briefly (`BIND_AUTO_CREATE`) when it isn't bound; an unstarted service then stops again on unbind.
+How to resolve: keep the hunks; if upstream changes how `connect()` / `LAST_CONF` work in the service, keep a way to
+update the saved config without connecting.
+
 ## Translations
 Fork UI strings are Russian source text inside `qsTr(...)` (e.g. "Аккаунт VPN"). The fork does not edit `client/translations/*.ts`,
 so on conflict take upstream's `.ts` files. Only if a fork commit ever added entries to them, re-add those entries.

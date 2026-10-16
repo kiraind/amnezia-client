@@ -222,6 +222,18 @@ void CoreSignalHandlers::initAndroidSettingsHandler()
                 AndroidController::instance()->resetLastServer(removedIndex);
             });
     connect(m_coreController->m_appSettingsRepository, &SecureAppSettingsRepository::settingsCleared, []() { AndroidController::instance()->resetLastServer(-1); });
+
+    // Fork: always-on and the QS tile connect with the service's last saved config; keep it in step with the
+    // default server (e.g. a coordinator config replaced after the entry node moved) without connecting.
+    const auto saveDefaultServerConfig = [this](const QString &serverId) {
+        SecureServersRepository *serversRepository = m_coreController->m_serversRepository;
+        if (!serverId.isEmpty() && serverId == serversRepository->defaultServerId()) {
+            m_coreController->m_connectionController->saveAndroidConfig(serverId);
+        }
+    };
+    connect(m_coreController->m_serversRepository, &SecureServersRepository::serverEdited, this, saveDefaultServerConfig);
+    connect(m_coreController->m_serversRepository, &SecureServersRepository::serverAdded, this, saveDefaultServerConfig);
+    connect(m_coreController->m_serversRepository, &SecureServersRepository::defaultServerChanged, this, saveDefaultServerConfig);
 #endif
 }
 

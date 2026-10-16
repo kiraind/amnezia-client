@@ -139,6 +139,14 @@ void AndroidController::stop()
     callActivityMethod("stop", "()V");
 }
 
+// Fork: update the config the service uses for always-on / QS tile connections, without connecting
+void AndroidController::saveConfig(const QJsonObject &vpnConfig)
+{
+    auto config = QJsonDocument(vpnConfig).toJson();
+    callActivityMethod("saveVpnConfig", "(Ljava/lang/String;)V",
+                       QJniObject::fromString(config).object<jstring>());
+}
+
 void AndroidController::resetLastServer(int serverIndex)
 {
     callActivityMethod("resetLastServer", "(I)V", serverIndex);
