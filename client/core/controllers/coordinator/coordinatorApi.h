@@ -52,6 +52,8 @@ public:
     void configStatus(const QString &configId, const QString &revision, const Callback &callback);
     // DELETE /v1/configs/{id} -> 204
     void deleteConfig(const QString &configId, const Callback &callback);
+    // PATCH /v1/configs/{id} { name } -> ConfigSummary
+    void renameConfig(const QString &configId, const QString &name, const Callback &callback);
 
     // Hostname of the base URL, used to allow the coordinator through the strict kill switch.
     QString host() const;

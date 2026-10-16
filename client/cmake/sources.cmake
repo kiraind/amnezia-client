@@ -27,6 +27,7 @@ set(HEADERS ${HEADERS}
     ${CLIENT_ROOT_DIR}/core/controllers/settingsController.h
     ${CLIENT_ROOT_DIR}/core/controllers/coordinator/coordinatorApi.h
     ${CLIENT_ROOT_DIR}/core/controllers/coordinator/coordinatorController.h
+    ${CLIENT_ROOT_DIR}/core/controllers/coordinator/deviceName.h
     ${CLIENT_ROOT_DIR}/core/repositories/secureServersRepository.h
     ${CLIENT_ROOT_DIR}/core/repositories/secureAppSettingsRepository.h
     ${CLIENT_ROOT_DIR}/core/protocols/qmlRegisterProtocols.h
@@ -83,6 +84,7 @@ set(SOURCES ${SOURCES}
     ${CLIENT_ROOT_DIR}/core/controllers/settingsController.cpp
     ${CLIENT_ROOT_DIR}/core/controllers/coordinator/coordinatorApi.cpp
     ${CLIENT_ROOT_DIR}/core/controllers/coordinator/coordinatorController.cpp
+    ${CLIENT_ROOT_DIR}/core/controllers/coordinator/deviceName.cpp
     ${CLIENT_ROOT_DIR}/core/repositories/secureServersRepository.cpp
     ${CLIENT_ROOT_DIR}/core/repositories/secureAppSettingsRepository.cpp
     ${CLIENT_ROOT_DIR}/ui/utils/qAutoStart.cpp

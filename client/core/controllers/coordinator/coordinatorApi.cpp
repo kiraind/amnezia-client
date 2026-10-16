@@ -98,6 +98,13 @@ void CoordinatorApi::deleteConfig(const QString &configId, const Callback &callb
     send("DELETE", QStringLiteral("/configs/") + encodeSegment(configId), nullptr, true, callback);
 }
 
+void CoordinatorApi::renameConfig(const QString &configId, const QString &name, const Callback &callback)
+{
+    QJsonObject body;
+    body[QStringLiteral("name")] = name;
+    send("PATCH", QStringLiteral("/configs/") + encodeSegment(configId), &body, true, callback);
+}
+
 QString CoordinatorApi::host() const
 {
     return QUrl(m_baseUrl).host();

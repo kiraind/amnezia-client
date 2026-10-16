@@ -22,6 +22,7 @@ Commits: `c1dde1e`, `6818032`, `e70a501`.
 Fork-only files (never conflict; upstream doesn't have them, but check that APIs they call still exist):
 - `client/core/controllers/coordinator/coordinatorApi.{h,cpp}` — HTTP client for the coordinator API
 - `client/core/controllers/coordinator/coordinatorController.{h,cpp}` — login, config sync, import of managed configs into the servers repo
+- `client/core/controllers/coordinator/deviceName.{h,cpp}` — device name for the default config name and login label (Android device name / manufacturer + model, macOS computer name, Linux pretty hostname, else hostname) and free text → `[a-z0-9-]` with Cyrillic transliteration; configs are renamed with `PATCH /v1/configs/{id}`
 - `client/ui/controllers/coordinator/coordinatorUiController.{h,cpp}` — QML-facing controller (`CoordinatorController` in QML)
 - `client/ui/qml/Pages2/PageCoordinatorLogin.qml`, `PageCoordinatorConfigs.qml`
 - `client/tests/testCoordinatorController.cpp` (mock API test, `CoordinatorControllerTest`)
