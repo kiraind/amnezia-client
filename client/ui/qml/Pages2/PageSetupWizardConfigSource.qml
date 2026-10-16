@@ -54,7 +54,7 @@ PageType {
                 Layout.leftMargin: 16
                 Layout.bottomMargin: 24
 
-                text: qsTr("Войдите по коду из Telegram-бота: приложение само получит и будет обновлять настройки подключения")
+                text: qsTr("Sign in with a code from the Telegram bot: the app will get your connection settings and keep them up to date")
             }
         }
 
@@ -98,8 +98,8 @@ PageType {
         id: coordinatorLogin
 
         property bool featuredAmneziaConnection: false
-        property string title: qsTr("Войти по коду из Telegram")
-        property string description: qsTr("Получите код командой /login в боте")
+        property string title: qsTr("Sign in with a Telegram code")
+        property string description: qsTr("Get a code with the /login command in the bot")
         property string imageSource: "qrc:/images/controls/telegram.svg"
         property bool isVisible: true
         property var handler: function() {

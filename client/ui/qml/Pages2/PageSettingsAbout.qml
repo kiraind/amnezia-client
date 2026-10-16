@@ -107,7 +107,7 @@ PageType {
         id: telegram
 
         readonly property string title: qsTr("Telegram")
-        readonly property string description: qsTr("@kiraind")
+        readonly property string description: "@kiraind"
         readonly property string imageSource: "qrc:/images/controls/telegram.svg"
         readonly property var handler: function() {
             Qt.openUrlExternally("https://t.me/kiraind")

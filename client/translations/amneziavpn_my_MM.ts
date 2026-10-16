@@ -213,6 +213,83 @@
     </message>
 </context>
 <context>
+    <name>CoordinatorController</name>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="130"/>
+        <source>Enter a server address starting with https://</source>
+        <translation>https:// ဖြင့် စတင်သော ဆာဗာလိပ်စာကို ထည့်ပါ</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="247"/>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="619"/>
+        <source>Config &quot;%1&quot; was deleted</source>
+        <translation>config &quot;%1&quot; ကို ဖျက်လိုက်ပါပြီ</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="661"/>
+        <source>VPN access is suspended: you are not a member of the chat</source>
+        <translation>VPN အသုံးပြုခွင့်ကို ဆိုင်းငံ့ထားသည်- သင်သည် chat ၏ အဖွဲ့ဝင် မဟုတ်ပါ</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="680"/>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="695"/>
+        <source>Could not import config &quot;%1&quot;</source>
+        <translation>config &quot;%1&quot; ကို တင်သွင်း၍ မရပါ</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="719"/>
+        <source>Could not add config &quot;%1&quot;</source>
+        <translation>config &quot;%1&quot; ကို ထည့်၍ မရပါ</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="753"/>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="785"/>
+        <source>You have been signed out. Sign in again with a code from the bot</source>
+        <translation>သင် အကောင့်မှ ထွက်သွားပါပြီ။ bot မှ ကုဒ်ဖြင့် ပြန်လည် ဝင်ရောက်ပါ</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="757"/>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="782"/>
+        <source>You are no longer a member of the chat, VPN access is suspended</source>
+        <translation>သင်သည် chat ၏ အဖွဲ့ဝင် မဟုတ်တော့ပါ၊ VPN အသုံးပြုခွင့်ကို ဆိုင်းငံ့ထားသည်</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="767"/>
+        <source>No connection to the Лёша VPN server. Check your internet connection and try again</source>
+        <translation>Лёша VPN ဆာဗာနှင့် ချိတ်ဆက်မှု မရှိပါ။ အင်တာနက်ချိတ်ဆက်မှုကို စစ်ဆေးပြီး ထပ်မံကြိုးစားပါ</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="770"/>
+        <source>Wrong or expired code</source>
+        <translation>ကုဒ် မှားနေသည် သို့မဟုတ် သက်တမ်းကုန်သွားပြီ</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="773"/>
+        <source>Too many attempts. Try again in a minute</source>
+        <translation>ကြိုးစားမှု များလွန်းနေသည်။ တစ်မိနစ်အကြာတွင် ထပ်မံကြိုးစားပါ</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="776"/>
+        <source>This name is already taken</source>
+        <translation>ဤအမည်ကို အသုံးပြုပြီးဖြစ်သည်</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="779"/>
+        <source>The name may only contain Latin letters, digits and hyphens, up to 32 characters</source>
+        <translation>အမည်တွင် လက်တင်အက္ခရာ၊ ဂဏန်းနှင့် တုံးတို (-) များသာ ပါဝင်နိုင်ပြီး အများဆုံး စာလုံး 32 လုံး ဖြစ်သည်</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="788"/>
+        <source>Config not found</source>
+        <translation>config ကို မတွေ့ပါ</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="791"/>
+        <source>Лёша VPN server error (HTTP %1). Try again later</source>
+        <translation>Лёша VPN ဆာဗာ အမှား (HTTP %1)။ နောက်မှ ထပ်မံကြိုးစားပါ</translation>
+    </message>
+</context>
+<context>
     <name>HomeContainersListView</name>
     <message>
         <location filename="../ui/qml/Components/HomeContainersListView.qml" line="55"/>
@@ -451,6 +528,165 @@ Already installed containers were found on the server. All installed containers 
         <location filename="../ui/utils/notificationHandler.cpp" line="89"/>
         <source>Unsecured network detected: </source>
         <translation>လုံခြုံမှုမရှိသောကွန်ရက်မှန်း ထောက်လှန်းမိသည်: </translation>
+    </message>
+</context>
+<context>
+    <name>PageCoordinatorConfigs</name>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="119"/>
+        <source>%1 account</source>
+        <translation>%1 အကောင့်</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="37"/>
+        <source>Another device</source>
+        <translation>အခြားစက်</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="47"/>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="225"/>
+        <source>Cancel</source>
+        <translation>ပယ်ဖျက်မည်</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="199"/>
+        <source>Connect this device</source>
+        <translation>ဤစက်ကို ချိတ်ဆက်မည်</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="46"/>
+        <source>Delete</source>
+        <translation>ဖျက်မည်</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="42"/>
+        <source>Delete device %1?</source>
+        <translation>စက် %1 ကို ဖျက်မလား?</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="41"/>
+        <source>Delete the config of this device?</source>
+        <translation>ဤစက်၏ config ကို ဖျက်မလား?</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="32"/>
+        <source>Deleted</source>
+        <translation>ဖျက်ပြီး</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="292"/>
+        <source>Device name</source>
+        <translation>စက်အမည်</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="70"/>
+        <source>Device renamed</source>
+        <translation>စက်အမည်ကို ပြောင်းလိုက်ပါပြီ</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="306"/>
+        <source>Latin letters, digits and hyphens, up to 32 characters</source>
+        <translation>လက်တင်အက္ခရာ၊ ဂဏန်းနှင့် တုံးတို (-)၊ အများဆုံး စာလုံး 32 လုံး</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="283"/>
+        <source>Rename device</source>
+        <translation>စက်အမည် ပြောင်းမည်</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="316"/>
+        <source>Save</source>
+        <translation>သိမ်းဆည်းမည်</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="219"/>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="224"/>
+        <source>Sign out</source>
+        <translation>အကောင့်မှ ထွက်မည်</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="222"/>
+        <source>Sign out?</source>
+        <translation>အကောင့်မှ ထွက်မလား?</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="35"/>
+        <source>Suspended</source>
+        <translation>ဆိုင်းငံ့ထားသည်</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="131"/>
+        <source>The VPN network is down</source>
+        <translation>VPN ကွန်ရက် ရပ်တန့်နေသည်</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="132"/>
+        <source>The VPN network is unstable</source>
+        <translation>VPN ကွန်ရက် မတည်ငြိမ်ပါ</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="37"/>
+        <source>This device</source>
+        <translation>ဤစက်</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="66"/>
+        <source>This device is connected</source>
+        <translation>ဤစက်ကို ချိတ်ဆက်ပြီးပါပြီ</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="45"/>
+        <source>VPN on %1 will stop working.</source>
+        <translation>%1 တွင် VPN အလုပ်မလုပ်တော့ပါ။</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="223"/>
+        <source>VPN on this device keeps working, but its settings will no longer be updated.</source>
+        <translation>ဤစက်ပေါ်ရှိ VPN ဆက်လက်အလုပ်လုပ်မည်ဖြစ်သော်လည်း ၎င်း၏ ဆက်တင်များကို အပ်ဒိတ်လုပ်တော့မည် မဟုတ်ပါ။</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="44"/>
+        <source>VPN on this device will stop working. To connect it again, tap &quot;Connect this device&quot;.</source>
+        <translation>ဤစက်ပေါ်ရှိ VPN အလုပ်မလုပ်တော့ပါ။ ပြန်လည်ချိတ်ဆက်ရန် &quot;ဤစက်ကို ချိတ်ဆက်မည်&quot; ကို နှိပ်ပါ။</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="307"/>
+        <source>Will be saved as %1</source>
+        <translation>%1 အဖြစ် သိမ်းဆည်းမည်</translation>
+    </message>
+</context>
+<context>
+    <name>PageCoordinatorLogin</name>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="106"/>
+        <source>Code</source>
+        <translation>ကုဒ်</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="200"/>
+        <source>Enter the server address</source>
+        <translation>ဆာဗာလိပ်စာကို ထည့်ပါ</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="95"/>
+        <source>Send /login to the bot and enter the code you get. The code is valid for 5 minutes.</source>
+        <translation>bot ထံ /login ပို့ပြီး ရရှိသော ကုဒ်ကို ထည့်ပါ။ ကုဒ်သည် 5 မိနစ်ကြာ အကျုံးဝင်သည်။</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="148"/>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="165"/>
+        <source>Server address</source>
+        <translation>ဆာဗာလိပ်စာ</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="194"/>
+        <source>Sign in</source>
+        <translation>ဝင်ရောက်မည်</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="94"/>
+        <source>Sign in with a code</source>
+        <translation>ကုဒ်ဖြင့် ဝင်ရောက်ရန်</translation>
     </message>
 </context>
 <context>
@@ -3375,6 +3611,16 @@ Create one from the current settings.</source>
         <source>Dev console</source>
         <translation>ဒက်ဗယ်လော်ပါ console</translation>
     </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettings.qml" line="99"/>
+        <source>%1 account</source>
+        <translation>%1 အကောင့်</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettings.qml" line="136"/>
+        <source>About</source>
+        <translation>အပလီကေးရှင်းအကြောင်း</translation>
+    </message>
 </context>
 <context>
     <name>PageSettingsAbout</name>
@@ -3477,6 +3723,11 @@ Create one from the current settings.</source>
         <location filename="../ui/qml/Pages2/PageSettingsAbout.qml" line="239"/>
         <source>Visit official website</source>
         <translation>တရားဝင် ဝဘ်ဆိုက်ကို ကြည့်မည်</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsAbout.qml" line="109"/>
+        <source>Telegram</source>
+        <translation>Telegram</translation>
     </message>
 </context>
 <context>
@@ -4145,6 +4396,11 @@ Create one from the current settings.</source>
         <source>Cannot reset settings during active connection</source>
         <translation>ချိတ်ဆက်မှုရှိနေချိန်အတွင်း ဆက်တင်များကို မူရင်းအတိုင်း ပြန်လည်သတ်မှတ်၍မရပါ</translation>
     </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsApplication.qml" line="220"/>
+        <source>All settings will be reset to default. The config of this device will be deleted from your account.</source>
+        <translation>ဆက်တင်အားလုံးကို မူလအတိုင်း ပြန်လည်သတ်မှတ်မည်။ ဤစက်၏ config ကို သင့်အကောင့်မှ ဖျက်မည်။</translation>
+    </message>
 </context>
 <context>
     <name>PageSettingsBackup</name>
@@ -4590,6 +4846,16 @@ Create one from the current settings.</source>
         <source>AmneziaVPN-service logs</source>
         <translation>AmneziaVPN-service မှတ်တမ်းများ</translation>
     </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsLogging.qml" line="182"/>
+        <source>%1 logs</source>
+        <translation>%1 မှတ်တမ်းများ</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsLogging.qml" line="211"/>
+        <source>%1 service logs</source>
+        <translation>%1 ဆားဗစ် မှတ်တမ်းများ</translation>
+    </message>
 </context>
 <context>
     <name>PageSettingsNewsNotifications</name>
@@ -4711,6 +4977,26 @@ Create one from the current settings.</source>
         <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="212"/>
         <source>Cannot reset API config during active connection</source>
         <translation>လက်ရှိချိတ်ဆက်မှုတစ်ခုရှိနေချိန်တွင် API config ကို ပြန်လည်သတ်မှတ်၍မရပါ</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="69"/>
+        <source>Delete the config of this device</source>
+        <translation>ဤစက်၏ config ကို ဖျက်မည်</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="74"/>
+        <source>Delete the config of this device?</source>
+        <translation>ဤစက်၏ config ကို ဖျက်မလား?</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="78"/>
+        <source>The server will be removed from this app only.</source>
+        <translation>ဆာဗာကို ဤအပလီကေးရှင်းမှသာ ဖယ်ရှားမည်။</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="77"/>
+        <source>VPN on this device will stop working. To connect it again, tap &quot;Connect this device&quot; in your account.</source>
+        <translation>ဤစက်ပေါ်ရှိ VPN အလုပ်မလုပ်တော့ပါ။ ပြန်လည်ချိတ်ဆက်ရန် သင့်အကောင့်ရှိ &quot;ဤစက်ကို ချိတ်ဆက်မည်&quot; ကို နှိပ်ပါ။</translation>
     </message>
 </context>
 <context>
@@ -5243,6 +5529,21 @@ Create one from the current settings.</source>
         <location filename="../ui/qml/Pages2/PageSetupWizardConfigSource.qml" line="392"/>
         <source>I have nothing</source>
         <translation>ကျွန်ုပ်တွင်ဘာမှမရှိပါ</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSetupWizardConfigSource.qml" line="57"/>
+        <source>Sign in with a code from the Telegram bot: the app will get your connection settings and keep them up to date</source>
+        <translation>Telegram bot မှ ကုဒ်ဖြင့် ဝင်ရောက်ပါ- အပလီကေးရှင်းသည် ချိတ်ဆက်မှုဆက်တင်များကို ရယူပြီး အမြဲ အပ်ဒိတ်လုပ်ပေးမည်</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSetupWizardConfigSource.qml" line="101"/>
+        <source>Sign in with a Telegram code</source>
+        <translation>Telegram ကုဒ်ဖြင့် ဝင်ရောက်မည်</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSetupWizardConfigSource.qml" line="102"/>
+        <source>Get a code with the /login command in the bot</source>
+        <translation>bot တွင် /login command ဖြင့် ကုဒ်ရယူပါ</translation>
     </message>
 </context>
 <context>
@@ -5932,6 +6233,14 @@ Create one from the current settings.</source>
         <location filename="../ui/qml/Controls2/PopupType.qml" line="101"/>
         <source>Close</source>
         <translation>ပိတ်မည်</translation>
+    </message>
+</context>
+<context>
+    <name>ProtocolSettingsUiController</name>
+    <message>
+        <location filename="../ui/controllers/protocolSettingsUiController.cpp" line="53"/>
+        <source>Settings updated successfully</source>
+        <translation>ဆက်တင်များကို အောင်မြင်စွာ အပ်ဒိတ်လုပ်ပြီးပါပြီ</translation>
     </message>
 </context>
 <context>
@@ -6864,6 +7173,11 @@ For more detailed information, you can
         <location filename="../ui/controllers/serversUiController.cpp" line="100"/>
         <source>Use the remove action to delete this legacy config.</source>
         <translation>ဤစီစဉ်သတ်မှတ်မှုအဟောင်းကို ဖျက်ရန် ဖယ်ရှားမည် လုပ်ဆောင်ချက်ကို အသုံးပြုပါ။</translation>
+    </message>
+    <message>
+        <location filename="../ui/controllers/serversUiController.cpp" line="56"/>
+        <source>Server &apos;%1&apos; was removed</source>
+        <translation>ဆာဗာ &apos;%1&apos; ကို ဖယ်ရှားခဲ့သည်။</translation>
     </message>
 </context>
 <context>

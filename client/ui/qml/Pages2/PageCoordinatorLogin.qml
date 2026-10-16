@@ -104,7 +104,7 @@ PageType {
                 Layout.bottomMargin: 16
 
                 headerText: qsTr("Code")
-                textField.placeholderText: qsTr("ABC123")
+                textField.placeholderText: "ABC123"
                 // Longer than a code so a paste like " abc123" or "Код: ABC123" isn't cut before it is cleaned up
                 textField.maximumLength: 64
                 textField.inputMethodHints: Qt.ImhUppercaseOnly | Qt.ImhNoPredictiveText | Qt.ImhSensitiveData
@@ -163,7 +163,7 @@ PageType {
                 visible: root.showServerField
 
                 headerText: qsTr("Server address")
-                textField.placeholderText: qsTr("https://vpn.example.com")
+                textField.placeholderText: "https://vpn.example.com"
                 textField.text: CoordinatorController.baseUrl || CoordinatorController.defaultBaseUrl
                 textField.inputMethodHints: Qt.ImhUrlCharactersOnly | Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
 

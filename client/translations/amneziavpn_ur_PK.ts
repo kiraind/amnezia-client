@@ -213,6 +213,83 @@
     </message>
 </context>
 <context>
+    <name>CoordinatorController</name>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="130"/>
+        <source>Enter a server address starting with https://</source>
+        <translation>https:// سے شروع ہونے والا سرور کا پتہ درج کریں</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="247"/>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="619"/>
+        <source>Config &quot;%1&quot; was deleted</source>
+        <translation>کنفیگ &quot;%1&quot; حذف کر دی گئی</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="661"/>
+        <source>VPN access is suspended: you are not a member of the chat</source>
+        <translation>VPN تک رسائی معطل ہے: آپ چیٹ کے رکن نہیں ہیں</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="680"/>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="695"/>
+        <source>Could not import config &quot;%1&quot;</source>
+        <translation>کنفیگ &quot;%1&quot; درآمد نہیں کی جا سکی</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="719"/>
+        <source>Could not add config &quot;%1&quot;</source>
+        <translation>کنفیگ &quot;%1&quot; شامل نہیں کی جا سکی</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="753"/>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="785"/>
+        <source>You have been signed out. Sign in again with a code from the bot</source>
+        <translation>آپ سائن آؤٹ ہو گئے ہیں۔ بوٹ سے ملنے والے کوڈ کے ساتھ دوبارہ سائن ان کریں</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="757"/>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="782"/>
+        <source>You are no longer a member of the chat, VPN access is suspended</source>
+        <translation>آپ اب چیٹ کے رکن نہیں ہیں، VPN تک رسائی معطل ہے</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="767"/>
+        <source>No connection to the Лёша VPN server. Check your internet connection and try again</source>
+        <translation>Лёша VPN سرور سے رابطہ نہیں ہے۔ اپنا انٹرنیٹ کنکشن چیک کریں اور دوبارہ کوشش کریں</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="770"/>
+        <source>Wrong or expired code</source>
+        <translation>غلط یا میعاد ختم شدہ کوڈ</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="773"/>
+        <source>Too many attempts. Try again in a minute</source>
+        <translation>بہت زیادہ کوششیں۔ ایک منٹ بعد دوبارہ کوشش کریں</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="776"/>
+        <source>This name is already taken</source>
+        <translation>یہ نام پہلے سے لیا جا چکا ہے</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="779"/>
+        <source>The name may only contain Latin letters, digits and hyphens, up to 32 characters</source>
+        <translation>نام میں صرف لاطینی حروف، ہندسے اور ہائفن ہو سکتے ہیں، زیادہ سے زیادہ 32 حروف</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="788"/>
+        <source>Config not found</source>
+        <translation>کنفیگ نہیں ملی</translation>
+    </message>
+    <message>
+        <location filename="../core/controllers/coordinator/coordinatorController.cpp" line="791"/>
+        <source>Лёша VPN server error (HTTP %1). Try again later</source>
+        <translation>Лёша VPN سرور کی خرابی (HTTP %1)۔ بعد میں دوبارہ کوشش کریں</translation>
+    </message>
+</context>
+<context>
     <name>HomeContainersListView</name>
     <message>
         <location filename="../ui/qml/Components/HomeContainersListView.qml" line="55"/>
@@ -451,6 +528,165 @@ Already installed containers were found on the server. All installed containers 
         <location filename="../ui/utils/notificationHandler.cpp" line="89"/>
         <source>Unsecured network detected: </source>
         <translation>غیر محفوظ نیٹ ورک کا پتہ لگایا گیا ہے: </translation>
+    </message>
+</context>
+<context>
+    <name>PageCoordinatorConfigs</name>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="119"/>
+        <source>%1 account</source>
+        <translation>%1 اکاؤنٹ</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="37"/>
+        <source>Another device</source>
+        <translation>دوسری ڈیوائس</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="47"/>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="225"/>
+        <source>Cancel</source>
+        <translation>منسوخ کریں</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="199"/>
+        <source>Connect this device</source>
+        <translation>اس ڈیوائس کو منسلک کریں</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="46"/>
+        <source>Delete</source>
+        <translation>حذف کریں</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="42"/>
+        <source>Delete device %1?</source>
+        <translation>کیا ڈیوائس %1 حذف کرنی ہے؟</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="41"/>
+        <source>Delete the config of this device?</source>
+        <translation>کیا اس ڈیوائس کی کنفیگ حذف کرنی ہے؟</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="32"/>
+        <source>Deleted</source>
+        <translation>حذف شدہ</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="292"/>
+        <source>Device name</source>
+        <translation>ڈیوائس کا نام</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="70"/>
+        <source>Device renamed</source>
+        <translation>ڈیوائس کا نام تبدیل کر دیا گیا</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="306"/>
+        <source>Latin letters, digits and hyphens, up to 32 characters</source>
+        <translation>لاطینی حروف، ہندسے اور ہائفن، زیادہ سے زیادہ 32 حروف</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="283"/>
+        <source>Rename device</source>
+        <translation>ڈیوائس کا نام تبدیل کریں</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="316"/>
+        <source>Save</source>
+        <translation>محفوظ کریں</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="219"/>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="224"/>
+        <source>Sign out</source>
+        <translation>سائن آؤٹ کریں</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="222"/>
+        <source>Sign out?</source>
+        <translation>کیا سائن آؤٹ کرنا ہے؟</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="35"/>
+        <source>Suspended</source>
+        <translation>معطل</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="131"/>
+        <source>The VPN network is down</source>
+        <translation>VPN نیٹ ورک دستیاب نہیں ہے</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="132"/>
+        <source>The VPN network is unstable</source>
+        <translation>VPN نیٹ ورک غیر مستحکم ہے</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="37"/>
+        <source>This device</source>
+        <translation>یہ ڈیوائس</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="66"/>
+        <source>This device is connected</source>
+        <translation>یہ ڈیوائس منسلک ہو گئی ہے</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="45"/>
+        <source>VPN on %1 will stop working.</source>
+        <translation>%1 پر VPN کام کرنا بند کر دے گا۔</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="223"/>
+        <source>VPN on this device keeps working, but its settings will no longer be updated.</source>
+        <translation>اس ڈیوائس پر VPN کام کرتا رہے گا، لیکن اس کی ترتیبات مزید اپ ڈیٹ نہیں ہوں گی۔</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="44"/>
+        <source>VPN on this device will stop working. To connect it again, tap &quot;Connect this device&quot;.</source>
+        <translation>اس ڈیوائس پر VPN کام کرنا بند کر دے گا۔ اسے دوبارہ منسلک کرنے کے لیے &quot;اس ڈیوائس کو منسلک کریں&quot; پر ٹیپ کریں۔</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorConfigs.qml" line="307"/>
+        <source>Will be saved as %1</source>
+        <translation>%1 کے طور پر محفوظ ہوگا</translation>
+    </message>
+</context>
+<context>
+    <name>PageCoordinatorLogin</name>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="106"/>
+        <source>Code</source>
+        <translation>کوڈ</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="200"/>
+        <source>Enter the server address</source>
+        <translation>سرور کا پتہ درج کریں</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="95"/>
+        <source>Send /login to the bot and enter the code you get. The code is valid for 5 minutes.</source>
+        <translation>بوٹ کو /login بھیجیں اور موصول ہونے والا کوڈ درج کریں۔ کوڈ 5 منٹ کے لیے درست ہے۔</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="148"/>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="165"/>
+        <source>Server address</source>
+        <translation>سرور کا پتہ</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="194"/>
+        <source>Sign in</source>
+        <translation>سائن ان کریں</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageCoordinatorLogin.qml" line="94"/>
+        <source>Sign in with a code</source>
+        <translation>کوڈ کے ساتھ سائن ان</translation>
     </message>
 </context>
 <context>
@@ -3375,6 +3611,16 @@ Create one from the current settings.</source>
         <source>Dev console</source>
         <translation>ڈیو کنسول</translation>
     </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettings.qml" line="99"/>
+        <source>%1 account</source>
+        <translation>%1 اکاؤنٹ</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettings.qml" line="136"/>
+        <source>About</source>
+        <translation>ایپ کے بارے میں</translation>
+    </message>
 </context>
 <context>
     <name>PageSettingsAbout</name>
@@ -3477,6 +3723,11 @@ Create one from the current settings.</source>
         <location filename="../ui/qml/Pages2/PageSettingsAbout.qml" line="239"/>
         <source>Visit official website</source>
         <translation>سرکاری ویب سائٹ دیکھیں</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsAbout.qml" line="109"/>
+        <source>Telegram</source>
+        <translation>Telegram</translation>
     </message>
 </context>
 <context>
@@ -4145,6 +4396,11 @@ Create one from the current settings.</source>
         <source>Cannot reset settings during active connection</source>
         <translation>چالو کنکشن کے دوران ترتیبات کو دوبارہ ترتیب نہیں دی جا سکتی</translation>
     </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsApplication.qml" line="220"/>
+        <source>All settings will be reset to default. The config of this device will be deleted from your account.</source>
+        <translation>تمام ترتیبات ڈیفالٹ پر ری سیٹ ہو جائیں گی۔ اس ڈیوائس کی کنفیگ آپ کے اکاؤنٹ سے حذف کر دی جائے گی۔</translation>
+    </message>
 </context>
 <context>
     <name>PageSettingsBackup</name>
@@ -4590,6 +4846,16 @@ Create one from the current settings.</source>
         <source>AmneziaVPN-service logs</source>
         <translation>AmneziaVPN سروس لاگز</translation>
     </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsLogging.qml" line="182"/>
+        <source>%1 logs</source>
+        <translation>%1 لاگز</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsLogging.qml" line="211"/>
+        <source>%1 service logs</source>
+        <translation>%1 سروس لاگز</translation>
+    </message>
 </context>
 <context>
     <name>PageSettingsNewsNotifications</name>
@@ -4711,6 +4977,26 @@ Create one from the current settings.</source>
         <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="212"/>
         <source>Cannot reset API config during active connection</source>
         <translation>چالو کنکشن کے دوران API ترتیبات کو دوبارہ ترتیب نہیں دی جا سکتی</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="69"/>
+        <source>Delete the config of this device</source>
+        <translation>اس ڈیوائس کی کنفیگ حذف کریں</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="74"/>
+        <source>Delete the config of this device?</source>
+        <translation>کیا اس ڈیوائس کی کنفیگ حذف کرنی ہے؟</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="78"/>
+        <source>The server will be removed from this app only.</source>
+        <translation>سرور صرف اس ایپ سے ہٹایا جائے گا۔</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSettingsServerData.qml" line="77"/>
+        <source>VPN on this device will stop working. To connect it again, tap &quot;Connect this device&quot; in your account.</source>
+        <translation>اس ڈیوائس پر VPN کام کرنا بند کر دے گا۔ اسے دوبارہ منسلک کرنے کے لیے اپنے اکاؤنٹ میں &quot;اس ڈیوائس کو منسلک کریں&quot; پر ٹیپ کریں۔</translation>
     </message>
 </context>
 <context>
@@ -5246,6 +5532,21 @@ Create one from the current settings.</source>
         <location filename="../ui/qml/Pages2/PageSetupWizardConfigSource.qml" line="392"/>
         <source>I have nothing</source>
         <translation>میرے پاس کچھ نہیں ہے</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSetupWizardConfigSource.qml" line="57"/>
+        <source>Sign in with a code from the Telegram bot: the app will get your connection settings and keep them up to date</source>
+        <translation>Telegram بوٹ سے ملنے والے کوڈ کے ساتھ سائن ان کریں: ایپ آپ کی کنکشن ترتیبات حاصل کرے گی اور انہیں تازہ رکھے گی</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSetupWizardConfigSource.qml" line="101"/>
+        <source>Sign in with a Telegram code</source>
+        <translation>Telegram کوڈ کے ساتھ سائن ان کریں</translation>
+    </message>
+    <message>
+        <location filename="../ui/qml/Pages2/PageSetupWizardConfigSource.qml" line="102"/>
+        <source>Get a code with the /login command in the bot</source>
+        <translation>بوٹ میں /login کمانڈ سے کوڈ حاصل کریں</translation>
     </message>
 </context>
 <context>
@@ -5935,6 +6236,14 @@ Create one from the current settings.</source>
         <location filename="../ui/qml/Controls2/PopupType.qml" line="101"/>
         <source>Close</source>
         <translation>بند</translation>
+    </message>
+</context>
+<context>
+    <name>ProtocolSettingsUiController</name>
+    <message>
+        <location filename="../ui/controllers/protocolSettingsUiController.cpp" line="53"/>
+        <source>Settings updated successfully</source>
+        <translation>ترتیبات کامیابی سے اپ ڈیٹ ہو گئیں</translation>
     </message>
 </context>
 <context>
@@ -6867,6 +7176,11 @@ For more detailed information, you can
         <location filename="../ui/controllers/serversUiController.cpp" line="100"/>
         <source>Use the remove action to delete this legacy config.</source>
         <translation>اس پرانے کنفیگ کو مٹانے کے لیے ہٹانے کی کارروائی استعمال کریں۔</translation>
+    </message>
+    <message>
+        <location filename="../ui/controllers/serversUiController.cpp" line="56"/>
+        <source>Server &apos;%1&apos; was removed</source>
+        <translation>سرور %1 ہٹا دیا گیا تھا</translation>
     </message>
 </context>
 <context>

@@ -37,7 +37,7 @@ Fork hunks in upstream files (conflict-prone):
 - `client/core/controllers/coreSignalHandlers.cpp` — `CoordinatorUiController::errorOccurred` -> `PageController::showErrorMessage(QString)`.
 - `client/cmake/sources.cmake` — coordinator `.h/.cpp` in HEADERS/SOURCES; `ui/controllers/coordinator/*` in the UI_CONTROLLERS globs.
 - `client/ui/utils/pageEnum.h` — `PageCoordinatorLogin`, `PageCoordinatorConfigs`; `client/ui/qml/qml.qrc` — the two pages.
-- `client/ui/qml/Pages2/PageSettings.qml` — `coordinatorAccount` entry ("Аккаунт VPN").
+- `client/ui/qml/Pages2/PageSettings.qml` — `coordinatorAccount` entry ("%1 account" with the display name).
 - `client/ui/qml/Pages2/PageStart.qml` (third tab, `onEscapePressed`) and `PageSetupWizardStart.qml` ("Let's get started") —
   when logged in, open `PageCoordinatorConfigs` instead of the connection screen. The third tab shows the fork-only
   `client/images/controls/user.svg` (Feather "user", same style as the other tab icons) instead of upstream's `plus.svg`.
@@ -61,7 +61,7 @@ Fork state: `variants` = `coordinatorLogin` only. Removed: "VPN by Amnezia"
 (`amneziaVpn`), self-hosted setup (`selfHostVpn`), `backupRestore`, `restorePurchases`, `siteLink`,
 the "Site Amnezia" footer link, and (Noah, 2026-10-13) the "Insert key" field with its Continue button,
 the "Other connection options" label, and the `fileOpen`/`qrScan` entries (their QtObjects stay defined,
-just not listed), because imported configs don't auto-update. The intro text is the fork's Russian line.
+just not listed), because imported configs don't auto-update. The intro text and the `coordinatorLogin` title/description are fork strings (see Translations).
 The header's "more" (⋮) button and its drawer (logs toggle/export, support tag) are removed too (Noah, 2026-10-13):
 the header is a plain `BaseHeaderType` "Connection".
 How to resolve: take upstream's file for new/changed code, then delete the removed variants again and
@@ -335,10 +335,11 @@ How to resolve: keep ours. If upstream adds a new place that hardcodes `amn0` fo
 ## 11. Settings, About and tray trimmed
 Noah, 2026-10-13.
 - `client/ui/qml/Pages2/PageSettings.qml` — the "Servers" entry is removed from the list (the servers pages stay in the
-  build, just unreachable from Settings). Titles: "Аккаунт %1" (`Qt.application.displayName`) and plain "О приложении".
-- `client/ui/qml/Pages2/PageCoordinatorConfigs.qml` — header "Аккаунт %1" with the display name.
+  build, just unreachable from Settings). Titles: "%1 account" (`Qt.application.displayName`) and plain "About" (context `PageSettings`).
+- `client/ui/qml/Pages2/PageCoordinatorConfigs.qml` — header "%1 account" with the display name.
 - `client/ui/qml/Pages2/PageSettingsAbout.qml` — no donation header/paragraph, no Privacy Policy button; contacts are only
-  Telegram (https://t.me/kiraind) and GitHub (https://github.com/lesha-vpn). The version line stays.
+  Telegram (https://t.me/kiraind, the `@kiraind` handle is not translatable) and GitHub (https://github.com/lesha-vpn). The version line stays.
+- `client/ui/qml/Pages2/PageSettingsLogging.qml` — log descriptions are "%1 logs" / "%1 service logs" with the display name instead of "AmneziaVPN(-service) logs".
 - `client/ui/utils/systemTrayNotificationHandler.{h,cpp}` — the tray "Visit Website" action is removed.
 How to resolve: take upstream's changes, then drop these entries again. New upstream contacts/links in About are dropped.
 
@@ -358,5 +359,19 @@ How to resolve: keep the hunks; if upstream changes how `connect()` / `LAST_CONF
 update the saved config without connecting.
 
 ## Translations
-Fork UI strings are Russian source text inside `qsTr(...)` (e.g. "Аккаунт VPN"). The fork does not edit `client/translations/*.ts`,
-so on conflict take upstream's `.ts` files. Only if a fork commit ever added entries to them, re-add those entries.
+Fork UI strings are **English source text** in `qsTr()`/`tr()`, like upstream's, and every fork string has a finished
+translation in all 12 shipped `client/translations/amneziavpn_*.ts` (ru_RU, uk_UA, es_ES, fr_FR, ar_EG, fa_IR, hi_IN, ko_KR,
+my_MM, th_TH, ur_PK, zh_CN). The brand stays «Лёша VPN» in every language; prefer `%1` + `Qt.application.displayName` /
+`DISPLAY_NAME` over a literal. Russian uses the fork's wording («конфиг», «» quotes, «вы»).
+Fork entries in the `.ts` files: contexts `CoordinatorController`, `PageCoordinatorConfigs`, `PageCoordinatorLogin` (fork-only),
+`ProtocolSettingsUiController`, `ServersUiController` (strings moved out of upstream's deleted `InstallUiController`, §9.2), and
+fork strings added to the upstream contexts `PageSettings`, `PageSettingsAbout`, `PageSettingsApplication`, `PageSettingsLogging`,
+`PageSettingsServerData`, `PageSetupWizardConfigSource`.
+- A new or changed fork string must be added to **every** `.ts` in the same change (a QML string's context is the file's basename).
+  The fork's `.ts` files are edited by hand / script: don't run a full `lupdate` over them, it would mark hundreds of strings
+  of the features removed in §9 as vanished. To find untranslated fork strings, run `lupdate` over the current tree and over
+  the upstream base into scratch `.ts` files and compare (strings in the current tree but not in the base, plus anything in
+  fork-only files, must have a finished translation with the same `%N` placeholders in each language).
+- How to resolve: on conflict take upstream's `.ts` files, then re-add the fork entries listed above (copy the fork's
+  `<message>` blocks from the pre-merge `dev` version of each file). If upstream changed the source text of a string the fork
+  also changed, keep the fork's source text and its entries.

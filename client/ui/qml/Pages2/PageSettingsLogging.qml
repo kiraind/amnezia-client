@@ -179,7 +179,7 @@ PageType {
         id: clientLogs
 
         readonly property string title: qsTr("Client logs")
-        readonly property string description: qsTr("AmneziaVPN logs")
+        readonly property string description: qsTr("%1 logs").arg(Qt.application.displayName)
         readonly property bool isVisible: true
         readonly property var openLogsHandler: function() {
             SettingsController.openLogsFolder()
@@ -208,7 +208,7 @@ PageType {
         id: serviceLogs
 
         readonly property string title: qsTr("Service logs")
-        readonly property string description: qsTr("AmneziaVPN-service logs")
+        readonly property string description: qsTr("%1 service logs").arg(Qt.application.displayName)
         readonly property bool isVisible: !GC.isMobile() && !IsMacOsNeBuild
         readonly property var openLogsHandler: function() {
             SettingsController.openServiceLogsFolder()

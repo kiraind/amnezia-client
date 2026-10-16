@@ -55,8 +55,9 @@ git status   # list conflicts
 - **Icons (§6):** binary conflicts → `git checkout --ours <file>`; new/changed upstream logo images → re-flip (rule in FORK.md §6).
 - **CI (§7):** `git checkout --ours .github/workflows/deploy.yml`; `git rm` tag-deploy/tag-upload if they reappear;
   port useful toolchain bumps (Qt version, conan, packages) by hand.
-- **Translations:** take upstream's `client/translations/*.ts` (`git checkout --theirs`). Fork strings are Russian
-  source text in `qsTr()`; re-add `.ts` entries only if a fork commit had added any.
+- **Translations:** the `.ts` files carry fork entries (English sources, translated into all 12 languages; FORK.md
+  "Translations"). On conflict take upstream's `client/translations/*.ts`, then re-add the fork's `<message>` blocks from the
+  pre-merge `dev` version, and check with the lupdate comparison described there that every fork string is still translated.
 - **Protocols (§9.4):** keep XRay/OpenVPN/IKEv2 files deleted (incl. Android modules and service xray/TAP code); in hunk files
   take upstream and drop the references again. New upstream code for these protocols is not added to the build.
 - **Submodules / conan / recipes:** take theirs, then drop again the requirements and recipes removed in FORK.md §9
