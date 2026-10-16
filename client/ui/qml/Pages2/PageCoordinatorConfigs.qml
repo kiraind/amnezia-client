@@ -240,7 +240,7 @@ PageType {
 
             // Same sizing as QuestionDrawer: as tall as the content
             onImplicitHeightChanged: {
-                configDrawer.expandedHeight = drawerContent.implicitHeight + 16 + PageController.safeAreaBottomMargin
+                configDrawer.expandedHeight = drawerContent.implicitHeight + 8 + PageController.safeAreaBottomMargin
             }
 
             Connections {
