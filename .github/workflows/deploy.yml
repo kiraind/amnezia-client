@@ -119,7 +119,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: release-linux
-        path: deploy/build/LeshaVPN_*_linux_x64.run
+        path: deploy/build/LeshaVPN_linux-x64_*.run
         if-no-files-found: error
         retention-days: 14
 
@@ -214,7 +214,7 @@ jobs:
       with:
         name: release-windows
         path: |
-          deploy/build/LeshaVPN_*_windows_x64.msi
+          deploy/build/LeshaVPN_windows-x64_*.msi
         if-no-files-found: error
         retention-days: 14
 
@@ -314,7 +314,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: release-macos
-        path: deploy/build/LeshaVPN_*_macos.pkg
+        path: deploy/build/LeshaVPN_macos_*.pkg
         if-no-files-found: error
         retention-days: 14
 
@@ -530,7 +530,7 @@ jobs:
             -alias "$QT_ANDROID_KEYSTORE_ALIAS" -storepass "$QT_ANDROID_KEYSTORE_STORE_PASS" \
             -keypass "$QT_ANDROID_KEYSTORE_STORE_PASS" -keyalg RSA -keysize 2048 -validity 365 \
             -dname "CN=CI throwaway key"
-          echo "APK_SUFFIX=_unofficial-key" >> "$GITHUB_ENV"
+          echo "APK_SUFFIX=-unofficial-key" >> "$GITHUB_ENV"
         fi
 
     # Compiler cache: a rebuild after a small change recompiles only what changed.
@@ -580,7 +580,8 @@ jobs:
 
         APK=$(find deploy/build/client/android-build -maxdepth 1 -name '*.apk' | head -n1)
         test -n "$APK"
-        mv "$APK" "$OUT/LeshaVPN_${VERSION}_${LABEL}_universal${APK_SUFFIX}.apk"
+        # LeshaVPN_<platform>_<version>.apk, hyphens inside <platform>
+        mv "$APK" "$OUT/LeshaVPN_${LABEL}-universal${APK_SUFFIX}_${VERSION}.apk"
 
         ls -l $OUT
 

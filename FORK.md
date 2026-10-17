@@ -111,7 +111,7 @@ Code that now derives from these macros instead of hard-coded `AmneziaVPN`/`org.
   (notification channel/tile/auth labels), `protocolApi/.../Protocol.kt`.
 - Apple: `client/ios/app/{Info.plist.in,main.entitlements}`, `client/ios/networkextension/*`, `client/macos/app/{Info.plist.in,app.entitlements}`,
   `client/macos/networkextension/*.entitlements` (app group written literally — keep in sync with `apple.cmake`).
-- Packaging: `cmake/CPack.cmake` (names from branding; the macOS package is `_macos`, not upstream's `_macos_x64`, because it is universal arm64+x86_64, own installer GUIDs/ids, WiX culture ru-RU for the Cyrillic name),
+- Packaging: `cmake/CPack.cmake` (names from branding; release files are `LeshaVPN_<platform>_<version>.<ext>` with hyphens inside `<platform>`, e.g. `LeshaVPN_windows-x64_5.0.3.1-lesha.6.msi`, `LeshaVPN_android11+-universal_….apk`; the macOS package is plain `macos`, not upstream's `macos_x64`, because it is universal arm64+x86_64, own installer GUIDs/ids, WiX culture ru-RU for the Cyrillic name),
   `cmake/CPackOptions.cmake` (macOS pkg signing identity only when set, so unsigned CI builds work), `cmake/sign_binaries.cmake` (ad-hoc signs the macOS bundle when no identity is set, otherwise Apple Silicon kills the app),
   `client/android/build.gradle.kts` (`onlyOssRelease` gradle property: CI packages only the ossRelease variant),
   `deploy/installer/qif/{componentscript.js,controlscript.js}`, deploy data turned into templates:
