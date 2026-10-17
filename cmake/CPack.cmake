@@ -5,14 +5,15 @@ set(CPACK_PACKAGE_NAME              ${CLIENT_APPLICATION_NAME})
 set(CPACK_PACKAGE_VENDOR            ${CLIENT_ORGANIZATION_NAME})
 # Numeric MAJOR.MINOR.(PATCH*1000+LESHA_VERSION): grows with every fork release, so the WiX
 # MajorUpgrade (same CPACK_WIX_UPGRADE_GUID, MSI compares only the first three fields) replaces
-# an older fork install. The human-readable LESHA_FULL_VERSION goes into the file names.
+# an older fork install. The human-readable LESHA_FULL_VERSION goes into the file names:
+# LeshaVPN_<platform>_<version>.<ext>, hyphens (never underscores) inside <platform>.
 set(CPACK_PACKAGE_VERSION           ${LESHA_NUMERIC_VERSION})
 if(WIN32)
-    set(CPACK_PACKAGE_FILE_NAME "${CLIENT_APPLICATION_NAME}_${LESHA_FULL_VERSION}_windows_x64")
+    set(CPACK_PACKAGE_FILE_NAME "${CLIENT_APPLICATION_NAME}_windows-x64_${LESHA_FULL_VERSION}")
 elseif(APPLE AND NOT IOS AND NOT MACOS_NE)
-    set(CPACK_PACKAGE_FILE_NAME "${CLIENT_APPLICATION_NAME}_${LESHA_FULL_VERSION}_macos")  # universal: arm64 + x86_64
+    set(CPACK_PACKAGE_FILE_NAME "${CLIENT_APPLICATION_NAME}_macos_${LESHA_FULL_VERSION}")  # universal: arm64 + x86_64
 elseif(LINUX AND NOT ANDROID)
-    set(CPACK_PACKAGE_FILE_NAME "${CLIENT_APPLICATION_NAME}_${LESHA_FULL_VERSION}_linux_x64")
+    set(CPACK_PACKAGE_FILE_NAME "${CLIENT_APPLICATION_NAME}_linux-x64_${LESHA_FULL_VERSION}")
 endif()
 set(CPACK_PACKAGE_INSTALL_DIRECTORY ${CLIENT_APPLICATION_NAME})
 set(CPACK_PACKAGE_EXECUTABLES       ${CLIENT_APPLICATION_NAME} "${CLIENT_DISPLAY_NAME}")
